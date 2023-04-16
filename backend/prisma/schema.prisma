@@ -12,6 +12,23 @@ datasource db {
 }
 
 model Post {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(255)
+  id         Int        @id @default(autoincrement())
+  createdAt  DateTime   @default(now())
+  title      String
+}
+
+model ComplaintAndSuggestionList{
+  id                       Int        @id @default(autoincrement())
+  ComplaintSuggestion      String? 
+  ComplaintType            String?
+  ComplaintReason          String?
+  ComplaintResolution      String?
+  ComplaintResolution_date DateTime?
+  ResponsibleEmployee      String?   // going to connect a foreign key to the employee table
+  Location                 String?   // going to connect a foreign key to the store table
+  CreatedAt                DateTime   @default(now())
+  CreatedBy                String?
+  ComplaintDate            DateTime?
+  ModifiedAt               DateTime?
+  ModifiedBy               String?
 }
