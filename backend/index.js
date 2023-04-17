@@ -1,3 +1,4 @@
+const { log } = require("console");
 const express = require("express");
 const mssql = require("mssql");
 const Connection = require("tedious").Connection;
@@ -23,43 +24,36 @@ const config = {
 const connection = new Connection(config);
 connection.on("connect", function (err) {
   console.log("Connected");
-  executeStatement();
+  executeGet("ComplaintAndSuggestionList");
 });
 
 connection.connect();
 
-function executeStatement() {
-  var request = new Request(
-    "select * from ComplaintAndSuggestionList",
-    function (err) {
-      if (err) {
-        console.log(err);
-      }
-    }
-  );
+function executeGet(table) {
+  const resultArray = [];
 
-  var result = "";
+  var request = new Request(`select * from ${table}`, function (err) {
+    if (err) {
+      console.log(err);
+    }
+  });
+
   request.on("row", function (columns) {
+    let resultObject = {};
+
     columns.forEach(function (column) {
       if (column.value === null) {
-        console.log("NULL");
+        resultObject[column.metadata.colName] = null;
       } else {
-        result += column.value + " ";
+        resultObject[column.metadata.colName] = column.value;
       }
     });
-    console.log(result);
-    result = "";
+    resultArray.push(resultObject);
   });
 
-  request.on("done", function (rowCount, more) {
-    console.log(rowCount + " rows returned");
-  });
-
-  // Close the connection after the final event emitted by the request, after the callback passes
-  request.on("requestCompleted", function (rowCount, more) {
-    connection.close();
-  });
   connection.execSql(request);
+
+  console.log(resultArray);
 }
 
 app.listen(5000, function () {
