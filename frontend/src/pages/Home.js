@@ -30,12 +30,12 @@ const Home = () => {
       <div className="fixed h-full w-full overflow-y-scroll">
         <div className="p-4 sm:ml-[13em] flex justify-center">
           <div className="p-4 rounded-lg dark:border-gray-700 mt-14 w-[65em]">
-            <div className="grid grid-cols-5 gap-[30px] content-between">
+            <div className="grid grid-cols-5 gap-[30px]">
               {testLists.map((value) => {
                 return (
                   <div
                     key={value.id}
-                    className="bg-gray-100 hover:bg-gray-300 h-[200px] w-[171px] rounded transition ease-in-out cursor-pointer"
+                    className="bg-gray-100 hover:bg-gray-300 h-[180px] w-[151px] rounded transition ease-in-out cursor-pointer"
                   >
                     <div className="p-5 flex justify-center content-between text-[80px]">
                       <RiFileList3Line />
