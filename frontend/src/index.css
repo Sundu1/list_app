@@ -1,3 +1,10 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer components {
+  .height_full {
+    height: 89.5%;
+    background-color: aqua;
+  }
+}
