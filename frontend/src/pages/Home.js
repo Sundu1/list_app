@@ -29,8 +29,8 @@ const Home = () => {
       <Sidebar />
       <div className="fixed h-full w-full overflow-y-scroll">
         <div className="p-4 sm:ml-[13em] flex justify-center">
-          <div className="p-4 rounded-lg dark:border-gray-700 mt-14 w-[65em]">
-            <div className="grid grid-cols-5 gap-[30px]">
+          <div className="ml-[100px] p-4 rounded-lg dark:border-gray-700 mt-14 w-[65em]">
+            <div className="grid grid-cols-5 gap-[30px] w-[900px]">
               {testLists.map((value) => {
                 return (
                   <div
