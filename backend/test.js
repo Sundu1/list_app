@@ -1,16 +1,23 @@
-const { error, log } = require("console");
 const express = require("express");
+const cors = require("cors");
+const sql = require("mssql");
+
 require("dotenv").config();
 
 const app = express();
 const port = 5000;
 
-const sql = require("mssql");
+// var corsOptions = {
+//   origin: "http://example.com",
+//   optionsSuccessStatus: 200,
+// };
+app.use(cors());
+
 const config = {
-  user: process.env.USER,
-  password: process.env.PWD,
-  database: process.env.DATABASE,
-  server: process.env.SERVER,
+  user: "tuggy",
+  password: "test@#$123",
+  database: "test-sharepoint-list",
+  server: "test-sharepoint-list.database.windows.net",
   pool: {
     max: 10,
     min: 0,
@@ -38,22 +45,6 @@ async function getAll(value) {
 
 async function post(table, object) {
   try {
-    const table = "ComplaintAndSuggestionList";
-    const insertValues = new Object({
-      ComplaintSuggestion: "sdfsdfsdfsdf",
-      ComplaintType: "tessdfsdfsdfsdft001",
-      ComplaintReason: "testsdfsdfsdfdsfs001",
-      ComplaintResolution: "",
-      ComplaintResolution_date: "2023-04-05",
-      ResponsibleEmployee: "test0sdfsdf01",
-      Location: "",
-      CreatedAt: "2023-04-05",
-      CreatedBy: "",
-      ComplaintDate: "2023-04-05",
-      ModifiedAt: "2023-04-05",
-      ModifiedBy: "2023-04-05",
-    });
-
     let columns = "";
     let values = "";
 
@@ -79,6 +70,21 @@ async function post(table, object) {
 }
 
 app.post("/", (req, res) => {
+  const table = "ComplaintAndSuggestionList";
+  const insertValues = new Object({
+    ComplaintSuggestion: "sdfsdfsdfsdf",
+    ComplaintType: "tessdfsdfsdfsdft001",
+    ComplaintReason: "testsdfsdfsdfdsfs001",
+    ComplaintResolution: "",
+    ComplaintResolution_date: "2023-04-05",
+    ResponsibleEmployee: "test0sdfsdf01",
+    Location: "",
+    CreatedAt: "2023-04-05",
+    CreatedBy: "",
+    ComplaintDate: "2023-04-05",
+    ModifiedAt: "2023-04-05",
+    ModifiedBy: "2023-04-05",
+  });
   post(table, insertValues);
   res.send("post");
 });
@@ -131,10 +137,11 @@ app.post("/create-table", (req, res) => {
   res.send("create-table");
 });
 
-app.get("/", (req, res) => {
-  const table = "ComplaintAndSuggestionList";
-  getAll(table);
-  res.send("done");
+app.get("/:tableName", async (req, res) => {
+  // ComplaintAndSuggestionList
+  const table = req.params.tableName;
+  const tableValues = await getAll(table);
+  res.send(tableValues);
 });
 
 app.listen(port, function () {
