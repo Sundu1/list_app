@@ -1,20 +1,21 @@
 import React from "react";
 import axios from "axios";
+import { BASE_URL } from "./config.js";
 
-const getAll = async (tableName, setTable) => {
+const getAll = async (tableName, setTable, isChanged) => {
   try {
-    if (localStorage.getItem(tableName)) {
+    if (localStorage.getItem(tableName) && isChanged != true) {
       setTable(JSON.parse(localStorage.getItem(tableName)));
       return;
     }
 
     const response = await axios({
       method: "get",
-      url: `http://localhost:5000/${tableName}`,
+      url: `${BASE_URL}/${tableName}`,
     });
     const data = await response.data;
-    localStorage.setItem(tableName, JSON.stringify(data));
     setTable(data);
+    localStorage.setItem(tableName, JSON.stringify(data));
   } catch (err) {
     console.error(err);
   }
