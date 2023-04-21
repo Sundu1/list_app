@@ -2,9 +2,9 @@ import React from "react";
 import axios from "axios";
 import { BASE_URL } from "./config.js";
 
-const getAll = async (tableName, setTable, isChanged) => {
+const getTableValue = async (tableName, setTable) => {
   try {
-    if (localStorage.getItem(tableName) && isChanged != true) {
+    if (localStorage.getItem(tableName)) {
       setTable(JSON.parse(localStorage.getItem(tableName)));
       return;
     }
@@ -21,4 +21,4 @@ const getAll = async (tableName, setTable, isChanged) => {
   }
 };
 
-export { getAll };
+export { getTableValue };

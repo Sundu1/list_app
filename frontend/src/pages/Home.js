@@ -1,10 +1,18 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { RiFileList3Line } from "react-icons/ri";
-import Login from "./Login";
+// import
 
 const Home = () => {
+  const [tableList, setTableList] = useState([]);
+
+  useEffect(() => {
+    return () => {
+      console.log("sdfsd");
+    };
+  }, []);
+
   const testLists = [
     { id: 1, name: "Санал гомдлын бүртгэл" },
     { id: 2, name: "Тэжээлийн бүртгэл" },
