@@ -60,13 +60,6 @@ async function getAll(tableName) {
   }
 }
 
-app.get("/:tableName", async (req, res) => {
-  // ComplaintAndSuggestionList
-  const table = req.params.tableName;
-  const tableValues = await getAll(table);
-  res.send(tableValues);
-});
-
 async function post(table, object) {
   try {
     let columns = "";
@@ -93,26 +86,6 @@ async function post(table, object) {
   }
 }
 
-app.post("/:tableName", (req, res) => {
-  const table = req.params.tableName;
-  const insertValues = req.body;
-  post(table, insertValues);
-  res.send("done");
-
-  // ComplaintSuggestion: "susdfsjl;dkj",
-  // ComplaintType: "testsetset",
-  // ComplaintReason: "test",
-  // ComplaintResolution: "",
-  // ComplaintResolution_date: "2023-04-05",
-  // ResponsibleEmployee: "test0sdfsdf0sfs1",
-  // Location: "",
-  // CreatedAt: "2023-04-05",
-  // CreatedBy: "",
-  // ComplaintDate: "2023-04-05",
-  // ModifiedAt: "2023-04-05",
-  // ModifiedBy: "2023-04-05",
-});
-
 async function createTable(tableObject) {
   try {
     const tableName = tableObject["tableName"];
@@ -133,6 +106,41 @@ async function createTable(tableObject) {
     console.error(err);
   }
 }
+
+async function getTableList() {
+  try {
+    const query = `select TableId, 
+                          TableName,
+                          CreatedBy,
+                          CreateAt,
+                          ModifiedBy,
+                          ModifiedAt
+                    from Table_list`;
+    let pool = await sql.connect(config);
+    const result = await pool.request().query(query);
+    return result.recordsets[0];
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+app.get("/tablelist", async (req, res) => {
+  const tablelist = await getTableList();
+  res.send(tablelist);
+});
+
+app.get("/:tableName", async (req, res) => {
+  const table = req.params.tableName;
+  const tableValues = await getAll(table);
+  res.send(tableValues);
+});
+
+app.post("/:tableName", (req, res) => {
+  const table = req.params.tableName;
+  const insertValues = req.body;
+  post(table, insertValues);
+  res.send("done");
+});
 
 app.post("/create-table", (req, res) => {
   const tableObject = {

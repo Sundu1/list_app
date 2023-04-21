@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import "../index.css";
-import { getTableValue } from "../Model/Get";
-import { Post } from "../Model/Post";
+import { getTableValue } from "../model/Get";
+import { Post } from "../model/Post";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
+import { useParams } from "react-router-dom";
 
 const List = () => {
-  const [tableName, setTableName] = useState("ComplaintAndSuggestionList");
+  const { tableName } = useParams();
+
   const [table, setTable] = useState({});
   const [insertValues, setInsertValues] = useState({});
   const [modal, setModal] = useState(false);

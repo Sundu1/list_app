@@ -2,34 +2,20 @@ import React, { useState, useEffect } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { RiFileList3Line } from "react-icons/ri";
-// import
+import { getTableList } from "../model/Get";
+import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
+import { useNavigate } from "react-router-dom";
 
 const Home = () => {
   const [tableList, setTableList] = useState([]);
 
   useEffect(() => {
     return () => {
-      console.log("sdfsd");
+      getTableList(setTableList);
     };
   }, []);
 
-  const testLists = [
-    { id: 1, name: "Санал гомдлын бүртгэл" },
-    { id: 2, name: "Тэжээлийн бүртгэл" },
-    { id: 3, name: "Салбарын дэмжлэг" },
-    { id: 4, name: "Дэгдээхэй бойжуулах" },
-    { id: 5, name: "Жор" },
-    { id: 6, name: "Илүү цаг & гадуур ажиллах хүсэлт" },
-    { id: 7, name: "Чөлөөлийн хүсэлт" },
-    { id: 8, name: "Тоног төхөөрөмжийн хүсэлт" },
-    { id: 9, name: "test9" },
-    { id: 10, name: "test9" },
-    { id: 11, name: "test9" },
-    { id: 12, name: "test9" },
-    { id: 13, name: "test9" },
-    { id: 14, name: "test9" },
-    { id: 15, name: "test9" },
-  ];
+  const navigate = useNavigate();
 
   return (
     <div className="relative">
@@ -38,20 +24,27 @@ const Home = () => {
       <div className="fixed h-full w-full overflow-y-scroll">
         <div className="p-4 sm:ml-[13em] flex justify-center">
           <div className="ml-[100px] p-4 rounded-lg dark:border-gray-700 mt-14 w-[65em]">
+            <div className="ml-[300px] pb-5">
+              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 pr-4 pl-2 rounded flex text-[15px]">
+                <AiOutlinePlus className="mt-[2px] mr-2 text-[20px]" />
+                New
+              </button>
+            </div>
             <div className="grid grid-cols-5 gap-[30px] w-[900px]">
-              {testLists.map((value) => {
+              {tableList.map((value) => {
                 return (
                   <div
-                    key={value.id}
+                    key={value.TableId}
                     className="bg-gray-100 hover:bg-gray-300 h-[180px] w-[151px] rounded transition ease-in-out cursor-pointer"
+                    onClick={() => navigate(`/list/${value.TableName}`)}
                   >
                     <div className="p-5 flex justify-center content-between text-[80px]">
                       <RiFileList3Line />
                     </div>
                     <p className="p-2 text-center text-[12px] font-san">
-                      {value.name.length > 18
-                        ? value.name.substring(0, 18) + "..."
-                        : value.name}
+                      {value.TableName.length > 18
+                        ? value.TableName.substring(0, 18) + "..."
+                        : value.TableName}
                     </p>
                   </div>
                 );
