@@ -10,9 +10,27 @@ const Post = async (tableName, insertValues) => {
       data: new Object(insertValues),
     });
     const data = await response.data;
+    return "yes";
   } catch (err) {
     console.error(err);
   }
 };
 
-export { Post };
+const SignIn = async (Username, Password) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: `${BASE_URL}/sign-in`,
+      data: {
+        Username,
+        Password,
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { Post, SignIn };

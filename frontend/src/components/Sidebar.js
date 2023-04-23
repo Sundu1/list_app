@@ -1,8 +1,11 @@
 import React from "react";
 import { FaRegListAlt } from "react-icons/fa";
 import { RiContactsBookFill } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+
   return (
     <aside
       className="fixed top-0 left-0 z-30 w-[13em] h-screen pt-20 transition-transhtmlForm -translate-x-full bg-white border-r 
@@ -14,7 +17,8 @@ const Sidebar = () => {
           <li>
             <a
               href="#"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100
+                       dark:hover:bg-gray-700"
             >
               <svg
                 aria-hidden="true"
@@ -33,11 +37,13 @@ const Sidebar = () => {
           <li>
             <a
               href="#"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100
+                       dark:hover:bg-gray-700"
             >
               <svg
                 aria-hidden="true"
-                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900
+                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400
+                          group-hover:text-gray-900
                            dark:group-hover:text-white"
                 fill="currentColor"
                 viewBox="0 0 20 20"
@@ -54,11 +60,13 @@ const Sidebar = () => {
           </li>
           <li>
             <a
-              href="#"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100
+                        dark:hover:bg-gray-700"
+              onClick={() => navigate(`/home`)}
             >
               <div
-                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900
+                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400
+                          group-hover:text-gray-900
                            dark:group-hover:text-white text-lg p-[3px]"
               >
                 <FaRegListAlt />
@@ -69,24 +77,12 @@ const Sidebar = () => {
           <li>
             <a
               href="#"
-              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700"
+              className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100
+                        dark:hover:bg-gray-700"
             >
-              {/* <svg
-                aria-hidden="true"
-                className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 
-                           dark:group-hover:text-white"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z"
-                  clipRule="evenodd"
-                ></path>
-              </svg> */}
               <div
-                className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400 group-hover:text-gray-900
+                className="flex-shrink-0 w-6 h-6 text-gray-400 transition duration-75 dark:text-gray-400
+                          group-hover:text-gray-900
                            dark:group-hover:text-white text-[20px] p-[2px]"
               >
                 <RiContactsBookFill />

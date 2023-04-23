@@ -3,8 +3,18 @@
 @tailwind utilities;
 
 @layer components {
-  .height_full {
-    height: 89.5%;
-    background-color: aqua;
+  test_animation {
+    animation-duration: 3s;
+    animation-name: slidein;
+  }
+
+  from {
+    margin-left: 100%;
+    width: 300%;
+  }
+
+  to {
+    margin-left: 0%;
+    width: 100%;
   }
 }

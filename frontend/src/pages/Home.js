@@ -1,13 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import { RiFileList3Line } from "react-icons/ri";
 import { getTableList } from "../model/Get";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../components/LoginProvider";
 
 const Home = () => {
   const [tableList, setTableList] = useState([]);
+  const { value, setValue } = useContext(UserContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     return () => {
@@ -15,7 +18,9 @@ const Home = () => {
     };
   }, []);
 
-  const navigate = useNavigate();
+  const createNewTable = () => {
+    console.log("create table");
+  };
 
   return (
     <div className="relative">
@@ -25,7 +30,10 @@ const Home = () => {
         <div className="p-4 sm:ml-[13em] flex justify-center">
           <div className="ml-[100px] p-4 rounded-lg dark:border-gray-700 mt-14 w-[65em]">
             <div className="ml-[300px] pb-5">
-              <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 pr-4 pl-2 rounded flex text-[15px]">
+              <button
+                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 pr-4 pl-2 rounded flex text-[15px]"
+                onClick={createNewTable}
+              >
                 <AiOutlinePlus className="mt-[2px] mr-2 text-[20px]" />
                 New
               </button>
