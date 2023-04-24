@@ -16,7 +16,9 @@ const Login = () => {
     const userInfo = await SignIn(username, password);
     console.log(userInfo);
     if (userInfo.result) {
-      localStorage.setItem("user", userInfo);
+      localStorage.setItem("user", JSON.stringify(userInfo));
+      setValue(userInfo);
+      navigate("/home");
       return;
     }
     console.log(userInfo.result);

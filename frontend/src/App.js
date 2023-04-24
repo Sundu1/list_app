@@ -3,21 +3,37 @@ import react, { useContext, useState, useMemo, useEffect } from "react";
 import Login from "./pages/Login.js";
 import Home from "./pages/Home";
 import List from "./pages/List";
+import Signup from "./pages/Signup";
 import { Router, Route, Routes } from "react-router-dom";
-import { LoginProvider, UserContext } from "./components/LoginProvider";
+import {
+  LoginProvider,
+  UserContext,
+  IsLoggedIn,
+} from "./components/LoginProvider";
 
 function App() {
-  const user = localStorage.getItem("user");
-  const [value, setValue] = useState(null);
+  const [value, setValue] = useState({});
 
   useEffect(() => {
-    setValue(user);
+    setValue(
+      localStorage.getItem("user")
+        ? JSON.parse(localStorage.getItem("user"))
+        : {}
+    );
   }, []);
 
   return (
     <UserContext.Provider value={{ value, setValue }}>
       <Routes>
-        <Route path="/" element={<Login />} />
+        <Route
+          path="/"
+          element={
+            <IsLoggedIn>
+              <Login />
+            </IsLoggedIn>
+          }
+        />
+        <Route path="/signup" element={<Signup />} />
         <Route
           path="/home"
           element={

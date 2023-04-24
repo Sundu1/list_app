@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
-const Pool = require("pg").Pool;
+const sql = require("mssql");
+
 const jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const configAuth = require("./auth/auth.config.js");
@@ -19,20 +20,26 @@ app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-const pool = new Pool({
-  user: "pdscooffpjuazx",
-  host: "ec2-107-21-67-46.compute-1.amazonaws.com",
-  database: "de93ur7e92jd95",
-  password: "392d7229bf05e5ac9328e6e58857c97f2fe641f76aa472bad7f61c21e64f0278",
-  port: 5432,
-  ssl: {
-    rejectUnauthorized: false,
+const config = {
+  user: "tuggy",
+  password: "test@#$123",
+  database: "main-db",
+  server: "test-sharepoint-list.database.windows.net",
+  pool: {
+    max: 10,
+    min: 0,
+    idleTimeoutMillis: 30000,
   },
-});
+  options: {
+    encrypt: true,
+    trustServerCertificate: false,
+  },
+};
 
 async function getAll(tableName) {
   try {
-    let result = await pool.query(`
+    let pool = await sql.connect(config);
+    let result = await pool.request().query(`
                       select * INTO #TempTable 
                       from ${tableName}
                       ALTER TABLE #TempTable
@@ -84,7 +91,8 @@ async function post(table, object) {
       -1
     )}) values (${values.slice(0, -1)})`;
 
-    await pool.query(query);
+    let pool = await sql.connect(config);
+    await pool.request().query(query);
   } catch (err) {
     console.error(err);
   }
@@ -104,7 +112,8 @@ async function createTable(tableObject) {
 
     const query = `CREATE TABLE ${tableName}(${tableValues})`;
 
-    await pool.query(query);
+    let pool = await sql.connect(config);
+    await pool.request().query(query);
   } catch (err) {
     console.error(err);
   }
@@ -119,8 +128,8 @@ async function getTableList() {
                           ModifiedBy,
                           ModifiedAt
                     from Table_list`;
-
-    const result = await pool.query(query);
+    let pool = await sql.connect(config);
+    const result = await pool.request().query(query);
     return result.recordsets[0];
   } catch (err) {
     console.error(err);
@@ -141,28 +150,27 @@ app.get("/:tableName", async (req, res) => {
 const today = new Date().toLocaleDateString();
 
 app.post("/sign-up", async (req, res) => {
+  let pool = await sql.connect(config);
   const data = req.body;
-  const isUserExist = await pool.query(
-    `select Username from Users where Username = '${data.Username}'`
-  );
+  const isUserExist = await pool
+    .request()
+    .query(`select Username from Users where Username = '${data.Username}'`);
 
-  console.log(isUserExist.rows);
-  if (isUserExist.rows.length > 0) {
+  if (isUserExist.recordset.length > 0) {
     res.send({ message: "User already exist" });
     return;
   } else {
     const password = bcrypt.hashSync(data.Password);
-    const createBy = "admin";
 
-    const insertUser =
-      await pool.query(`insert into Users (Username, Email, Password, CreatedAt, CreatedBy, ModifiedAt, ModifiedBy)
+    const insertUser = await pool.request()
+      .query(`insert into Users (Username, Email, Password, CreatedAt, CreatedBy, ModifiedAt, ModifiedBy)
                         values ('${data.Username}', 
                                 '${data.Email}', 
                                 '${password}',
                                 '${today}',
-                                '${createBy}', 
+                                '${data.CreatedBy}', 
                                 '${today}', 
-                                '${createBy}')`);
+                                '${data.ModifiedBy}')`);
 
     if (insertUser) {
       res.send("yes");
@@ -174,19 +182,19 @@ app.post("/sign-up", async (req, res) => {
 
 app.post("/sign-in", async (req, res) => {
   const data = req.body;
-  const isUserExist = await pool.query(
-    `select * from Users where Username = '${data.Username}'`
-  );
+  let pool = await sql.connect(config);
+  const isUserExist = await pool
+    .request()
+    .query(`select * from Users where Username = '${data.Username}'`);
 
-  if (isUserExist.rows.length > 0) {
-    const user = isUserExist.rows[0];
-    console.log(user);
+  if (isUserExist.recordset.length > 0) {
+    const user = isUserExist.recordset[0];
     const token = jwt.sign({ id: user.PkId }, configAuth.secret);
-    const passwordIsValid = bcrypt.compareSync(data.Password, user.password);
+    const passwordIsValid = bcrypt.compareSync(data.Password, user.Password);
     if (passwordIsValid) {
       res.send({
-        Username: user.username,
-        Email: user.email,
+        Username: user.Username,
+        Email: user.Email,
         passwordIsValid,
         token,
         result: true,
@@ -199,7 +207,7 @@ app.post("/sign-in", async (req, res) => {
   }
 });
 
-app.post("/list/:tableName", (req, res) => {
+app.post("/:tableName", (req, res) => {
   const table = req.params.tableName;
   const insertValues = req.body;
   post(table, insertValues);
@@ -207,29 +215,29 @@ app.post("/list/:tableName", (req, res) => {
 });
 
 app.post("/create-table", (req, res) => {
-  // const tableObject = {
-  //   tableName: "testTable",
-  //   values: {
-  //     Id: {
-  //       type: "SERIAL PRIMARY KEY",
-  //       isnull: "no",
-  //     },
-  //     name: {
-  //       type: "VARCHAR(255)",
-  //       isnull: "no",
-  //     },
-  //     age: {
-  //       type: "INT",
-  //       isnull: "yes",
-  //     },
-  //     birthday: {
-  //       type: "DATETIME",
-  //       isnull: "yes",
-  //     },
-  //   },
-  // };
+  const tableObject = {
+    tableName: "testTable",
+    values: {
+      Id: {
+        type: "INT PRIMARY KEY",
+        isnull: "no",
+      },
+      name: {
+        type: "NVARCHAR(255)",
+        isnull: "no",
+      },
+      age: {
+        type: "INT",
+        isnull: "yes",
+      },
+      birthday: {
+        type: "DATETIME",
+        isnull: "yes",
+      },
+    },
+  };
 
-  // createTable(tableObject);
+  createTable(tableObject);
   res.send("create-table");
 });
 

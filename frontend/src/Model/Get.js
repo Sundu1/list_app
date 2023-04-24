@@ -11,7 +11,7 @@ const getTableValue = async (tableName, setTable) => {
 
     const response = await axios({
       method: "get",
-      url: `${BASE_URL}/${tableName}`,
+      url: `${BASE_URL}/list/${tableName}`,
     });
     const data = await response.data;
     setTable(data);

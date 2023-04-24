@@ -8,4 +8,9 @@ const LoginProvider = ({ children }) => {
   return user ? children : <Navigate to="/" />;
 };
 
-export { LoginProvider, UserContext };
+const IsLoggedIn = ({ children }) => {
+  const [user, setUser] = useState(localStorage.getItem("user"));
+  return user ? <Navigate to="/home" /> : children;
+};
+
+export { LoginProvider, UserContext, IsLoggedIn };

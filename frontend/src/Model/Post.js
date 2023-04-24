@@ -33,4 +33,38 @@ const SignIn = async (Username, Password) => {
   }
 };
 
-export { Post, SignIn };
+const SignUp = async (Username, Password) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: `${BASE_URL}/sign-up`,
+      data: {
+        Username,
+        Password,
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+const insertNewTable = async (tableName, user) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: `${BASE_URL}/create-table`,
+      data: {
+        tableName,
+        user,
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { Post, SignIn, insertNewTable };

@@ -3,6 +3,11 @@ import React, { useState } from "react";
 const Signup = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  const signupButton = () => {
+    console.log(username, password, confirmPassword);
+  };
 
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
@@ -12,23 +17,25 @@ const Signup = () => {
             <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
               Sign up
             </h1>
-            <div className="space-y-4 md:space-y-6" action="#">
+            <div className="space-y-4 md:space-y-6">
               <div>
                 <label
-                  htmlFor="email"
+                  htmlFor="Username"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                  value={username}
+                  onChange={(e) => setUsername(e.target.value)}
                 >
-                  Your email
+                  Your Username
                 </label>
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
+                  type="Username"
+                  name="Username"
+                  id="Username"
                   className="bg-gray-50 border border-gray-300 text-gray-900 sm:text-sm 
                       rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
                        dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  placeholder="name@company.com"
-                  required=""
+                  placeholder="Username"
+                  required={true}
                 />
               </div>
               <div>
@@ -39,6 +46,8 @@ const Signup = () => {
                   Password
                 </label>
                 <input
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   type="password"
                   name="password"
                   id="password"
@@ -46,17 +55,19 @@ const Signup = () => {
                   className="bg-gray-50 border border-gray-300
                        text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700
                         dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required=""
+                  required={true}
                 />
               </div>
               <div>
                 <label
-                  htmlFor="password"
+                  htmlFor="confirmPassword"
                   className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
                 >
                   Confirm Password
                 </label>
                 <input
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
                   type="password"
                   name="confirmPassword"
                   id="confirmPassword"
@@ -64,11 +75,14 @@ const Signup = () => {
                   className="bg-gray-50 border border-gray-300
                        text-gray-900 sm:text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700
                         dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-                  required=""
+                  required={true}
                 />
               </div>
               <div className="flex justify-center">
-                <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                <button
+                  className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                  onClick={signupButton}
+                >
                   Sign Up
                 </button>
               </div>

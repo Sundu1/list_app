@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
+import { UserContext } from "./LoginProvider";
 
 const Navbar = () => {
   const [dropdown, setDropdown] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+
+  const { value, setValue } = useContext(UserContext);
 
   const dropdownButton = () => {
     setDropdown(!dropdown);
@@ -12,15 +15,15 @@ const Navbar = () => {
     console.log(searchValue);
   };
 
+  const signOutButton = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
   return (
-    <nav className="fixed w-full bg-white border-b-2 border-gray-200 dark:bg-gray-900 z-40">
+    <nav className="relative w-full bg-white border-b-2 border-gray-200 dark:bg-gray-900 z-40">
       <div className="px-10 flex flex-wrap items-center justify-between mx-auto p-2">
         <a href="https://flowbite.com/" className="flex items-center">
-          {/* <img
-            src="https://flowbite.com/docs/images/logo.svg"
-            className="h-8 mr-3"
-            alt="Flowbite Logo"
-          /> */}
           <span className="self-center text-2xl font-semibold whitespace-nowrap dark:text-white">
             List App
           </span>
@@ -42,17 +45,17 @@ const Navbar = () => {
           <div
             className={
               dropdown
-                ? "absolute top-9 z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
+                ? "absolute top-9 right-[5px] z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700 dark:divide-gray-600"
                 : "hidden"
             }
             id="user-dropdown"
           >
             <div className="px-4 py-3">
               <span className="block text-sm text-gray-900 dark:text-white">
-                Bonnie Green
+                {value.Username}
               </span>
               <span className="block text-sm  text-gray-500 truncate dark:text-gray-400">
-                name@flowbite.com
+                {value.Email}
               </span>
             </div>
             <ul className="py-2" aria-labelledby="user-menu-button">
@@ -76,14 +79,7 @@ const Navbar = () => {
                 <a
                   href="#"
                   className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
-                >
-                  Earnings
-                </a>
-              </li>
-              <li>
-                <a
-                  href="#"
-                  className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white"
+                  onClick={signOutButton}
                 >
                   Sign out
                 </a>
@@ -121,16 +117,6 @@ const Navbar = () => {
             className="flex flex-col font-medium p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row 
                        md:space-x-8 md:mt-0 md:border-0 md:bg-white dark:bg-gray-800 md:dark:bg-gray-900 dark:border-gray-700"
           >
-            {/* <li>
-              <a
-                href="#"
-                className="block py-2 pl-3 pr-4 text-white bg-blue-700 rounded md:bg-transparent md:text-blue-700 md:p-0
-                           md:dark:text-blue-500"
-                aria-current="page"
-              >
-                Home
-              </a>
-            </li> */}
             <li>
               <form
                 className="flex items-center w-[35em]"
