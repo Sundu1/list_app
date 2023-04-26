@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import "../index.css";
@@ -6,19 +6,23 @@ import { getTableValue } from "../model/Get";
 import { Post } from "../model/Post";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useParams } from "react-router-dom";
+import { UserContext } from "../components/LoginProvider";
 
 const List = () => {
   const { tableName } = useParams();
+  const { value, setValue } = useContext(UserContext);
 
   const [table, setTable] = useState({});
   const [insertValues, setInsertValues] = useState({});
   const [modal, setModal] = useState(false);
+  const [addColumnModal, setAddColumnModal] = useState(false);
 
   useEffect(() => {
-    return () => {
-      getTableValue(tableName, setTable);
-    };
-  }, []);
+    if (value.Username != undefined) {
+      getTableValue(tableName, setTable, value.Username);
+    }
+    return () => {};
+  }, [value.Username]);
 
   const dataTypes = new Object({
     int: {
@@ -48,6 +52,11 @@ const List = () => {
     Post(tableName, insertValues);
   };
 
+  const addColumn = () => {
+    console.log("addcolumn");
+    setAddColumnModal(!addColumnModal);
+  };
+
   return (
     <div className="relative">
       <Navbar />
@@ -70,43 +79,50 @@ const List = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th className="border-2 min-w-[100px]">
+                        <th className="border-2 p-2">
                           <input type="checkbox" />
                         </th>
                         {Object.values(table.data.columns).map((object) => {
+                          console.log(object.column_name);
                           return (
                             <th
-                              key={object.ColumnName}
+                              key={object.column_name}
                               className="border-2 min-w-[100px] text-left"
                             >
-                              <div className="p-2">{object.ColumnName}</div>
+                              <div className="p-2">{object.column_name}</div>
                             </th>
                           );
                         })}
+                        <th className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer">
+                          <div className="" onClick={addColumn}>
+                            New column
+                          </div>
+                        </th>
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.values(table.data.tableValues).map(
-                        (values, keys) => {
-                          return (
-                            <tr key={keys}>
-                              <td className="border-2 min-w-[100px] text-center">
-                                <input type="checkbox" />
-                              </td>
-                              {Object.entries(values).map(([key, value]) => {
-                                return (
-                                  <td
-                                    key={key.concat(value)}
-                                    className="border-2 min-w-[100px]"
-                                  >
-                                    <div className="p-2">{value}</div>
-                                  </td>
-                                );
-                              })}
-                            </tr>
-                          );
-                        }
-                      )}
+                      {Object.values(table.data.tableValues).map((values) => {
+                        return (
+                          <tr key={values.column_name}>
+                            <td className="border-2 p-2 text-center">
+                              <input type="checkbox" />
+                            </td>
+                            {Object.entries(values).map(([key, value]) => {
+                              return (
+                                <td
+                                  key={key.concat(value)}
+                                  className="border-2 min-w-[100px]"
+                                >
+                                  <div className="p-2">{value}</div>
+                                </td>
+                              );
+                            })}
+                            <th className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer">
+                              <div className="">empty row</div>
+                            </th>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 ) : (
@@ -118,7 +134,7 @@ const List = () => {
         </div>
       </div>
 
-      {/* Beginning Modal ---New--- */}
+      {/* Beginning Create Modal ---New--- */}
       <div
         className={
           modal ? "fixed w-full h-full z-40 top-0 left-0 pt-[59px]" : "hidden"
@@ -187,7 +203,49 @@ const List = () => {
           </div>
         </div>
       </div>
-      {/* Ending Modal ---New--- */}
+      {/* Ending Create Modal ---New--- */}
+
+      {/* Beginning Add Column Modal ---New--- */}
+      <div
+        className={
+          addColumnModal
+            ? "fixed w-full h-full z-40 top-0 left-0 pt-[59px]"
+            : "hidden"
+        }
+      >
+        <div className="w-full h-full right-0 bottom-0 z-50 bg-gray-500/50 flex justify-end">
+          <div className="w-[40em] min-h-full bg-white overflow-y-auto">
+            <div className="flex justify-between w-full p-2 border-b-2">
+              <button
+                className="hover:bg-gray-300 p-1 px-2 rounded"
+                // onClick={saveButton}
+              >
+                Save
+              </button>
+              <button
+                className="text-lg p-2 hover:bg-gray-300 rounded-full transition ease-in-out"
+                onClick={addColumn}
+              >
+                <AiOutlineClose />
+              </button>
+            </div>
+            <div className="px-5 pb-10 ">
+              <div>Name</div>
+              <input type="text" className="border-2 w-[150px]" />
+            </div>
+            <div className="px-5 pb-10 ">
+              <div>Type</div>
+              <select name="cars" id="cars" className="border-2 w-[150px]">
+                <option value="volvo">Number</option>
+                <option value="saab">Text</option>
+                <option value="mercedes">Date</option>
+                <option value="audi">Choice</option>
+              </select>
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* Ending Add Column Modal ---New--- */}
     </div>
   );
 };

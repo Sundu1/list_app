@@ -4,7 +4,6 @@ const Pool = require("pg").Pool;
 const jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const configAuth = require("./auth/auth.config.js");
-const { table } = require("console");
 
 require("dotenv").config();
 
@@ -33,32 +32,32 @@ const pool = new Pool({
 
 const today = new Date().toLocaleDateString();
 
-async function getAll(tableName) {
+async function getAll(tableName, user) {
   try {
-    let result = await pool.query(`
-                      select * INTO #TempTable 
-                      from ${tableName}
-                      ALTER TABLE #TempTable
-                      DROP COLUMN PkId
-                      SELECT * FROM #TempTable
-                      DROP TABLE #TempTable`);
-    let result_columns = await pool.request().query(` 
-                      SELECT 
-                      c.name 'ColumnName',
-                      t.Name 'DataType'
-                      FROM    
-                          sys.columns c
-                      INNER JOIN 
-                        sys.types t ON c.user_type_id = t.user_type_id
-                      WHERE
-                          c.object_id = OBJECT_ID('${tableName}') and
-                          c.name != 'PkId'`);
+    const columns_query = await pool.query(`
+        SELECT column_name, data_type
+        FROM information_schema.columns
+        WHERE table_schema = '${user}'
+        AND table_name   = '${tableName}'
+        AND column_name != 'pkid'
+    `);
+    let list_query = "";
+    columns_query.rows.forEach((value) => {
+      if (value.column_name != "pkid") list_query += `${value.column_name},`;
+    });
+
+    console.log(list_query);
+
+    const result = await pool.query(`
+        SELECT ${list_query.slice(0, -1)} 
+        FROM ${user}.${tableName}
+    `);
 
     const tablevalues = new Object({
       tableName: tableName,
       data: {
-        columns: result_columns.recordset,
-        tableValues: result.recordset,
+        columns: columns_query.rows,
+        tableValues: result.rows,
       },
     });
 
@@ -142,12 +141,16 @@ async function getTableList(user) {
 app.get("/tablelist/:user", async (req, res) => {
   const { user } = req.params;
   const tablelist = await getTableList(user);
-  res.send(tablelist);
+  if (tablelist) {
+    req.send("it's worked");
+    return;
+  }
+  res.send("not worked");
 });
 
-app.get("/:tableName", async (req, res) => {
-  const table = req.params.tableName;
-  const tableValues = await getAll(table);
+app.get("/list/:User/:tableName", async (req, res) => {
+  const { User, tableName } = req.params;
+  const tableValues = await getAll(tableName, User);
   res.send(tableValues);
 });
 
