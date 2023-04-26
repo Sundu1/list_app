@@ -4,6 +4,7 @@ const Pool = require("pg").Pool;
 const jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const configAuth = require("./auth/auth.config.js");
+const { table } = require("console");
 
 require("dotenv").config();
 
@@ -29,6 +30,8 @@ const pool = new Pool({
     rejectUnauthorized: false,
   },
 });
+
+const today = new Date().toLocaleDateString();
 
 async function getAll(tableName) {
   try {
@@ -90,45 +93,55 @@ async function post(table, object) {
   }
 }
 
-async function createTable(tableObject) {
+async function createTable(tableName, user) {
   try {
-    const tableName = tableObject["tableName"];
-    const values = tableObject["values"];
-    let tableValues = "";
+    const tables = await pool.query(`
+                  select table_name 
+                  from information_schema.tables
+                  where table_schema = '${user}'`);
 
-    for (const [key, value] of Object.entries(values)) {
-      tableValues += `${key} ${value["type"]} ${
-        value["isnull"] == "no" ? "NOT NULL" : "NULL"
-      },\n`;
+    const tablesExistList = [];
+    for (const [key, value] of Object.entries(tables.rows)) {
+      tablesExistList.push(value.table_name);
     }
 
-    const query = `CREATE TABLE ${tableName}(${tableValues})`;
-
-    await pool.query(query);
+    if (tablesExistList.includes(`${tableName}`)) {
+      return { message: "table already exist" };
+    } else {
+      const isTableExist = await pool.query(`CREATE TABLE ${user}.${tableName}(
+        PkId int PRIMARY KEY
+      )`);
+      if (isTableExist) {
+        await pool.query(`insert into ${user}.TableList (tablename, createdby, createat, modifiedby, modifiedat)
+                          values ('${tableName}', '${user}', '${today}', '${user}', '${today}')`);
+        return { message: "table created successfully" };
+      }
+    }
   } catch (err) {
     console.error(err);
   }
 }
 
-async function getTableList() {
+async function getTableList(user) {
   try {
-    const query = `select TableId, 
-                          TableName,
-                          CreatedBy,
-                          CreateAt,
-                          ModifiedBy,
-                          ModifiedAt
-                    from Table_list`;
+    const query = `select  
+                        TableName,
+                        CreatedBy,
+                        CreateAt,
+                        ModifiedBy,
+                        ModifiedAt
+                    from ${user}.TableList`;
 
     const result = await pool.query(query);
-    return result.recordsets[0];
+    return result.rows;
   } catch (err) {
     console.error(err);
   }
 }
 
-app.get("/tablelist", async (req, res) => {
-  const tablelist = await getTableList();
+app.get("/tablelist/:user", async (req, res) => {
+  const { user } = req.params;
+  const tablelist = await getTableList(user);
   res.send(tablelist);
 });
 
@@ -138,15 +151,12 @@ app.get("/:tableName", async (req, res) => {
   res.send(tableValues);
 });
 
-const today = new Date().toLocaleDateString();
-
 app.post("/sign-up", async (req, res) => {
   const data = req.body;
   const isUserExist = await pool.query(
     `select Username from Users where Username = '${data.Username}'`
   );
 
-  console.log(isUserExist.rows);
   if (isUserExist.rows.length > 0) {
     res.send({ message: "User already exist" });
     return;
@@ -165,8 +175,21 @@ app.post("/sign-up", async (req, res) => {
                                 '${createBy}')`);
 
     if (insertUser) {
-      res.send("yes");
-      return;
+      const isSchemaExist = await pool.query(`CREATE SCHEMA ${data.Username}`);
+      if (isSchemaExist) {
+        await pool.query(`
+                    CREATE TABLE ${data.Username}.TableList(
+                    PkId integer not null generated always as identity (increment by 1),
+                    constraint pk_${data.Username}_tablelist primary key (PkId),
+                    TableName varchar(255) not null,
+                    CreatedBy varchar(255) not null,
+                    CreateAt timestamp not null,
+                    ModifiedBy varchar(255) not null,
+                    ModifiedAt timestamp not null
+                  )`);
+        res.send("yes");
+        return;
+      }
     }
     res.send("no");
   }
@@ -180,7 +203,6 @@ app.post("/sign-in", async (req, res) => {
 
   if (isUserExist.rows.length > 0) {
     const user = isUserExist.rows[0];
-    console.log(user);
     const token = jwt.sign({ id: user.PkId }, configAuth.secret);
     const passwordIsValid = bcrypt.compareSync(data.Password, user.password);
     if (passwordIsValid) {
@@ -206,31 +228,10 @@ app.post("/list/:tableName", (req, res) => {
   res.send("done");
 });
 
-app.post("/create-table", (req, res) => {
-  // const tableObject = {
-  //   tableName: "testTable",
-  //   values: {
-  //     Id: {
-  //       type: "SERIAL PRIMARY KEY",
-  //       isnull: "no",
-  //     },
-  //     name: {
-  //       type: "VARCHAR(255)",
-  //       isnull: "no",
-  //     },
-  //     age: {
-  //       type: "INT",
-  //       isnull: "yes",
-  //     },
-  //     birthday: {
-  //       type: "DATETIME",
-  //       isnull: "yes",
-  //     },
-  //   },
-  // };
-
-  // createTable(tableObject);
-  res.send("create-table");
+app.post("/create-table", async (req, res) => {
+  const { tableName, user } = req.body;
+  const result = await createTable(tableName, user);
+  res.send(result);
 });
 
 app.listen(port, function () {

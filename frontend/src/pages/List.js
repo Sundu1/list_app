@@ -53,7 +53,7 @@ const List = () => {
       <Navbar />
       <Sidebar />
       <div className="fixed h-full w-full bg-gray-400">
-        <div className="h-full pt-[58px] ml-[12.8em]">
+        <div className="h-full ml-[12.8em]">
           <div className="absolute w-full bg-white p-3">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 pr-3 pl-2 rounded flex text-[15px]"
@@ -64,8 +64,8 @@ const List = () => {
             </button>
           </div>
           <div className="pt-[55px] h-full w-full">
-            <div className="h-full p-5 text-white text-[12.5px] overflow-auto">
-              <div className="inline-block p-5 mr-5 bg-black rounded-lg min-w-full min-h-full">
+            <div className="h-full p-5 text-[12.5px] overflow-auto">
+              <div className="inline-block p-5 mr-5 bg-white rounded-lg min-w-full min-h-full">
                 {Object.keys(table).length > 0 ? (
                   <table>
                     <thead>

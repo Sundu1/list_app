@@ -17,13 +17,15 @@ const Home = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    return () => {
-      getTableList(setTableList);
-    };
-  }, []);
+    if (value.Username != undefined) {
+      getTableList(setTableList, value.Username);
+    }
+    return () => {};
+  }, [value.Username]);
+
+  console.log(tableList);
 
   const createNewTable = async () => {
-    console.log(tableName);
     const result = await insertNewTable(tableName, value.Username);
     console.log(result);
     setCreateModal(!createModal);
@@ -54,17 +56,17 @@ const Home = () => {
                 tableList.map((value) => {
                   return (
                     <div
-                      key={value.TableId}
+                      key={value.tablename}
                       className="bg-gray-100 hover:bg-gray-300 h-[180px] w-[151px] rounded transition ease-in-out cursor-pointer"
-                      onClick={() => navigate(`/list/${value.TableName}`)}
+                      onClick={() => navigate(`/list/${value.tablename}`)}
                     >
                       <div className="p-5 flex justify-center content-between text-[80px]">
                         <RiFileList3Line />
                       </div>
                       <p className="p-2 text-center text-[12px] font-san">
-                        {value.TableName.length > 18
-                          ? value.TableName.substring(0, 18) + "..."
-                          : value.TableName}
+                        {value.tablename.length > 18
+                          ? value.tablename.substring(0, 18) + "..."
+                          : value.tablename}
                       </p>
                     </div>
                   );

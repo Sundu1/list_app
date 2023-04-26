@@ -21,20 +21,19 @@ const getTableValue = async (tableName, setTable) => {
   }
 };
 
-const getTableList = async (setTableList) => {
+const getTableList = async (setTableList, user) => {
   try {
-    if (localStorage.getItem("tablelist")) {
-      setTableList(JSON.parse(localStorage.getItem("tablelist")));
-      return;
-    }
-
+    // if (localStorage.getItem("tablelist")) {
+    //   setTableList(JSON.parse(localStorage.getItem("tablelist")));
+    //   return;
+    // }
     const response = await axios({
       method: "get",
-      url: `${BASE_URL}/tablelist`,
+      url: `${BASE_URL}/tablelist/${user}`,
     });
     const data = await response.data;
     setTableList(data);
-    localStorage.setItem("tablelist", JSON.stringify(data));
+    // localStorage.setItem("tablelist", JSON.stringify(data));
   } catch (err) {
     console.error(err);
   }
