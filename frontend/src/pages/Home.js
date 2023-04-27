@@ -13,6 +13,7 @@ const Home = () => {
   const [tableList, setTableList] = useState([]);
   const [createModal, setCreateModal] = useState(false);
   const [tableName, setTableName] = useState("");
+  const [test, setTest] = useState(false);
 
   const navigate = useNavigate();
 
@@ -21,14 +22,13 @@ const Home = () => {
       getTableList(setTableList, value.Username);
     }
     return () => {};
-  }, [value.Username]);
-
-  console.log(tableList);
+  }, [value.Username, test]);
 
   const createNewTable = async () => {
     const result = await insertNewTable(tableName, value.Username);
     console.log(result);
     setCreateModal(!createModal);
+    setTest(true);
   };
 
   const newButton = () => {

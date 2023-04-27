@@ -67,4 +67,23 @@ const insertNewTable = async (tableName, user) => {
   }
 };
 
-export { Post, SignIn, insertNewTable };
+const addColumnPost = async (tableName, user, columnInfo) => {
+  try {
+    console.log(tableName, user, columnInfo);
+    const response = await axios({
+      method: "post",
+      url: `${BASE_URL}/add-column`,
+      data: {
+        tableName,
+        user,
+        columnInfo,
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { Post, SignIn, insertNewTable, addColumnPost };

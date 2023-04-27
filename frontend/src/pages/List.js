@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import "../index.css";
 import { getTableValue } from "../model/Get";
-import { Post } from "../model/Post";
+import { Post, addColumnPost } from "../model/Post";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../components/LoginProvider";
@@ -14,6 +14,7 @@ const List = () => {
 
   const [table, setTable] = useState({});
   const [insertValues, setInsertValues] = useState({});
+  const [columnInfo, setColumnInfo] = useState({ Name: "", Type: "Number" });
   const [modal, setModal] = useState(false);
   const [addColumnModal, setAddColumnModal] = useState(false);
 
@@ -53,8 +54,15 @@ const List = () => {
   };
 
   const addColumn = () => {
-    console.log("addcolumn");
     setAddColumnModal(!addColumnModal);
+  };
+
+  const saveColumnInfo = () => {
+    if (columnInfo.Name) {
+      addColumnPost(tableName, value.Username, columnInfo);
+      return;
+    }
+    console.log("no");
   };
 
   return (
@@ -83,7 +91,6 @@ const List = () => {
                           <input type="checkbox" />
                         </th>
                         {Object.values(table.data.columns).map((object) => {
-                          console.log(object.column_name);
                           return (
                             <th
                               key={object.column_name}
@@ -93,10 +100,11 @@ const List = () => {
                             </th>
                           );
                         })}
-                        <th className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer">
-                          <div className="" onClick={addColumn}>
-                            New column
-                          </div>
+                        <th
+                          className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer"
+                          onClick={addColumn}
+                        >
+                          <div className="">New column</div>
                         </th>
                       </tr>
                     </thead>
@@ -218,7 +226,7 @@ const List = () => {
             <div className="flex justify-between w-full p-2 border-b-2">
               <button
                 className="hover:bg-gray-300 p-1 px-2 rounded"
-                // onClick={saveButton}
+                onClick={saveColumnInfo}
               >
                 Save
               </button>
@@ -231,15 +239,32 @@ const List = () => {
             </div>
             <div className="px-5 pb-10 ">
               <div>Name</div>
-              <input type="text" className="border-2 w-[150px]" />
+              <input
+                type="text"
+                className="border-2 w-[150px]"
+                value={columnInfo["Name"]}
+                onChange={(e) =>
+                  setColumnInfo((old) => ({ ...old, Name: e.target.value }))
+                }
+              />
             </div>
             <div className="px-5 pb-10 ">
               <div>Type</div>
-              <select name="cars" id="cars" className="border-2 w-[150px]">
-                <option value="volvo">Number</option>
-                <option value="saab">Text</option>
-                <option value="mercedes">Date</option>
-                <option value="audi">Choice</option>
+              <select
+                id="Type"
+                className="border-2 w-[150px]"
+                onChange={(e) =>
+                  setColumnInfo((old) => ({
+                    ...old,
+                    Type: e.target.value,
+                  }))
+                }
+              >
+                <option value="Number">Number</option>
+                <option value="Text">Text</option>
+                <option value="Date">Date</option>
+                <option value="Choice">Choice</option>
+                <option value="Lookup">Lookup</option>
               </select>
             </div>
           </div>

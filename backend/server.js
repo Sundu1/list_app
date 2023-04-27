@@ -94,6 +94,7 @@ async function post(table, object) {
 
 async function createTable(tableName, user) {
   try {
+    const tableName_replaced = tableName.replaceAll(" ", "_");
     const tables = await pool.query(`
                   select table_name 
                   from information_schema.tables
@@ -104,15 +105,16 @@ async function createTable(tableName, user) {
       tablesExistList.push(value.table_name);
     }
 
-    if (tablesExistList.includes(`${tableName}`)) {
+    if (tablesExistList.includes(`${tableName_replaced}`)) {
       return { message: "table already exist" };
     } else {
-      const isTableExist = await pool.query(`CREATE TABLE ${user}.${tableName}(
+      const isTableExist =
+        await pool.query(`CREATE TABLE ${user}.${tableName_replaced}(
         PkId int PRIMARY KEY
       )`);
       if (isTableExist) {
         await pool.query(`insert into ${user}.TableList (tablename, createdby, createat, modifiedby, modifiedat)
-                          values ('${tableName}', '${user}', '${today}', '${user}', '${today}')`);
+                          values ('${tableName_replaced}', '${user}', '${today}', '${user}', '${today}')`);
         return { message: "table created successfully" };
       }
     }
@@ -138,11 +140,28 @@ async function getTableList(user) {
   }
 }
 
+async function addColumn(tablename, user, column_info) {
+  const types = {
+    Number: "int",
+    Text: "varchar(255)",
+    Date: "timestamp",
+  };
+  const isAltered = pool.query(`
+    ALTER TABLE ${user}.${tablename}
+    ADD COLUMN ${column_info.Name} ${types[column_info.Type]}
+  `);
+
+  if (isAltered) {
+    return { message: "altered" };
+  }
+  return { message: "not altered" };
+}
+
 app.get("/tablelist/:user", async (req, res) => {
   const { user } = req.params;
   const tablelist = await getTableList(user);
   if (tablelist) {
-    req.send("it's worked");
+    res.send(tablelist);
     return;
   }
   res.send("not worked");
@@ -167,8 +186,14 @@ app.post("/sign-up", async (req, res) => {
     const password = bcrypt.hashSync(data.Password);
     const createBy = "admin";
 
-    const insertUser =
-      await pool.query(`insert into Users (Username, Email, Password, CreatedAt, CreatedBy, ModifiedAt, ModifiedBy)
+    const insertUser = await pool.query(`
+                      insert into Users (Username, 
+                                           Email, 
+                                           Password, 
+                                           CreatedAt, 
+                                           CreatedBy, 
+                                           ModifiedAt, 
+                                           ModifiedBy)
                         values ('${data.Username}', 
                                 '${data.Email}', 
                                 '${password}',
@@ -235,6 +260,12 @@ app.post("/create-table", async (req, res) => {
   const { tableName, user } = req.body;
   const result = await createTable(tableName, user);
   res.send(result);
+});
+
+app.post("/add-column", async (req, res) => {
+  const { tableName, user, columnInfo } = req.body;
+  const data = await addColumn(tableName, user, columnInfo);
+  res.send(data);
 });
 
 app.listen(port, function () {
