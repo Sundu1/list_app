@@ -3,7 +3,7 @@ import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import "../index.css";
 import { getTableValue } from "../model/Get";
-import { Post, addColumnPost } from "../model/Post";
+import { createNewRow, addColumnPost } from "../model/Post";
 import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { useParams } from "react-router-dom";
 import { UserContext } from "../components/LoginProvider";
@@ -11,8 +11,8 @@ import { UserContext } from "../components/LoginProvider";
 const List = () => {
   const { tableName } = useParams();
   const { value, setValue } = useContext(UserContext);
-
   const [table, setTable] = useState({});
+
   const [insertValues, setInsertValues] = useState({});
   const [columnInfo, setColumnInfo] = useState({ Name: "", Type: "Number" });
   const [modal, setModal] = useState(false);
@@ -26,21 +26,17 @@ const List = () => {
   }, [value.Username]);
 
   const dataTypes = new Object({
-    int: {
+    integer: {
       inputType: "number",
       value: "Enter a number",
     },
-    nvarchar: {
+    "character varying": {
       inputType: "text",
       value: "Enter value here",
     },
-    datetime: {
+    "timestamp without time zone": {
       inputType: "date",
-      value: "2023-04-21",
-    },
-    datetime2: {
-      inputType: "date",
-      value: "2023-04-21",
+      value: "2023-04-01",
     },
   });
 
@@ -49,8 +45,12 @@ const List = () => {
   };
 
   const saveButton = () => {
-    localStorage.removeItem(tableName);
-    Post(tableName, insertValues);
+    const createNewRowData = new Object({
+      TableName: tableName,
+      User: value.Username,
+      Values: insertValues,
+    });
+    createNewRow(createNewRowData);
   };
 
   const addColumn = () => {
@@ -94,7 +94,7 @@ const List = () => {
                           return (
                             <th
                               key={object.column_name}
-                              className="border-2 min-w-[100px] text-left"
+                              className="border-2 min-w-[100px] text-left font-serif"
                             >
                               <div className="p-2">{object.column_name}</div>
                             </th>
@@ -104,7 +104,10 @@ const List = () => {
                           className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer"
                           onClick={addColumn}
                         >
-                          <div className="">New column</div>
+                          <div className="font-serif flex px-2">
+                            <AiOutlinePlus className="mt-[2px] mr-2 text-[14px]" />
+                            New column
+                          </div>
                         </th>
                       </tr>
                     </thead>
@@ -169,35 +172,34 @@ const List = () => {
                 Object.values(table.data.columns).map((object) => {
                   return (
                     <div
-                      key={object.ColumnName}
+                      key={object.column_name}
                       className="min-w-[100px] text-left"
                     >
-                      <div className="p-2">
-                        {object.ColumnName} - {object.DataType}
-                      </div>
+                      <div className="p-2 font-serif">{object.column_name}</div>
                       <input
-                        className="border-2"
+                        className="border-2 p-1 rounded"
                         type={
-                          dataTypes[object.DataType]
-                            ? dataTypes[object.DataType].inputType
+                          dataTypes[object.data_type]
+                            ? dataTypes[object.data_type].inputType
                             : ""
                         }
+                        required
                         value={
-                          insertValues[object.ColumnName]
-                            ? insertValues[object.ColumnName]
-                            : object.DataType == "datetime"
-                            ? "2023-04-21"
+                          insertValues[object.column_name]
+                            ? insertValues[object.column_name]
+                            : object.data_type == "timestamp without time zone"
+                            ? dataTypes[object.data_type]
                             : ""
                         }
                         placeholder={
-                          dataTypes[object.DataType]
-                            ? dataTypes[object.DataType].value
+                          dataTypes[object.data_type]
+                            ? dataTypes[object.data_type].value
                             : ""
                         }
                         onChange={(e) =>
                           setInsertValues((old) => ({
                             ...old,
-                            [object.ColumnName]: e.target.value,
+                            [object.column_name]: e.target.value,
                           }))
                         }
                       />

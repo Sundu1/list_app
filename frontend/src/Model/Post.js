@@ -2,15 +2,15 @@ import React from "react";
 import axios from "axios";
 import { BASE_URL } from "./config.js";
 
-const Post = async (tableName, insertValues) => {
+const createNewRow = async (createNewRowData) => {
   try {
     const response = await axios({
       method: "post",
-      url: `${BASE_URL}/${tableName}`,
-      data: new Object(insertValues),
+      url: `${BASE_URL}/create-new-row`,
+      data: createNewRowData,
     });
     const data = await response.data;
-    return "yes";
+    return data;
   } catch (err) {
     console.error(err);
   }
@@ -86,4 +86,4 @@ const addColumnPost = async (tableName, user, columnInfo) => {
   }
 };
 
-export { Post, SignIn, insertNewTable, addColumnPost };
+export { createNewRow, SignIn, insertNewTable, addColumnPost };

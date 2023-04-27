@@ -43,10 +43,8 @@ async function getAll(tableName, user) {
     `);
     let list_query = "";
     columns_query.rows.forEach((value) => {
-      if (value.column_name != "pkid") list_query += `${value.column_name},`;
+      if (value.column_name != "pkid") list_query += `'${value.column_name}',`;
     });
-
-    console.log(list_query);
 
     const result = await pool.query(`
         SELECT ${list_query.slice(0, -1)} 
@@ -67,12 +65,12 @@ async function getAll(tableName, user) {
   }
 }
 
-async function post(table, object) {
+async function createNewRow(createNewRowData) {
   try {
+    console.log("sdfsdfsdfsd", createNewRowData);
     let columns = "";
     let values = "";
-
-    for (const [key, value] of Object.entries(object)) {
+    for (const [key, value] of Object.entries(createNewRowData.Values)) {
       columns += key + ",";
       if (value == "") {
         values += value + "null" + ",";
@@ -80,13 +78,13 @@ async function post(table, object) {
         values += "'" + value + "'" + ",";
       }
     }
-
-    let query = `insert into ${table} (${columns.slice(
-      0,
-      -1
-    )}) values (${values.slice(0, -1)})`;
-
-    await pool.query(query);
+    console.log(columns);
+    console.log(values);
+    // let query = `insert into ${table} (${columns.slice(
+    //   0,
+    //   -1
+    // )}) values (${values.slice(0, -1)})`;
+    // await pool.query(query);
   } catch (err) {
     console.error(err);
   }
@@ -148,7 +146,7 @@ async function addColumn(tablename, user, column_info) {
   };
   const isAltered = pool.query(`
     ALTER TABLE ${user}.${tablename}
-    ADD COLUMN ${column_info.Name} ${types[column_info.Type]}
+    ADD COLUMN "${column_info.Name}" ${types[column_info.Type]}
   `);
 
   if (isAltered) {
@@ -249,10 +247,9 @@ app.post("/sign-in", async (req, res) => {
   }
 });
 
-app.post("/list/:tableName", (req, res) => {
-  const table = req.params.tableName;
-  const insertValues = req.body;
-  post(table, insertValues);
+app.post("/create-new-row", (req, res) => {
+  const data = req.body;
+  createNewRow(data);
   res.send("done");
 });
 

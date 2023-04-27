@@ -40,9 +40,9 @@ const Home = () => {
       <Navbar />
       <Sidebar />
       <div className="fixed h-full w-full overflow-y-scroll">
-        <div className="p-4 sm:ml-[13em] flex justify-center">
+        <div className="p-4 sm:ml-[10em] flex justify-center">
           <div className="ml-[100px] p-4 rounded-lg dark:border-gray-700 w-[65em]">
-            <div className="ml-[300px] pb-5">
+            <div className="ml-[25.2em] pb-5">
               <button
                 className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 pr-4 pl-2 rounded flex text-[15px]"
                 onClick={newButton}
