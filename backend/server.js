@@ -43,7 +43,7 @@ async function getAll(tableName, user) {
     `);
     let list_query = "";
     columns_query.rows.forEach((value) => {
-      if (value.column_name != "pkid") list_query += `'${value.column_name}',`;
+      if (value.column_name != "pkid") list_query += `"${value.column_name}",`;
     });
 
     const result = await pool.query(`
@@ -67,24 +67,24 @@ async function getAll(tableName, user) {
 
 async function createNewRow(createNewRowData) {
   try {
-    console.log("sdfsdfsdfsd", createNewRowData);
+    const { TableName, User, Values } = createNewRowData;
     let columns = "";
     let values = "";
-    for (const [key, value] of Object.entries(createNewRowData.Values)) {
-      columns += key + ",";
+    for (const [key, value] of Object.entries(Values)) {
+      columns += `"${key}",`;
       if (value == "") {
-        values += value + "null" + ",";
+        values += "null,";
       } else {
-        values += "'" + value + "'" + ",";
+        values += `'${value}',`;
       }
     }
-    console.log(columns);
-    console.log(values);
-    // let query = `insert into ${table} (${columns.slice(
-    //   0,
-    //   -1
-    // )}) values (${values.slice(0, -1)})`;
-    // await pool.query(query);
+
+    let query = `insert into ${User}.${TableName} (${columns.slice(
+      0,
+      -1
+    )}) values (${values.slice(0, -1)})`;
+
+    await pool.query(query);
   } catch (err) {
     console.error(err);
   }
@@ -108,8 +108,8 @@ async function createTable(tableName, user) {
     } else {
       const isTableExist =
         await pool.query(`CREATE TABLE ${user}.${tableName_replaced}(
-        PkId int PRIMARY KEY
-      )`);
+          PkId integer not null generated always as identity (increment by 1),
+          constraint pk_${tableName_replaced} primary key (PkId))`);
       if (isTableExist) {
         await pool.query(`insert into ${user}.TableList (tablename, createdby, createat, modifiedby, modifiedat)
                           values ('${tableName_replaced}', '${user}', '${today}', '${user}', '${today}')`);

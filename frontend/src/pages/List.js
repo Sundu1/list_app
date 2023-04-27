@@ -17,13 +17,14 @@ const List = () => {
   const [columnInfo, setColumnInfo] = useState({ Name: "", Type: "Number" });
   const [modal, setModal] = useState(false);
   const [addColumnModal, setAddColumnModal] = useState(false);
+  const [refreshList, setRefreshList] = useState(false);
 
   useEffect(() => {
     if (value.Username != undefined) {
       getTableValue(tableName, setTable, value.Username);
     }
     return () => {};
-  }, [value.Username]);
+  }, [value.Username, refreshList]);
 
   const dataTypes = new Object({
     integer: {
@@ -60,6 +61,8 @@ const List = () => {
   const saveColumnInfo = () => {
     if (columnInfo.Name) {
       addColumnPost(tableName, value.Username, columnInfo);
+      setRefreshList(!refreshList);
+      setAddColumnModal(!addColumnModal);
       return;
     }
     console.log("no");
@@ -112,28 +115,30 @@ const List = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.values(table.data.tableValues).map((values) => {
-                        return (
-                          <tr key={values.column_name}>
-                            <td className="border-2 p-2 text-center">
-                              <input type="checkbox" />
-                            </td>
-                            {Object.entries(values).map(([key, value]) => {
-                              return (
-                                <td
-                                  key={key.concat(value)}
-                                  className="border-2 min-w-[100px]"
-                                >
-                                  <div className="p-2">{value}</div>
-                                </td>
-                              );
-                            })}
-                            <th className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer">
-                              <div className="">empty row</div>
-                            </th>
-                          </tr>
-                        );
-                      })}
+                      {Object.values(table.data.tableValues).map(
+                        (values, i) => {
+                          return (
+                            <tr key={i}>
+                              <td className="border-2 p-2 text-center">
+                                <input type="checkbox" />
+                              </td>
+                              {Object.entries(values).map(([key, value], i) => {
+                                return (
+                                  <td
+                                    className="border-2 min-w-[100px]"
+                                    key={i}
+                                  >
+                                    <div className="p-2">{value}</div>
+                                  </td>
+                                );
+                              })}
+                              <th className="border-2 min-w-[100px]">
+                                <div className=""></div>
+                              </th>
+                            </tr>
+                          );
+                        }
+                      )}
                     </tbody>
                   </table>
                 ) : (
