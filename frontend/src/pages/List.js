@@ -19,6 +19,8 @@ const List = () => {
   const [addColumnModal, setAddColumnModal] = useState(false);
   const [refreshList, setRefreshList] = useState(false);
 
+  const [checked, setChecked] = useState([]);
+
   useEffect(() => {
     if (value.Username != undefined) {
       getTableValue(tableName, setTable, value.Username);
@@ -52,6 +54,8 @@ const List = () => {
       Values: insertValues,
     });
     createNewRow(createNewRowData);
+    setRefreshList(!refreshList);
+    setModal(!modal);
   };
 
   const addColumn = () => {
@@ -68,30 +72,68 @@ const List = () => {
     console.log("no");
   };
 
+  const handleChecked = (e, id) => {
+    if (e.target.checked) setChecked((old) => [...old, id]);
+    else {
+      checked.forEach((value, i) => {
+        if (value == id) checked.splice(i, 1);
+      });
+    }
+  };
+
+  const handleCheckedAll = (e) => {
+    const checkboxes = document.querySelectorAll("#checkbox");
+    if (e.target.checked) {
+      setChecked([]);
+      table.data.tableValues.forEach((value) =>
+        setChecked((old) => [...old, value.pkid])
+      );
+      checkboxes.forEach((value) => (value.checked = true));
+    } else {
+      setChecked([]);
+      checkboxes.forEach((value) => (value.checked = false));
+    }
+  };
+
+  const handleDeleteButton = () => {
+    console.log(checked);
+  };
+
   return (
     <div className="relative">
       <Navbar />
       <Sidebar />
-      <div className="fixed h-full w-full bg-gray-400">
+      <div className="fixed top-0 pt-[60px] h-full w-full bg-gray-400">
         <div className="h-full ml-[12.8em]">
-          <div className="absolute w-full bg-white p-3">
+          <div className="absolute w-full bg-white p-3 flex">
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 pr-3 pl-2 rounded flex text-[15px]"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 pr-3 
+                      pl-2 rounded flex text-[15px]"
               onClick={newButton}
             >
               <AiOutlinePlus className="mt-[2px] mr-2 text-[18px]" />
               New
             </button>
+            <button
+              className={
+                checked.length > 0
+                  ? "ml-5 bg-red-500 hover:bg-red-700 text-white font-bold py-1 p-2 rounded flex text-[15px]"
+                  : "hidden"
+              }
+              onClick={handleDeleteButton}
+            >
+              Delete
+            </button>
           </div>
-          <div className="pt-[55px] h-full w-full">
-            <div className="h-full p-5 text-[12.5px] overflow-auto">
+          <div className="pt-[55px] h-full w-full overflow-auto">
+            <div className="h-full p-5 text-[12.5px]">
               <div className="inline-block p-5 mr-5 bg-white rounded-lg min-w-full min-h-full">
                 {Object.keys(table).length > 0 ? (
                   <table>
                     <thead>
                       <tr>
                         <th className="border-2 p-2">
-                          <input type="checkbox" />
+                          <input type="checkbox" onClick={handleCheckedAll} />
                         </th>
                         {Object.values(table.data.columns).map((object) => {
                           return (
@@ -104,7 +146,7 @@ const List = () => {
                           );
                         })}
                         <th
-                          className="border-2 min-w-[100px] hover:bg-gray-200 hover:cursor-pointer"
+                          className="border-2 min-w-[130px] hover:bg-gray-200 hover:cursor-pointer"
                           onClick={addColumn}
                         >
                           <div className="font-serif flex px-2">
@@ -115,30 +157,29 @@ const List = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {Object.values(table.data.tableValues).map(
-                        (values, i) => {
-                          return (
-                            <tr key={i}>
-                              <td className="border-2 p-2 text-center">
-                                <input type="checkbox" />
-                              </td>
-                              {Object.entries(values).map(([key, value], i) => {
-                                return (
-                                  <td
-                                    className="border-2 min-w-[100px]"
-                                    key={i}
-                                  >
-                                    <div className="p-2">{value}</div>
-                                  </td>
-                                );
-                              })}
-                              <th className="border-2 min-w-[100px]">
-                                <div className=""></div>
-                              </th>
-                            </tr>
-                          );
-                        }
-                      )}
+                      {Object.values(table.data.tableValues).map((values) => {
+                        return (
+                          <tr key={values.pkid}>
+                            <td className="border-2 p-2 text-center">
+                              <input
+                                id="checkbox"
+                                type="checkbox"
+                                onClick={(e) => handleChecked(e, values.pkid)}
+                              />
+                            </td>
+                            {Object.entries(values).map(([key, value], i) => {
+                              return (
+                                <td className="border-2 min-w-[100px]" key={i}>
+                                  <div className="p-2">{value}</div>
+                                </td>
+                              );
+                            })}
+                            <th className="border-2 min-w-[100px]">
+                              <div className=""></div>
+                            </th>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 ) : (

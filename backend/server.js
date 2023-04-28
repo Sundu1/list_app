@@ -38,12 +38,13 @@ async function getAll(tableName, user) {
         SELECT column_name, data_type
         FROM information_schema.columns
         WHERE table_schema = '${user}'
-        AND table_name   = '${tableName}'
-        AND column_name != 'pkid'
-    `);
+        AND table_name   = '${tableName.toLowerCase()}'
+        `);
+    // AND column_name != 'pkid'
     let list_query = "";
     columns_query.rows.forEach((value) => {
-      if (value.column_name != "pkid") list_query += `"${value.column_name}",`;
+      // if (value.column_name != "pkid")
+      list_query += `"${value.column_name}",`;
     });
 
     const result = await pool.query(`
