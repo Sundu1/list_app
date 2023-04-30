@@ -18,7 +18,7 @@ const Login = () => {
     if (userInfo.result) {
       localStorage.setItem("user", JSON.stringify(userInfo));
       setValue(userInfo);
-      navigate("/home");
+      navigate("/#/home");
       return;
     }
     console.log(userInfo.result);
@@ -113,7 +113,7 @@ const Login = () => {
                 Don’t have an account yet?{" "}
                 <button
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  onClick={() => navigate(`/signup`)}
+                  onClick={() => navigate(`/#/signup`)}
                 >
                   Sign up
                 </button>

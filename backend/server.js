@@ -72,11 +72,14 @@ async function createNewRow(createNewRowData) {
     let columns = "";
     let values = "";
     for (const [key, value] of Object.entries(Values)) {
-      columns += `"${key}",`;
-      if (value == "") {
-        values += "null,";
-      } else {
-        values += `'${value}',`;
+      if (key == "pkid") console.log(key);
+      else {
+        columns += `"${key}",`;
+        if (value == "") {
+          values += "null,";
+        } else {
+          values += `'${value}',`;
+        }
       }
     }
 
@@ -89,6 +92,18 @@ async function createNewRow(createNewRowData) {
   } catch (err) {
     console.error(err);
   }
+}
+
+async function deleteRows(deleteRowData) {
+  const { TableName, User, delete_pkid } = deleteRowData;
+
+  const query = `DELETE FROM ${User}.${TableName}
+                 WHERE pkid in (${delete_pkid.toString()})
+  `;
+
+  const result = await pool.query(query);
+  if (result) return { message: "deleted successfully" };
+  else return { message: "delete failed" };
 }
 
 async function createTable(tableName, user) {
@@ -154,6 +169,27 @@ async function addColumn(tablename, user, column_info) {
     return { message: "altered" };
   }
   return { message: "not altered" };
+}
+
+async function updateRowData(data) {
+  const { TableName, User, editValues } = data;
+  let setValues = "";
+  let query = "";
+
+  for (const [key, value] of Object.entries(editValues)) {
+    if (key != "pkid")
+      setValues += `"${key}"= ${value != null ? "'" + value + "'" : "null"},`;
+  }
+  query = `
+           UPDATE ${User}.${TableName} 
+           SET ${setValues.slice(0, -1)}
+           WHERE pkid = ${editValues.pkid}
+           `;
+  const updated = await pool.query(query);
+  if (updated) {
+    return { message: "updated successfully" };
+  }
+  return { message: "update failed" };
 }
 
 app.get("/tablelist/:user", async (req, res) => {
@@ -264,6 +300,17 @@ app.post("/add-column", async (req, res) => {
   const { tableName, user, columnInfo } = req.body;
   const data = await addColumn(tableName, user, columnInfo);
   res.send(data);
+});
+
+app.delete("/delete-rows", async (req, res) => {
+  const data = req.body;
+  const result = await deleteRows(data);
+  res.send(result);
+});
+
+app.put("/edit-row-data", async (req, res) => {
+  const data = req.body;
+  updateRowData(data);
 });
 
 app.listen(port, function () {
