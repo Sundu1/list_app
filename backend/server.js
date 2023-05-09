@@ -4,7 +4,6 @@ const Pool = require("pg").Pool;
 const jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 const configAuth = require("./auth/auth.config.js");
-
 require("dotenv").config();
 
 const app = express();
@@ -20,11 +19,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 const pool = new Pool({
-  user: "pdscooffpjuazx",
-  host: "ec2-107-21-67-46.compute-1.amazonaws.com",
-  database: "de93ur7e92jd95",
-  password: "392d7229bf05e5ac9328e6e58857c97f2fe641f76aa472bad7f61c21e64f0278",
-  port: 5432,
+  user: process.env.USER,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD,
+  port: process.env.PORT,
   ssl: {
     rejectUnauthorized: false,
   },
@@ -40,6 +39,8 @@ async function getAll(tableName, user) {
         WHERE table_schema = '${user}'
         AND table_name   = '${tableName.toLowerCase()}'
         `);
+
+    console.log(columns_query.rows);
     // AND column_name != 'pkid'
     let list_query = "";
     columns_query.rows.forEach((value) => {
@@ -104,6 +105,14 @@ async function deleteRows(deleteRowData) {
   const result = await pool.query(query);
   if (result) return { message: "deleted successfully" };
   else return { message: "delete failed" };
+}
+
+async function deleteColumn(deleteColumnData) {
+  const { TableName, User, ColumnName } = deleteColumnData;
+  const query = `ALTER TABLE ${User}.${TableName} DROP COLUMN "${ColumnName}"`;
+  const result = await pool.query(query);
+  if (result) return { message: "column deleted successfully" };
+  else return { message: "column delete failed" };
 }
 
 async function createTable(tableName, user) {
@@ -305,6 +314,12 @@ app.post("/add-column", async (req, res) => {
 app.delete("/delete-rows", async (req, res) => {
   const data = req.body;
   const result = await deleteRows(data);
+  res.send(result);
+});
+
+app.delete("/delete-column", async (req, res) => {
+  const data = req.body;
+  const result = await deleteColumn(data);
   res.send(result);
 });
 

@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "./LoginProvider";
+import default_img from "../imgs/default.png";
 
 const Navbar = () => {
   const [dropdown, setDropdown] = useState(false);
@@ -38,7 +39,7 @@ const Navbar = () => {
             <span className="sr-only">Open user menu</span>
             <img
               className="w-8 h-8 rounded-full"
-              src="/docs/images/people/profile-picture-3.jpg"
+              src={default_img}
               alt="user photo"
             />
           </button>

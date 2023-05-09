@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
 import "../index.css";
 import { getTableValue } from "../model/Get";
 import { createNewRow, addColumnPost } from "../model/Post";
-import { DeleteRow } from "../model/Delete";
+import { DeleteRow, DeleteColumn } from "../model/Delete";
 import { editRow } from "../model/Put";
 import {
   AiOutlinePlus,
@@ -37,12 +37,38 @@ const List = () => {
   const [refreshList, setRefreshList] = useState(false);
   const [checked, setChecked] = useState([]);
 
+  const [editColumnCoord, setEditColumnCoord] = useState({
+    isVisible: false,
+    top: 0,
+    left: 0,
+    columnName: "",
+  });
+
+  const refEditColumnModal = useRef();
+
   useEffect(() => {
     if (value.Username != undefined) {
       getTableValue(tableName, setTable, value.Username);
+      console.log("sdfsdf");
     }
     return () => {};
   }, [value.Username, refreshList]);
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e) => {
+      if (
+        editColumnCoord.isVisible &&
+        refEditColumnModal.current &&
+        !refEditColumnModal.current.contains(e.target)
+      ) {
+        setEditColumnCoord((old) => ({ ...old, isVisible: false }));
+      }
+    };
+    document.addEventListener("mousedown", checkIfClickedOutside);
+    return () => {
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [editColumnCoord]);
 
   const dataTypes = new Object({
     integer: {
@@ -186,23 +212,44 @@ const List = () => {
     e.preventDefault();
   };
 
-  const handleColumnButton = (columnName) => {
-    console.log(columnName);
+  const handleColumnButton = (e, columnName) => {
+    const { top, left, height } = e.currentTarget.getBoundingClientRect();
+
+    setEditColumnCoord((old) => ({
+      ...old,
+      top: height + top,
+      left,
+      isVisible: true,
+      columnName,
+    }));
+  };
+
+  const deleteColumn = async () => {
+    const deleteColumnInfo = new Object({
+      TableName: tableName,
+      User: value.Username,
+      ColumnName: editColumnCoord.columnName,
+    });
+
+    const result = await DeleteColumn(deleteColumnInfo);
+    console.log(result);
+    setEditColumnCoord((old) => ({ ...old, isVisible: false }));
+    setRefreshList(!refreshList);
   };
 
   return (
     <div className="relative">
       <Navbar />
       <Sidebar />
-      <div className="fixed top-0 pt-[60px] h-full w-full bg-gray-400">
+      <div className="fixed top-0 pt-[60px] h-full w-full bg-white">
         <div className="h-full ml-[12.8em]">
-          <div className="absolute w-full bg-white p-3 flex">
+          <div className="absolute w-full bg-white p-3 flex border-b-2">
             <button
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 pr-3 
                       pl-2 rounded flex text-[15px]"
               onClick={newButton}
             >
-              <AiOutlinePlus className="mt-[2px] mr-2 text-[18px]" />
+              <AiOutlinePlus className="mt-[2px] mr-1 text-[18px]" />
               New
             </button>
             <button
@@ -229,13 +276,13 @@ const List = () => {
             </button>
           </div>
           <div className="pt-[55px] h-full w-full overflow-auto">
-            <div className="h-full p-5 text-[12.5px]">
-              <div className="inline-block p-5 mr-5 bg-white rounded-lg min-w-full min-h-full">
+            <div className="text-[12.5px]">
+              <div className="inline-block pl-2 rounded-lg min-w-full min-h-full">
                 {Object.keys(table).length > 0 ? (
                   <table>
-                    <thead>
+                    <thead className=" bg-white">
                       <tr>
-                        <th className="border-2 p-2">
+                        <th className="border-b-2 p-2 py-5">
                           <input type="checkbox" onClick={handleCheckedAll} />
                         </th>
                         {Object.values(table.data.columns).map((object) => {
@@ -248,12 +295,12 @@ const List = () => {
                               onDragOver={(e) => handleDragOver(e)}
                               draggable
                               onClick={(e) =>
-                                handleColumnButton(object.column_name)
+                                handleColumnButton(e, object.column_name)
                               }
                               key={object.column_name}
                               className={
                                 object.column_name != "pkid"
-                                  ? "border-2 min-w-[100px] text-left font-serif hover:bg-gray-200 hover:cursor-pointer "
+                                  ? "border-b-2 min-w-[100px] text-left font-serif hover:bg-gray-200 hover:cursor-pointer "
                                   : "hidden"
                               }
                             >
@@ -262,7 +309,7 @@ const List = () => {
                           );
                         })}
                         <th
-                          className="border-2 min-w-[130px] hover:bg-gray-200 hover:cursor-pointer"
+                          className="border-b-2 min-w-[130px] hover:bg-gray-200 hover:cursor-pointer"
                           onClick={addColumn}
                         >
                           <div className="font-serif flex px-2">
@@ -276,7 +323,7 @@ const List = () => {
                       {Object.values(table.data.tableValues).map((values) => {
                         return (
                           <tr key={values.pkid}>
-                            <td className="border-2 p-2 text-center">
+                            <td className="border-b-2 p-2 text-center">
                               <input
                                 id="checkbox"
                                 type="checkbox"
@@ -288,7 +335,7 @@ const List = () => {
                                 <td
                                   className={
                                     key != "pkid"
-                                      ? "border-2 min-w-[100px]"
+                                      ? "border-b-2 min-w-[100px]"
                                       : "hidden"
                                   }
                                   key={key}
@@ -297,7 +344,7 @@ const List = () => {
                                 </td>
                               );
                             })}
-                            <th className="border-2 min-w-[100px]">
+                            <th className="border-b-2 min-w-[100px]">
                               <div className=""></div>
                             </th>
                           </tr>
@@ -559,8 +606,34 @@ const List = () => {
         </div>
       </div>
       {/* Ending Delete Modal ---Delete---*/}
+
+      {/*Beginning EditModal */}
+      <div
+        ref={refEditColumnModal}
+        style={{ top: editColumnCoord.top, left: editColumnCoord.left }}
+        className={
+          editColumnCoord.isVisible
+            ? `fixed h-[100px] w-[130px] bg-white shadow-lg text-center edit_column_slide_out rounded-b-lg`
+            : "hidden"
+        }
+      >
+        <div className="text-left px-3 py-1 text-[15px]">
+          <div className="px-5 hover:bg-gray-200 hover:cursor-pointer rounded-lg">
+            Edit
+          </div>
+          <div
+            className="px-5 hover:bg-gray-200 hover:cursor-pointer rounded-lg"
+            onClick={deleteColumn}
+          >
+            Delete
+          </div>
+        </div>
+      </div>
+      {/*Beginning EditModal */}
     </div>
   );
 };
+
+//top-[${editColumnCoord.top}px] left-[${editColumnCoord.left}px]
 
 export default List;

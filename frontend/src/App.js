@@ -4,6 +4,8 @@ import Login from "./pages/Login.js";
 import Home from "./pages/Home";
 import List from "./pages/List";
 import Signup from "./pages/Signup";
+import Design from "./pages/Design";
+
 import { Router, Route, Routes } from "react-router-dom";
 import {
   LoginProvider,
@@ -47,6 +49,14 @@ function App() {
           element={
             <LoginProvider>
               <List />
+            </LoginProvider>
+          }
+        />
+        <Route
+          path="/Design/:designTable"
+          element={
+            <LoginProvider>
+              <Design />
             </LoginProvider>
           }
         />

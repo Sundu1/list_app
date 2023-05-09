@@ -16,4 +16,18 @@ const DeleteRow = async (deleteRowsInfo) => {
   }
 };
 
-export { DeleteRow };
+const DeleteColumn = async (deleteColumnInfo) => {
+  try {
+    const response = await axios({
+      method: "delete",
+      url: `${BASE_URL}/delete-column`,
+      data: deleteColumnInfo,
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { DeleteRow, DeleteColumn };

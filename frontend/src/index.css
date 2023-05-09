@@ -3,18 +3,36 @@
 @tailwind utilities;
 
 @layer components {
-  test_animation {
-    animation-duration: 3s;
-    animation-name: slidein;
+  .slide-down {
+    animation-duration: 1s;
+    animation-name: slideDown;
   }
 
-  from {
-    margin-left: 100%;
-    width: 300%;
+  @keyframes slideDown {
+    from {
+      opacity: 0;
+      margin-top: 10px;
+    }
+
+    to {
+      margin-top: 100px;
+      opacity: 1;
+    }
   }
 
-  to {
-    margin-left: 0%;
-    width: 100%;
+  .edit_column_slide_out {
+    animation-duration: 0.2s;
+    animation-name: slideOutColumn;
+  }
+
+  @keyframes slideOutColumn {
+    from {
+      opacity: 0;
+      height: 0;
+    }
+    to {
+      opacity: 1;
+      height: 100px;
+    }
   }
 }
