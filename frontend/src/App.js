@@ -53,7 +53,7 @@ function App() {
           }
         />
         <Route
-          path="/Design/:designTable"
+          path="/design/:designTable"
           element={
             <LoginProvider>
               <Design />
