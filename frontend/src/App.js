@@ -55,9 +55,9 @@ function App() {
         <Route
           path="/design/:designTable"
           element={
-            <LoginProvider>
-              <Design />
-            </LoginProvider>
+            // <LoginProvider>
+            <Design />
+            // </LoginProvider>
           }
         />
       </Routes>

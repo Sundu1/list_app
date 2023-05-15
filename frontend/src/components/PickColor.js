@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const PickColor = ({ setElementName }) => {
+const PickColor = ({ updateElementsValues }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -36,8 +36,6 @@ const PickColor = ({ setElementName }) => {
       const [r, g, b] = imgData.data;
 
       const hex = valueToHex(r, g, b);
-
-      setElementName((old) => ({ ...old, background_color: hex }));
     });
   }, []);
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext, useRef } from "react";
 import { json, useParams } from "react-router-dom";
-import { UserContext } from "../components/LoginProvider";
+import { LoginProvider, UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
 import Sidebar from "../components/Sidebar";
@@ -95,23 +95,13 @@ const Design = () => {
     if (e.target.id) {
       setElementName((old) => ({
         ...old,
-        values: (old) => ({
-          ...old,
-          [e.target.id]: elementName.values[e.target.id],
-        }),
+        values: { ...old.values, [e.target.id]: e.target.value },
       }));
     }
 
-    console.log(elementName);
-
-    let newValues;
     const newState = jsonValue.elements.map((element) => {
       if (element.name == elementName.name) {
-        newValues = {
-          ...element,
-          [e.target.id]: elementName.values[e.target.id],
-        };
-        return newValues;
+        return { ...elementName.values, [e.target.id]: e.target.value };
       }
       return { ...element };
     });
@@ -154,15 +144,17 @@ const Design = () => {
               <div className="pb-2 flex">
                 <div
                   className="w-[20px] h-[20px] border-2 mr-2"
-                  style={{ background: elementName.background_color }}
+                  style={{ background: elementName.values.background_color }}
                 ></div>
                 <div className="">Background</div>
               </div>
               <input
+                id="background_color"
                 className="bg-black mr-5 rounded px-1 w-[180px]"
-                value={elementName.background_color}
+                value={elementName.values.background_color}
+                onChange={updateElementsValues}
               />
-              <PickColor setElementName={setElementName} />
+              <PickColor />
             </div>
             <div className="px-5 grid grid-cols-2">
               <div>Height</div>
