@@ -22,33 +22,36 @@ const Design = () => {
     name: undefined,
     values: {},
   });
+
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
         parent: "EditContainer",
         type: "div",
         name: "Page",
-        height: "500px",
-        width: "500px",
+        height: "500",
+        width: "500",
         background_color: "white",
         padding: "10px",
         border: "",
         text: "testing ",
         position: "",
         display: "",
+        margin: "",
       },
       {
         parent: "Page",
         type: "div",
         name: "container",
-        height: "100px",
-        width: "100px",
+        height: "100",
+        width: "100",
         background_color: "black",
         padding: "10px",
         border: "",
         text: "testing ",
         position: "",
         display: "",
+        margin: "",
       },
     ],
   });
@@ -92,6 +95,7 @@ const Design = () => {
   };
 
   const updateElementsValues = (e) => {
+    console.log(e.target.value);
     if (e.target.id) {
       setElementName((old) => ({
         ...old,
@@ -154,23 +158,66 @@ const Design = () => {
                 value={elementName.values.background_color}
                 onChange={updateElementsValues}
               />
-              <PickColor />
+              <PickColor updateElementsValues={updateElementsValues} />
             </div>
-            <div className="px-5 grid grid-cols-2">
-              <div>Height</div>
-              <div>width</div>
-              <input
-                id="height"
-                className="bg-black mr-5 rounded px-1"
-                value={elementName.values.height}
-                onChange={updateElementsValues}
-              />
+            <div className="px-5 pt-3">
+              <div className="flex justify-between">
+                <div>Height</div>
+                <input
+                  id="height"
+                  className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                  value={elementName.values.height}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div>
+                <input
+                  id="height"
+                  type="range"
+                  max={1000}
+                  className="mr-5 rounded px-1 w-full "
+                  value={elementName.values.height}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div className="flex justify-between">
+                <div>width</div>
+                <input
+                  id="width"
+                  className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                  value={elementName.values.width}
+                  onChange={updateElementsValues}
+                />
+              </div>
               <input
                 id="width"
-                className="bg-black mr-5 rounded px-1"
+                type="range"
+                max={1000}
+                className="mr-5 rounded px-1 w-full "
                 value={elementName.values.width}
                 onChange={updateElementsValues}
               />
+              <div>
+                <div>Margin</div>
+                <input
+                  id="margin"
+                  type="range"
+                  value={elementName.values.margin}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div>
+                <div>Border</div>
+                <input />
+              </div>
+              <div>
+                <div>Padding</div>
+                <input />
+              </div>
+              <div>
+                <div>padding</div>
+                <input />
+              </div>
             </div>
           </div>
         </div>
@@ -185,7 +232,7 @@ const Design = () => {
 // parent: "EditContainer",
 // type: "div",
 // name: "Page",
-// height: "100%",
+// height: "500px",
 // width: "500px",
 // background_color: "white",
 // padding: "10px",
@@ -193,4 +240,5 @@ const Design = () => {
 // text: "testing ",
 // position: "",
 // display: "",
+
 export default Design;

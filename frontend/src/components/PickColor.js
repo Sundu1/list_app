@@ -36,6 +36,14 @@ const PickColor = ({ updateElementsValues }) => {
       const [r, g, b] = imgData.data;
 
       const hex = valueToHex(r, g, b);
+      const background_color_values = new Object({
+        target: {
+          id: "background_color",
+          value: hex,
+        },
+      });
+
+      updateElementsValues(background_color_values);
     });
   }, []);
 
@@ -44,7 +52,11 @@ const PickColor = ({ updateElementsValues }) => {
     return hex;
   }
 
-  return <canvas ref={canvasRef} height="100" width="180"></canvas>;
+  return (
+    <div>
+      <canvas ref={canvasRef} height="100" width="180"></canvas>
+    </div>
+  );
 };
 
 export default PickColor;

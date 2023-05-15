@@ -19,8 +19,8 @@ const HtmlRenderFunction = (htmlValue, setChangeJson) => {
       };
       newDiv.setAttribute("draggable", true);
       newDiv.style.background = element.background_color;
-      newDiv.style.height = element.height;
-      newDiv.style.width = element.width;
+      newDiv.style.height = element.height + "px";
+      newDiv.style.width = element.width + "px";
       newDiv.style.border = element.border;
       parent.appendChild(newDiv);
     });
