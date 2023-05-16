@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const PickColor = ({ updateElementsValues }) => {
+const PickColor = ({ setColorUpdate }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -43,7 +43,7 @@ const PickColor = ({ updateElementsValues }) => {
         },
       });
 
-      updateElementsValues(background_color_values);
+      setColorUpdate(background_color_values);
     });
   }, []);
 
@@ -54,7 +54,12 @@ const PickColor = ({ updateElementsValues }) => {
 
   return (
     <div>
-      <canvas ref={canvasRef} height="100" width="180"></canvas>
+      <canvas
+        ref={canvasRef}
+        height="100"
+        width="180"
+        className="rounded-b-[6px] border-2 border-t-0 border-[#3071a9]"
+      ></canvas>
     </div>
   );
 };

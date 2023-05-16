@@ -23,6 +23,8 @@ const Design = () => {
     values: {},
   });
 
+  const [colorUpdate, setColorUpdate] = useState({});
+
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
@@ -37,7 +39,10 @@ const Design = () => {
         text: "testing ",
         position: "",
         display: "",
-        margin: "",
+        margin_top: "0",
+        margin_left: "0",
+        margin_right: "0",
+        margin_bottom: "0",
       },
       {
         parent: "Page",
@@ -51,7 +56,10 @@ const Design = () => {
         text: "testing ",
         position: "",
         display: "",
-        margin: "",
+        margin_top: "0",
+        margin_left: "0",
+        margin_right: "0",
+        margin_bottom: "0",
       },
     ],
   });
@@ -60,6 +68,12 @@ const Design = () => {
     HtmlRenderFunction(jsonValue, setChangeJson);
     return () => {};
   }, [jsonValue]);
+
+  useEffect(() => {
+    if (colorUpdate.target) {
+      updateElementsValues(colorUpdate);
+    }
+  }, [colorUpdate]);
 
   const clickedElement = (e) => {
     const changeName = changeJson.name;
@@ -95,7 +109,6 @@ const Design = () => {
   };
 
   const updateElementsValues = (e) => {
-    console.log(e.target.value);
     if (e.target.id) {
       setElementName((old) => ({
         ...old,
@@ -112,24 +125,26 @@ const Design = () => {
     setJsonValue({ elements: newState });
   };
 
+  console.log(jsonValue);
+
   return (
     <div>
       <Navbar />
       <div className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] rounded-lg text-[30px] z-50">
         <div className="p-3 text-[28px]">
-          <ImPlus className="text-gray-300 rounded-full hover:text-white hover:cursor-pointer" />
+          <ImPlus className="design_icon" />
         </div>
         <div className="p-3 text-[28px]">
-          <FaArrowLeft className="text-gray-300 rounded-full hover:text-white hover:cursor-pointer" />
+          <FaArrowLeft className="design_icon" />
         </div>
         <div className="p-3 text-[28px]">
-          <FaArrowRight className="text-gray-300  rounded-full hover:text-white hover:cursor-pointer" />
+          <FaArrowRight className="design_icon" />
         </div>
         <div className="p-3 text-[28px]">
-          <BsFillDatabaseFill className="text-gray-300  rounded-full hover:text-white hover:cursor-pointer" />
+          <BsFillDatabaseFill className="design_icon" />
         </div>
         <div className="p-3 text-[28px]">
-          <GiHamburgerMenu className="text-gray-300  rounded-full hover:text-white hover:cursor-pointer" />
+          <GiHamburgerMenu className="design_icon" />
         </div>
       </div>
       <div
@@ -139,12 +154,12 @@ const Design = () => {
       ></div>
       {/* Edit modal Begins here*/}
       {elementName.name !== undefined ? (
-        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50">
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
           <div className="text-white">
             <h1 className="px-5 py-3 border-b-2 border-black text-lg">
               {elementName.values.name}
             </h1>
-            <div className="pt-5 px-5">
+            <div className="pt-5 px-10 h-full">
               <div className="pb-2 flex">
                 <div
                   className="w-[20px] h-[20px] border-2 mr-2"
@@ -154,18 +169,18 @@ const Design = () => {
               </div>
               <input
                 id="background_color"
-                className="bg-black mr-5 rounded px-1 w-[180px]"
+                className="bg-black mr-5 rounded-t-[6px] px-1 w-[184px] border-2 border-b-0 border-[#3071a9]"
                 value={elementName.values.background_color}
                 onChange={updateElementsValues}
               />
-              <PickColor updateElementsValues={updateElementsValues} />
+              <PickColor setColorUpdate={setColorUpdate} />
             </div>
-            <div className="px-5 pt-3">
+            <div className="px-10 pt-3 absolute h-full">
               <div className="flex justify-between">
                 <div>Height</div>
                 <input
                   id="height"
-                  className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                  className="mr-5 rounded px-1 w-[50px] bg-transparent "
                   value={elementName.values.height}
                   onChange={updateElementsValues}
                 />
@@ -175,7 +190,7 @@ const Design = () => {
                   id="height"
                   type="range"
                   max={1000}
-                  className="mr-5 rounded px-1 w-full "
+                  className="slider_style"
                   value={elementName.values.height}
                   onChange={updateElementsValues}
                 />
@@ -193,30 +208,148 @@ const Design = () => {
                 id="width"
                 type="range"
                 max={1000}
-                className="mr-5 rounded px-1 w-full "
+                className="slider_style"
                 value={elementName.values.width}
                 onChange={updateElementsValues}
               />
-              <div>
-                <div>Margin</div>
-                <input
-                  id="margin"
-                  type="range"
-                  value={elementName.values.margin}
-                  onChange={updateElementsValues}
-                />
-              </div>
-              <div>
-                <div>Border</div>
-                <input />
-              </div>
-              <div>
-                <div>Padding</div>
-                <input />
-              </div>
-              <div>
-                <div>padding</div>
-                <input />
+              <div className="pt-5">
+                <div className="pb-5">Spacing</div>
+                <div className="grid h-[120px] w-[224px] grid-cols-[36px_1fr_36px] grid-rows-[24px_minmax(16px,_1fr)_24px]">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={224}
+                    height={120}
+                    className="bg-[#3071a9]"
+                  >
+                    <text>sdfsdfsd</text>
+                    <path
+                      className="fill-gray-600/90 hover:fill-gray-500/90"
+                      d="
+                    m1,1
+                    h223
+                    l-36,24
+                    h-151
+                    l-36,-24z
+                       "
+                    ></path>
+                    <path
+                      className="fill-gray-600 hover:fill-gray-500"
+                      d="
+                    m223,1
+                    v119
+                    l-36,-24
+                    v-71
+                    l36,-24z
+                       "
+                    ></path>
+                    <path
+                      className="fill-gray-600 hover:fill-gray-500"
+                      d="
+                    m1,1
+                    v119
+                    l36,-24
+                    v-71
+                    l-36,-24z
+                       "
+                    ></path>
+                    <path
+                      className="fill-gray-600/90 hover:fill-gray-500/90"
+                      d="
+                    m1,119
+                    h223
+                    l-36,-24
+                    h-151
+                    l-36,24z
+                       "
+                    ></path>
+                  </svg>
+                  <div className="text-black col-start-2 row-start-2 pt-1 pl-1">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width={144}
+                      height={64}
+                    >
+                      <path
+                        className="fill-gray-600/90 hover:fill-gray-600/80"
+                        d="
+                        m1,1
+                        h143
+                        l-36,24
+                        h-71
+                        l-36,-24z
+                      "
+                      ></path>
+                      <path
+                        className="fill-gray-600 hover:fill-gray-500"
+                        d="
+                        m1,1
+                        v63
+                        l36,-24
+                        v-15
+                        l-36,-24z
+                      "
+                      ></path>
+                      <path
+                        className="fill-gray-600 hover:fill-gray-500"
+                        d="
+                        m143,1
+                        v63
+                        l-36,-24
+                        v-15
+                        l36,-24z
+                      "
+                      ></path>
+
+                      <path
+                        className="fill-gray-600/90 hover:fill-gray-600/80"
+                        d="
+                        m1,63
+                        h143
+                        l-36,-24
+                        h-71
+                        l-36,24z
+                      "
+                      ></path>
+                    </svg>
+                  </div>
+                  <div className="col-start-0 col-end-0 text-center">
+                    <input
+                      id="margin_top"
+                      type="number"
+                      className="margin_webkit"
+                      value={elementName.values.margin_top}
+                      onChange={updateElementsValues}
+                    />
+                  </div>
+                  <div className="col-start-1 col-end-1 text-center pt-[50%]">
+                    <input
+                      id="margin_left"
+                      type="number"
+                      className="margin_webkit"
+                      value={elementName.values.margin_left}
+                      onChange={updateElementsValues}
+                    />
+                  </div>
+                  <div className="col-start-3 col-end-0 text-center pt-[50%]">
+                    <input
+                      id="margin_right"
+                      type="number"
+                      className="margin_webkit"
+                      value={elementName.values.margin_right}
+                      onChange={updateElementsValues}
+                    />
+                  </div>
+                  <div className="col-start-3 col-end-2 text-center">
+                    <input
+                      id="margin_bottom"
+                      type="number"
+                      className="margin_webkit"
+                      value={elementName.values.margin_bottom}
+                      onChange={updateElementsValues}
+                    />
+                  </div>
+                </div>
+                <svg xmlns="http://www.w3.org/2000/svg"></svg>
               </div>
             </div>
           </div>

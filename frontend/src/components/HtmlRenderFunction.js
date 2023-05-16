@@ -22,6 +22,10 @@ const HtmlRenderFunction = (htmlValue, setChangeJson) => {
       newDiv.style.height = element.height + "px";
       newDiv.style.width = element.width + "px";
       newDiv.style.border = element.border;
+      newDiv.style.marginLeft = element.margin_left + "px";
+      newDiv.style.marginRight = element.margin_right + "px";
+      newDiv.style.marginTop = element.margin_top + "px";
+      newDiv.style.marginBottom = element.margin_bottom + "px";
       parent.appendChild(newDiv);
     });
   }
