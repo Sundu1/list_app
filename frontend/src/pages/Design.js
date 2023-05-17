@@ -130,7 +130,10 @@ const Design = () => {
   return (
     <div>
       <Navbar />
-      <div className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] rounded-lg text-[30px] z-50">
+      <div
+        className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] 
+                        rounded-lg text-[30px] z-50"
+      >
         <div className="p-3 text-[28px]">
           <ImPlus className="design_icon" />
         </div>
@@ -358,6 +361,22 @@ const Design = () => {
         ""
       )}
       {/* Edit modal Ends here*/}
+      {/* New element Beginning here */}
+      <div
+        className="fixed mt-[10px] left-[70px] rounded-lg w-[15em] h-[20em] z-50
+                   bg-[rgba(53,54,66,.9825)] 
+      "
+      >
+        <div className="grid grid-cols-2 gap-y-[10px] gap-x-[30px] pt-5 px-5 text-white">
+          <div className="design_new_elements">Container</div>
+          <div className="design_new_elements">Text</div>
+          <div className="design_new_elements">Image</div>
+          <div className="design_new_elements">Video</div>
+          <div className="design_new_elements">Icons</div>
+          <div className="design_new_elements">Buttons</div>
+        </div>
+      </div>
+      {/* New element Ending here */}
     </div>
   );
 };

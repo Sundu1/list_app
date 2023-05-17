@@ -3,9 +3,23 @@
 @tailwind utilities;
 
 @layer components {
+  .design_new_elements {
+    padding: 5px;
+    border-radius: 5px;
+  }
+  .design_new_elements:hover {
+    background: rgba(50, 80, 80);
+    cursor: pointer;
+    font-weight: bold;
+  }
+
   .design_icon {
     color: #ffffff;
     padding-right: 2px;
+  }
+  .design_icon:hover {
+    cursor: pointer;
+    color: #808080;
   }
   .slider_style {
     -webkit-appearance: none;
