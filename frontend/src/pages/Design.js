@@ -24,7 +24,7 @@ const Design = () => {
   });
 
   const [colorUpdate, setColorUpdate] = useState({});
-
+  const [isAddElement, setIsAddElement] = useState(false);
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
@@ -63,6 +63,27 @@ const Design = () => {
       },
     ],
   });
+
+  const refAddElement = useRef();
+
+  useEffect(() => {
+    const checkIfClickedOutside = (e) => {
+      console.log(e.target && e.target.id);
+      if (
+        isAddElement &&
+        refAddElement.current &&
+        !refAddElement.current.contains(e.target) &&
+        e.target.id !== "test"
+      ) {
+        setIsAddElement(false);
+      }
+    };
+
+    document.addEventListener("mousedown", checkIfClickedOutside);
+    return () => {
+      document.removeEventListener("mousedown", checkIfClickedOutside);
+    };
+  }, [isAddElement]);
 
   useEffect(() => {
     HtmlRenderFunction(jsonValue, setChangeJson);
@@ -125,7 +146,9 @@ const Design = () => {
     setJsonValue({ elements: newState });
   };
 
-  console.log(jsonValue);
+  const handleAddElement = () => {
+    setIsAddElement(!isAddElement);
+  };
 
   return (
     <div>
@@ -134,8 +157,20 @@ const Design = () => {
         className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] 
                         rounded-lg text-[30px] z-50"
       >
-        <div className="p-3 text-[28px]">
-          <ImPlus className="design_icon" />
+        <div className="p-3 text-[28px] h-[50px]">
+          <svg className="hover:icon_style h-full w-full">
+            <path
+              id="test"
+              onClick={handleAddElement}
+              className="fill-white scale-[1.5] hover:fill-gray-500 hover:cursor-pointer
+                         filter drop-shadow"
+              d="M15.5 6h-5.5v-5.5c0-0.276-0.224-0.5-0.5-0.5h-3c-0.276 
+                0-0.5 0.224-0.5 0.5v5.5h-5.5c-0.276 0-0.5 0.224-0.5 
+                0.5v3c0 0.276 0.224 0.5 0.5 0.5h5.5v5.5c0 0.276 0.224 
+                0.5 0.5 0.5h3c0.276 0 0.5-0.224 0.5-0.5v-5.5h5.5c0.276 
+                0 0.5-0.224 0.5-0.5v-3c0-0.276-0.224-0.5-0.5-0.5z"
+            ></path>
+          </svg>
         </div>
         <div className="p-3 text-[28px]">
           <FaArrowLeft className="design_icon" />
@@ -362,20 +397,25 @@ const Design = () => {
       )}
       {/* Edit modal Ends here*/}
       {/* New element Beginning here */}
-      <div
-        className="fixed mt-[10px] left-[70px] rounded-lg w-[15em] h-[20em] z-50
+
+      {isAddElement ? (
+        <div
+          ref={refAddElement}
+          className="fixed mt-[10px] left-[70px] rounded-lg w-[15em] h-[20em] z-50
                    bg-[rgba(53,54,66,.9825)] 
       "
-      >
-        <div className="grid grid-cols-2 gap-y-[10px] gap-x-[30px] pt-5 px-5 text-white">
-          <div className="design_new_elements">Container</div>
-          <div className="design_new_elements">Text</div>
-          <div className="design_new_elements">Image</div>
-          <div className="design_new_elements">Video</div>
-          <div className="design_new_elements">Icons</div>
-          <div className="design_new_elements">Buttons</div>
+        >
+          <div className="grid grid-cols-2 gap-y-[10px] gap-x-[30px] pt-5 px-5 text-white">
+            <div className="design_new_elements">Container</div>
+            <div className="design_new_elements">Text</div>
+            <div className="design_new_elements">Image</div>
+            <div className="design_new_elements">Video</div>
+            <div className="design_new_elements">Icons</div>
+            <div className="design_new_elements">Buttons</div>
+          </div>
         </div>
-      </div>
+      ) : null}
+
       {/* New element Ending here */}
     </div>
   );

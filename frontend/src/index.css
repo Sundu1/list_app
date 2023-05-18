@@ -3,6 +3,9 @@
 @tailwind utilities;
 
 @layer components {
+  .icon_style {
+    filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
+  }
   .design_new_elements {
     padding: 5px;
     border-radius: 5px;
