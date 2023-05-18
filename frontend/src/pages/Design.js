@@ -25,6 +25,7 @@ const Design = () => {
 
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
+  const [refresh, setRefresh] = useState(false);
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
@@ -68,7 +69,6 @@ const Design = () => {
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
-      console.log(e.target && e.target.id);
       if (
         isAddElement &&
         refAddElement.current &&
@@ -88,7 +88,7 @@ const Design = () => {
   useEffect(() => {
     HtmlRenderFunction(jsonValue, setChangeJson);
     return () => {};
-  }, [jsonValue]);
+  }, [jsonValue, refresh]);
 
   useEffect(() => {
     if (colorUpdate.target) {
@@ -150,6 +150,34 @@ const Design = () => {
     setIsAddElement(!isAddElement);
   };
 
+  const addNewElement = (e) => {
+    if (e.target.id == "container") {
+      const newElement = new Object({
+        parent: "Page",
+        type: "div",
+        name: "container",
+        height: "1000",
+        width: "100",
+        background_color: "green",
+        padding: "10px",
+        border: "",
+        text: "testing ",
+        position: "",
+        display: "",
+        margin_top: "0",
+        margin_left: "0",
+        margin_right: "0",
+        margin_bottom: "0",
+      });
+      // jsonValue.elements.push(newElement);
+      setJsonValue((old) => ({
+        elements: [...old.elements, newElement],
+      }));
+    }
+  };
+
+  console.log(jsonValue);
+
   return (
     <div>
       <Navbar />
@@ -157,12 +185,15 @@ const Design = () => {
         className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] 
                         rounded-lg text-[30px] z-50"
       >
-        <div className="p-3 text-[28px] h-[50px]">
-          <svg className="hover:icon_style h-full w-full">
+        <div className="text-[28px] h-[50px]">
+          <svg
+            className="block hover:icon_style h-full w-full text-center"
+            viewBox="-13 0 50 30"
+          >
             <path
               id="test"
               onClick={handleAddElement}
-              className="fill-white scale-[1.5] hover:fill-gray-500 hover:cursor-pointer
+              className="fill-white scale-[1.5] hover:scale-[1.8] hover:fill-gray-500 hover:cursor-pointer
                          filter drop-shadow"
               d="M15.5 6h-5.5v-5.5c0-0.276-0.224-0.5-0.5-0.5h-3c-0.276 
                 0-0.5 0.224-0.5 0.5v5.5h-5.5c-0.276 0-0.5 0.224-0.5 
@@ -406,7 +437,13 @@ const Design = () => {
       "
         >
           <div className="grid grid-cols-2 gap-y-[10px] gap-x-[30px] pt-5 px-5 text-white">
-            <div className="design_new_elements">Container</div>
+            <div
+              className="design_new_elements"
+              id="container"
+              onClick={addNewElement}
+            >
+              Container
+            </div>
             <div className="design_new_elements">Text</div>
             <div className="design_new_elements">Image</div>
             <div className="design_new_elements">Video</div>
@@ -420,17 +457,5 @@ const Design = () => {
     </div>
   );
 };
-
-// parent: "EditContainer",
-// type: "div",
-// name: "Page",
-// height: "500px",
-// width: "500px",
-// background_color: "white",
-// padding: "10px",
-// border: "",
-// text: "testing ",
-// position: "",
-// display: "",
 
 export default Design;
