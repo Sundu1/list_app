@@ -113,7 +113,7 @@ const Design = () => {
       if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
         const newState = jsonValue.elements.map((element) => {
           if (element.name == changeName) {
-            return { ...element, border: oldBorderValue };
+            return { ...element, border: "" };
           }
           return { ...element };
         });
@@ -127,11 +127,10 @@ const Design = () => {
     if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
       const newState = jsonValue.elements.map((element) => {
         if (element.name == changeName) {
-          setOldBorderValue(element.border);
           newValues = { ...element, border: "2px red solid" };
           return newValues;
         }
-        return { ...element };
+        return { ...element, border: "" };
       });
       setChangeJson((old) => ({ ...old, isClicked: false }));
       setJsonValue({ elements: newState });
@@ -251,7 +250,7 @@ const Design = () => {
               <div className="">
                 <select
                   id="display"
-                  className="bg-transparent border-2 rounded-lg"
+                  className="bg-transparent border-2 rounded"
                   value={elementName.values.display}
                   onChange={updateElementsValues}
                 >

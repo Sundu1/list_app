@@ -48,8 +48,14 @@ const PickColor = ({ setColorUpdate }) => {
   }, []);
 
   function valueToHex(r, g, b) {
-    const hex = "#" + r.toString(16) + g.toString(16) + b.toString(16);
-    return hex;
+    const a = [r, g, b];
+    const hex = a
+      .map((x) => {
+        x = parseInt(x).toString(16);
+        return x.length == 1 ? "0" + x : x;
+      })
+      .join("");
+    return "#" + hex;
   }
 
   return (
