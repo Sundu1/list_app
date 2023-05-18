@@ -23,6 +23,7 @@ const Design = () => {
     values: {},
   });
 
+  const [oldBorderValue, setOldBorderValue] = useState("");
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
   const [refresh, setRefresh] = useState(false);
@@ -36,7 +37,7 @@ const Design = () => {
         width: "500",
         background_color: "white",
         padding: "10px",
-        border: "",
+        border: "2px solid black",
         text: "testing ",
         position: "",
         display: "",
@@ -44,6 +45,10 @@ const Design = () => {
         margin_left: "0",
         margin_right: "0",
         margin_bottom: "0",
+        padding_top: "0",
+        padding_left: "0",
+        padding_right: "0",
+        padding_bottom: "0",
       },
       {
         parent: "Page",
@@ -53,7 +58,7 @@ const Design = () => {
         width: "100",
         background_color: "black",
         padding: "10px",
-        border: "",
+        border: "2px solid #33ada9",
         text: "testing ",
         position: "",
         display: "",
@@ -61,6 +66,10 @@ const Design = () => {
         margin_left: "0",
         margin_right: "0",
         margin_bottom: "0",
+        padding_top: "0",
+        padding_left: "0",
+        padding_right: "0",
+        padding_bottom: "0",
       },
     ],
   });
@@ -104,9 +113,9 @@ const Design = () => {
       if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
         const newState = jsonValue.elements.map((element) => {
           if (element.name == changeName) {
-            return { ...element, border: "" };
+            return { ...element, border: oldBorderValue };
           }
-          return { ...element, border: "" };
+          return { ...element };
         });
         setChangeJson((old) => ({ ...old, isClicked: false }));
         setJsonValue({ elements: newState });
@@ -118,10 +127,11 @@ const Design = () => {
     if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
       const newState = jsonValue.elements.map((element) => {
         if (element.name == changeName) {
+          setOldBorderValue(element.border);
           newValues = { ...element, border: "2px red solid" };
           return newValues;
         }
-        return { ...element, border: "" };
+        return { ...element };
       });
       setChangeJson((old) => ({ ...old, isClicked: false }));
       setJsonValue({ elements: newState });
@@ -151,14 +161,18 @@ const Design = () => {
   };
 
   const addNewElement = (e) => {
-    if (e.target.id == "container") {
+    if (e.target.id == "container_element") {
+      const container_all = jsonValue.elements.filter((element) =>
+        element.name.includes("container")
+      ).length;
+
       const newElement = new Object({
         parent: "Page",
         type: "div",
-        name: "container",
-        height: "1000",
+        name: `container-${container_all + 1}`,
+        height: "100",
         width: "100",
-        background_color: "green",
+        background_color: "black",
         padding: "10px",
         border: "",
         text: "testing ",
@@ -168,15 +182,16 @@ const Design = () => {
         margin_left: "0",
         margin_right: "0",
         margin_bottom: "0",
+        padding_top: "0",
+        padding_left: "0",
+        padding_right: "0",
+        padding_bottom: "0",
       });
-      // jsonValue.elements.push(newElement);
       setJsonValue((old) => ({
         elements: [...old.elements, newElement],
       }));
     }
   };
-
-  console.log(jsonValue);
 
   return (
     <div>
@@ -216,9 +231,12 @@ const Design = () => {
           <GiHamburgerMenu className="design_icon" />
         </div>
       </div>
+
+      {/* EditContainer is where all new divs will append to */}
       <div
         id="EditContainer"
-        className="fixed flex justify-center bg-gray-300/50 w-full h-full z-10 text-black"
+        className="fixed top-0 pt-[65px] flex justify-center bg-gray-300/50 w-full 
+                   h-full z-10 text-black overflow-auto"
         onClick={(e) => clickedElement(e)}
       ></div>
       {/* Edit modal Begins here*/}
@@ -229,9 +247,36 @@ const Design = () => {
               {elementName.values.name}
             </h1>
             <div className="pt-5 px-10 h-full">
+              Display
+              <div className="">
+                <select
+                  id="display"
+                  className="bg-transparent border-2 rounded-lg"
+                  value={elementName.values.display}
+                  onChange={updateElementsValues}
+                >
+                  <option value="flex" className="bg-[rgba(53,54,66,.9825)]">
+                    Flex
+                  </option>
+                  <option value="Block" className="bg-[rgba(53,54,66,.9825)]">
+                    Block
+                  </option>
+                  <option value="Inline" className="bg-[rgba(53,54,66,.9825)]">
+                    Inline
+                  </option>
+                  <option value="Grid" className="bg-[rgba(53,54,66,.9825)]">
+                    Grid
+                  </option>
+                  <option value="" className="bg-[rgba(53,54,66,.9825)]">
+                    None
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div className="pt-5 px-10 h-full">
               <div className="pb-2 flex">
                 <div
-                  className="w-[20px] h-[20px] border-2 mr-2"
+                  className="w-[20px] h-[20px] border-2 mr-2 mt-1"
                   style={{ background: elementName.values.background_color }}
                 ></div>
                 <div className="">Background</div>
@@ -439,7 +484,7 @@ const Design = () => {
           <div className="grid grid-cols-2 gap-y-[10px] gap-x-[30px] pt-5 px-5 text-white">
             <div
               className="design_new_elements"
-              id="container"
+              id="container_element"
               onClick={addNewElement}
             >
               Container

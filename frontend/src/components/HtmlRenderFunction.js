@@ -1,4 +1,5 @@
 import React, { createElement } from "react";
+import { LoginProvider } from "./LoginProvider";
 
 const HtmlRenderFunction = (htmlValue, setChangeJson) => {
   let newDiv;
@@ -18,6 +19,7 @@ const HtmlRenderFunction = (htmlValue, setChangeJson) => {
           setChangeJson({ isChanged: true, name: element.name });
       };
       newDiv.setAttribute("draggable", true);
+      newDiv.style.display = element.display;
       newDiv.style.background = element.background_color;
       newDiv.style.height = element.height + "px";
       newDiv.style.width = element.width + "px";
