@@ -64,7 +64,7 @@ const PickColor = ({ setColorUpdate }) => {
         ref={canvasRef}
         height="100"
         width="180"
-        className="rounded-b-[6px] border-2 border-t-0 border-[#3071a9]"
+        className="rounded-b-[6px] border-2 border-t-0 border-[rgba(53,54,66,.9825)]"
       ></canvas>
     </div>
   );

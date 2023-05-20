@@ -31,8 +31,8 @@ const Design = () => {
     elements: [
       {
         parent: "EditContainer",
-        type: "div",
-        name: "Page",
+        type: "container",
+        id: "Page",
         height: "500",
         width: "500",
         background_color: "white",
@@ -50,32 +50,10 @@ const Design = () => {
         padding_right: "0",
         padding_bottom: "0",
       },
-      {
-        parent: "Page",
-        type: "div",
-        name: "container",
-        height: "100",
-        width: "100",
-        background_color: "black",
-        padding: "10px",
-        border: "2px solid #33ada9",
-        text: "testing ",
-        position: "",
-        display: "",
-        margin_top: "0",
-        margin_left: "0",
-        margin_right: "0",
-        margin_bottom: "0",
-        padding_top: "0",
-        padding_left: "0",
-        padding_right: "0",
-        padding_bottom: "0",
-      },
     ],
   });
 
   const refAddElement = useRef();
-
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
       if (
@@ -106,13 +84,14 @@ const Design = () => {
   }, [colorUpdate]);
 
   const clickedElement = (e) => {
+    console.log(e.target.id);
     const changeName = changeJson.name;
     let newValues = {};
 
     if (e.target.id == elementName.name) {
       if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
         const newState = jsonValue.elements.map((element) => {
-          if (element.name == changeName) {
+          if (element.id == changeName) {
             return { ...element, border: "" };
           }
           return { ...element };
@@ -126,7 +105,7 @@ const Design = () => {
 
     if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
       const newState = jsonValue.elements.map((element) => {
-        if (element.name == changeName) {
+        if (element.id == changeName) {
           newValues = { ...element, border: "2px red solid" };
           return newValues;
         }
@@ -142,12 +121,15 @@ const Design = () => {
     if (e.target.id) {
       setElementName((old) => ({
         ...old,
-        values: { ...old.values, [e.target.id]: e.target.value },
+        values: {
+          ...old.values,
+          [e.target.id]: e.target.value,
+        },
       }));
     }
 
     const newState = jsonValue.elements.map((element) => {
-      if (element.name == elementName.name) {
+      if (element.id == elementName.name) {
         return { ...elementName.values, [e.target.id]: e.target.value };
       }
       return { ...element };
@@ -162,13 +144,13 @@ const Design = () => {
   const addNewElement = (e) => {
     if (e.target.id == "container_element") {
       const container_all = jsonValue.elements.filter((element) =>
-        element.name.includes("container")
+        element.id.toLowerCase().includes("container")
       ).length;
 
       const newElement = new Object({
         parent: "Page",
-        type: "div",
-        name: `container-${container_all + 1}`,
+        type: "container",
+        id: `Container-${container_all + 1}`,
         height: "100",
         width: "100",
         background_color: "black",
@@ -190,7 +172,52 @@ const Design = () => {
         elements: [...old.elements, newElement],
       }));
     }
+    if (e.target.id == "text") {
+      const container_all = jsonValue.elements.filter((element) =>
+        element.id.toLowerCase().includes("container")
+      ).length;
+
+      const newElement = new Object({
+        parent: "Page",
+        type: "text",
+        id: `Text-${container_all + 1}`,
+        text_value: "put your text here",
+        text_color: "black",
+        text_style: "",
+        text_size: "20",
+        text_fontfamily: "",
+      });
+      setJsonValue((old) => ({
+        elements: [...old.elements, newElement],
+      }));
+    }
   };
+
+  const css_font_family = [
+    "serif",
+    "sans-serif",
+    "monospace",
+    "cursive",
+    "fantasy",
+    "system-ui",
+    "ui-serif",
+    "ui-sans-serif",
+    "ui-monospace",
+    "ui-rounded",
+    "emoji",
+    "math",
+    "fangsong",
+  ];
+
+  // const markdownParser = (text) => {
+  //   const toHTML = text
+  //     .replace(/^###(.*$)/gim, "<h3>$1</h3>") // h3 tag
+  //     .replace(/^##(.*$)/gim, "<h2>$1</h2>") // h2 tag
+  //     .replace(/^#(.*$)/gim, "<h1>$1</h1>") // h1 tag
+  //     .replace(/\*\*(.*)\*\*/gim, "<b>$1</b>") // bold text
+  //     .replace(/\*(.*)\*/gim, "<i>$1</i>"); // italic text
+  //   return toHTML.trim(); // using trim method to remove whitespace
+  // };
 
   return (
     <div>
@@ -239,18 +266,20 @@ const Design = () => {
         onClick={(e) => clickedElement(e)}
       ></div>
       {/* Edit modal Begins here*/}
-      {elementName.name !== undefined ? (
+      {/* Container beginning */}
+      {elementName.name !== undefined &&
+      elementName.values.type == "container" ? (
         <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
           <div className="text-white">
             <h1 className="px-5 py-3 border-b-2 border-black text-lg">
-              {elementName.values.name}
+              {elementName.values.id}
             </h1>
             <div className="pt-5 px-10 h-full">
               Display
-              <div className="">
+              <div className="pt-2">
                 <select
                   id="display"
-                  className="bg-transparent border-2 rounded"
+                  className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
                   value={elementName.values.display}
                   onChange={updateElementsValues}
                 >
@@ -282,14 +311,15 @@ const Design = () => {
               </div>
               <input
                 id="background_color"
-                className="bg-black mr-5 rounded-t-[6px] px-1 w-[184px] border-2 border-b-0 border-[#3071a9]"
+                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-[184px] border-2 border-b-0 
+                          border-black"
                 value={elementName.values.background_color}
                 onChange={updateElementsValues}
               />
               <PickColor setColorUpdate={setColorUpdate} />
             </div>
             <div className="px-10 pt-3 absolute h-full">
-              <div className="flex justify-between">
+              <div className="flex justify-between pt-3 pb-1">
                 <div>Height</div>
                 <input
                   id="height"
@@ -308,8 +338,8 @@ const Design = () => {
                   onChange={updateElementsValues}
                 />
               </div>
-              <div className="flex justify-between">
-                <div>width</div>
+              <div className="flex justify-between pt-3 pb-1">
+                <div>W idth</div>
                 <input
                   id="width"
                   className="mr-5 rounded px-1 w-[50px] bg-transparent"
@@ -332,7 +362,7 @@ const Design = () => {
                     xmlns="http://www.w3.org/2000/svg"
                     width={224}
                     height={120}
-                    className="bg-[#3071a9]"
+                    className="bg-[rgba(53,54,66,.9825)]"
                   >
                     <text>sdfsdfsd</text>
                     <path
@@ -470,9 +500,71 @@ const Design = () => {
       ) : (
         ""
       )}
-      {/* Edit modal Ends here*/}
-      {/* New element Beginning here */}
+      {/* Container Ending */}
 
+      {/* Text Beginning */}
+      {elementName.name !== undefined && elementName.values.type == "text" ? (
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
+          <div className="text-white">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+              {elementName.values.id}
+            </h1>
+            <div className="pt-5 px-10 h-full">
+              <div className="pb-2">Text</div>
+              <textarea
+                contentEditable
+                suppressContentEditableWarning={true}
+                id="text_value"
+                className="bg-[rgba(71,73,88,.475)] p-2 rounded-lg inline-block w-full"
+                value={elementName.values.text_value}
+                onChange={updateElementsValues}
+              />
+            </div>
+            <div className="pt-5 px-10 h-full">
+              <div className="pb-2">Font type</div>
+              <select
+                id="text_fontfamily"
+                className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
+                value={elementName.values.text_fontfamily}
+                onChange={updateElementsValues}
+              >
+                {css_font_family.map((font) => {
+                  return (
+                    <option value={font} className="bg-[rgba(53,54,66,.9825)]">
+                      {font}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            <div className="pt-5 px-10 h-full">
+              <div className="flex justify-between pb-2">
+                <div>Text size</div>
+                <input
+                  id="text_size"
+                  className="mr-5 rounded px-1 w-[50px] bg-transparent "
+                  value={elementName.values.text_size}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <input
+                id="text_size"
+                type="range"
+                max={100}
+                className="slider_style w-full"
+                value={elementName.values.text_size}
+                onChange={updateElementsValues}
+              />
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+      {/* Text Ending */}
+      {/* Edit modal Ends here*/}
+
+      {/* New element Beginning here */}
       {isAddElement ? (
         <div
           ref={refAddElement}
@@ -488,7 +580,13 @@ const Design = () => {
             >
               Container
             </div>
-            <div className="design_new_elements">Text</div>
+            <div
+              className="design_new_elements"
+              id="text"
+              onClick={addNewElement}
+            >
+              Text
+            </div>
             <div className="design_new_elements">Image</div>
             <div className="design_new_elements">Video</div>
             <div className="design_new_elements">Icons</div>

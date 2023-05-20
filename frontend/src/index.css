@@ -45,7 +45,8 @@
     height: 10px;
     cursor: pointer;
     box-shadow: 1px 1px 1px #000000;
-    background: #3071a9;
+    /* background: #3071a9; */
+    background: rgba(53, 54, 66, 0.9825);
     border-radius: 5px;
     border: 1px solid #000000;
   }
