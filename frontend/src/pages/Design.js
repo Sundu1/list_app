@@ -146,7 +146,8 @@ const Design = () => {
   const updateElementParent = (e) => {
     let test = new Object({});
     jsonValue.elements.map((element, i) => {
-      if (element.id == elementName.name) {
+      if (element.id == elementName.name && element.parent !== e.target.value) {
+        console.log("sdfsd", element.parent, e.target.value);
         const temp = jsonValue.elements.splice(i, 1)[0];
         temp[e.target.id] = e.target.value;
         test = temp;
@@ -161,8 +162,6 @@ const Design = () => {
       }));
     }
   };
-
-  console.log(jsonValue);
 
   const handleAddElement = () => {
     setIsAddElement(!isAddElement);

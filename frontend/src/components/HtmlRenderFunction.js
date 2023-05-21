@@ -49,13 +49,14 @@ const HtmlRenderFunction = (
         newDiv.innerHTML = element.text_value;
         newDiv.style.border = element.border;
       }
-      if (parent !== null) {
-        parent.appendChild(newDiv);
-      } else {
-        const test = htmlValue.elements.splice(i, 1)[0];
-        console.log("test", test);
-        htmlValue.elements.push(test);
-      }
+
+      parent.appendChild(newDiv);
+      // if (parent !== null) {
+      //   parent.appendChild(newDiv);
+      // } else {
+      //   const test = htmlValue.elements.splice(i, 1)[0];
+      //   htmlValue.elements.push(test);
+      // }
     });
   }
 };
