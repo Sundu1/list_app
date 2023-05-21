@@ -1,14 +1,14 @@
 import React, { useEffect, useRef } from "react";
 
-const PickColor = ({ setColorUpdate }) => {
+const PickColor = ({ setColorUpdate, test }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     const context = canvas.getContext("2d");
 
-    const height = 100;
-    const width = 180;
+    const height = canvas.height;
+    const width = canvas.width;
     const gradientH = context.createLinearGradient(0, 0, width, 0);
     gradientH.addColorStop(0, "rgb(255, 0, 0)"); // red
     gradientH.addColorStop(1 / 6, "rgb(255, 255, 0)"); // yellow
@@ -36,12 +36,24 @@ const PickColor = ({ setColorUpdate }) => {
       const [r, g, b] = imgData.data;
 
       const hex = valueToHex(r, g, b);
-      const background_color_values = new Object({
-        target: {
-          id: "background_color",
-          value: hex,
-        },
-      });
+      let background_color_values;
+
+      if (test.values && test.values.type == "container") {
+        background_color_values = new Object({
+          target: {
+            id: "background_color",
+            value: hex,
+          },
+        });
+      }
+      if (test.values && test.values.type == "text") {
+        background_color_values = new Object({
+          target: {
+            id: "text_color",
+            value: hex,
+          },
+        });
+      }
 
       setColorUpdate(background_color_values);
     });
@@ -62,9 +74,8 @@ const PickColor = ({ setColorUpdate }) => {
     <div>
       <canvas
         ref={canvasRef}
-        height="100"
-        width="180"
-        className="rounded-b-[6px] border-2 border-t-0 border-[rgba(53,54,66,.9825)]"
+        height="150"
+        className="w-full rounded-b-[6px] border-2 border-t-0 border-[rgba(53,54,66,.9825)]"
       ></canvas>
     </div>
   );

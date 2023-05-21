@@ -73,7 +73,13 @@ const Design = () => {
   }, [isAddElement]);
 
   useEffect(() => {
-    HtmlRenderFunction(jsonValue, setChangeJson);
+    HtmlRenderFunction(
+      jsonValue,
+      setChangeJson,
+      handleDragStart,
+      handleDragOver,
+      handleDrop
+    );
     return () => {};
   }, [jsonValue, refresh]);
 
@@ -84,7 +90,7 @@ const Design = () => {
   }, [colorUpdate]);
 
   const clickedElement = (e) => {
-    console.log(e.target.id);
+    // console.log(e.target.id);
     const changeName = changeJson.name;
     let newValues = {};
 
@@ -128,13 +134,33 @@ const Design = () => {
       }));
     }
 
-    const newState = jsonValue.elements.map((element) => {
+    const newState = jsonValue.elements.map((element, i) => {
       if (element.id == elementName.name) {
         return { ...elementName.values, [e.target.id]: e.target.value };
       }
       return { ...element };
     });
     setJsonValue({ elements: newState });
+  };
+
+  const updateElementParent = (e) => {
+    let test = new Object({});
+    jsonValue.elements.map((element, i) => {
+      if (element.id == elementName.name) {
+        const temp = jsonValue.elements.splice(i, 1)[0];
+        temp[e.target.id] = e.target.value;
+        test = temp;
+        return;
+      }
+    });
+
+    if (Object.keys(test).length > 0) {
+      console.log("yes");
+      setJsonValue((old) => ({
+        ...old,
+        elements: [...old.elements, test],
+      }));
+    }
   };
 
   const handleAddElement = () => {
@@ -218,6 +244,27 @@ const Design = () => {
   //     .replace(/\*(.*)\*/gim, "<i>$1</i>"); // italic text
   //   return toHTML.trim(); // using trim method to remove whitespace
   // };
+
+  const handleDragStart = (e) => {
+    console.log("handledragstart");
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+
+    if (elementName.name == "Page") return;
+    const newParentValue = new Object({
+      target: {
+        id: "parent",
+        value: e.target.id,
+      },
+    });
+    updateElementParent(newParentValue);
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+  };
 
   return (
     <div>
@@ -304,19 +351,18 @@ const Design = () => {
             <div className="pt-5 px-10 h-full">
               <div className="pb-2 flex">
                 <div
-                  className="w-[20px] h-[20px] border-2 mr-2 mt-1"
+                  className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
                   style={{ background: elementName.values.background_color }}
                 ></div>
                 <div className="">Background</div>
               </div>
               <input
                 id="background_color"
-                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-[184px] border-2 border-b-0 
-                          border-black"
+                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] p-2 w-full border-b-0"
                 value={elementName.values.background_color}
                 onChange={updateElementsValues}
               />
-              <PickColor setColorUpdate={setColorUpdate} />
+              <PickColor setColorUpdate={setColorUpdate} test={elementName} />
             </div>
             <div className="px-10 pt-3 absolute h-full">
               <div className="flex justify-between pt-3 pb-1">
@@ -339,7 +385,7 @@ const Design = () => {
                 />
               </div>
               <div className="flex justify-between pt-3 pb-1">
-                <div>W idth</div>
+                <div>Width</div>
                 <input
                   id="width"
                   className="mr-5 rounded px-1 w-[50px] bg-transparent"
@@ -505,11 +551,11 @@ const Design = () => {
       {/* Text Beginning */}
       {elementName.name !== undefined && elementName.values.type == "text" ? (
         <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
-          <div className="text-white">
+          <div className="text-white h-full">
             <h1 className="px-5 py-3 border-b-2 border-black text-lg">
               {elementName.values.id}
             </h1>
-            <div className="pt-5 px-10 h-full">
+            <div className="pt-5 px-10">
               <div className="pb-2">Text</div>
               <textarea
                 contentEditable
@@ -520,7 +566,7 @@ const Design = () => {
                 onChange={updateElementsValues}
               />
             </div>
-            <div className="pt-5 px-10 h-full">
+            <div className="pt-5 px-10">
               <div className="pb-2">Font type</div>
               <select
                 id="text_fontfamily"
@@ -530,14 +576,18 @@ const Design = () => {
               >
                 {css_font_family.map((font) => {
                   return (
-                    <option value={font} className="bg-[rgba(53,54,66,.9825)]">
+                    <option
+                      value={font}
+                      key={font}
+                      className="bg-[rgba(53,54,66,.9825)]"
+                    >
                       {font}
                     </option>
                   );
                 })}
               </select>
             </div>
-            <div className="pt-5 px-10 h-full">
+            <div className="pt-5 px-10">
               <div className="flex justify-between pb-2">
                 <div>Text size</div>
                 <input
@@ -555,6 +605,22 @@ const Design = () => {
                 value={elementName.values.text_size}
                 onChange={updateElementsValues}
               />
+            </div>
+            <div className="pt-5 px-10 h-full">
+              <div className="pb-2 flex">
+                <div
+                  className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                  style={{ background: elementName.values.text_color }}
+                ></div>
+                <div className="">Color</div>
+              </div>
+              <input
+                id="text_color"
+                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                value={elementName.values.text_color}
+                onChange={updateElementsValues}
+              />
+              <PickColor setColorUpdate={setColorUpdate} test={elementName} />
             </div>
           </div>
         </div>

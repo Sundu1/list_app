@@ -1,7 +1,13 @@
 import React, { createElement } from "react";
 import { LoginProvider } from "./LoginProvider";
 
-const HtmlRenderFunction = (htmlValue, setChangeJson) => {
+const HtmlRenderFunction = (
+  htmlValue,
+  setChangeJson,
+  handleDragStart,
+  handleDragOver,
+  handleDrop
+) => {
   let newDiv;
 
   if (htmlValue && htmlValue.elements) {
@@ -14,11 +20,14 @@ const HtmlRenderFunction = (htmlValue, setChangeJson) => {
 
       newDiv = document.createElement("div");
       newDiv.id = element.id;
-      newDiv.onclick = function (e) {
+      newDiv.onpointerdown = function (e) {
         if (e.target.id == element.id)
           setChangeJson({ isChanged: true, name: element.id });
       };
       newDiv.setAttribute("draggable", true);
+      newDiv.addEventListener("dragstart", handleDragStart);
+      newDiv.addEventListener("dragover", handleDragOver);
+      newDiv.addEventListener("drop", handleDrop);
 
       if (element.type == "container") {
         newDiv.style.display = element.display;
@@ -33,6 +42,7 @@ const HtmlRenderFunction = (htmlValue, setChangeJson) => {
         parent.appendChild(newDiv);
       }
       if (element.type == "text") {
+        newDiv.style.wordBreak = "break-word";
         newDiv.style.marginBottom = element.margin_bottom + "px";
         newDiv.style.color = element.text_color;
         newDiv.style.fontSize = element.text_size + "px";
