@@ -155,13 +155,14 @@ const Design = () => {
     });
 
     if (Object.keys(test).length > 0) {
-      console.log("yes");
       setJsonValue((old) => ({
         ...old,
         elements: [...old.elements, test],
       }));
     }
   };
+
+  console.log(jsonValue);
 
   const handleAddElement = () => {
     setIsAddElement(!isAddElement);
@@ -260,6 +261,7 @@ const Design = () => {
       },
     });
     updateElementParent(newParentValue);
+    // updateElementsValues(newParentValue);
   };
 
   const handleDragOver = (e) => {

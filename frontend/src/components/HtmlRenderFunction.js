@@ -11,7 +11,7 @@ const HtmlRenderFunction = (
   let newDiv;
 
   if (htmlValue && htmlValue.elements) {
-    htmlValue.elements.forEach((element) => {
+    htmlValue.elements.forEach((element, i) => {
       const parent = document.getElementById(element.parent);
       const element_value = document.getElementById(element.id);
       if (element_value !== null) {
@@ -39,7 +39,6 @@ const HtmlRenderFunction = (
         newDiv.style.marginRight = element.margin_right + "px";
         newDiv.style.marginTop = element.margin_top + "px";
         newDiv.style.marginBottom = element.margin_bottom + "px";
-        parent.appendChild(newDiv);
       }
       if (element.type == "text") {
         newDiv.style.wordBreak = "break-word";
@@ -49,7 +48,13 @@ const HtmlRenderFunction = (
         newDiv.style.fontFamily = element.text_fontfamily;
         newDiv.innerHTML = element.text_value;
         newDiv.style.border = element.border;
+      }
+      if (parent !== null) {
         parent.appendChild(newDiv);
+      } else {
+        const test = htmlValue.elements.splice(i, 1)[0];
+        console.log("test", test);
+        htmlValue.elements.push(test);
       }
     });
   }
