@@ -20,6 +20,7 @@ const HtmlRenderFunction = (
 
       newDiv = document.createElement("div");
       newDiv.id = element.id;
+      newDiv.parent = element.parent;
       newDiv.onpointerdown = function (e) {
         if (e.target.id == element.id)
           setChangeJson({ isChanged: true, name: element.id });
