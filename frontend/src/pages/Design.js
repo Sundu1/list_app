@@ -125,7 +125,6 @@ const Design = () => {
   const updateElementsValues = (e) => {
     if (e.target.id) {
       const matchAndUpdate = (values, changeJson, children) => {
-        console.log(e.target.id, e.target.value, children, changeJson);
         return children.map((_child) => {
           if (changeJson.id === _child.id) {
             return {
@@ -160,10 +159,6 @@ const Design = () => {
 
       setJsonValue({ elements: newState });
     }
-  };
-
-  const updateElementParent = (e) => {
-    console.log("update");
   };
 
   const handleAddElement = () => {
@@ -210,7 +205,11 @@ const Design = () => {
         });
       };
 
-      const new_test = matchAndAdd(jsonValue.elements, "Page", newElement);
+      const new_test = matchAndAdd(
+        jsonValue.elements,
+        changeJson.values.id ? changeJson.values.id : "Page",
+        newElement
+      );
       setJsonValue({ elements: new_test });
     }
 
@@ -243,24 +242,54 @@ const Design = () => {
   //   return toHTML.trim(); // using trim method to remove whitespace
   // };
 
-  const handleDragStart = (e) => {
-    clickedElement(e);
-    console.log("handledragstart");
+  const updateElementParent = (e) => {
+    const newParentEle = e.target.id;
+    const newEle = changeJson.values;
+
+    const matchAndChangePosition = (newParentEle, changeJson, children) => {
+      return children.map((_child, i) => {
+        if (changeJson.id === _child.id) {
+          children.splice(i, 1);
+        }
+        if (newParentEle === _child.id) {
+          return {
+            ..._child,
+            children: [..._child.children, changeJson],
+          };
+        } else {
+          return {
+            ..._child,
+            children:
+              _child.children && Array.isArray(_child.children)
+                ? matchAndChangePosition(
+                    newParentEle,
+                    changeJson,
+                    _child.children
+                  )
+                : null,
+          };
+        }
+      });
+    };
+
+    const newState = matchAndChangePosition(
+      newParentEle,
+      newEle,
+      jsonValue.elements
+    );
+
+    console.log("newstaet", newState);
+    console.log(jsonValue.elements);
+    setJsonValue({ elements: newState });
   };
+
+  const handleDragStart = (e) => {};
 
   const handleDrop = (e) => {
     e.preventDefault();
 
-    if (changeJson.name == "Page") return;
-    const newParentValue = new Object({
-      target: {
-        id: "parent",
-        value: e.target.id,
-        parent: e.target.parent,
-      },
-    });
-    updateElementParent(newParentValue);
-    // updateElementsValues(newParentValue);
+    if (changeJson.values.id == "Page") return;
+    updateElementParent(e);
   };
 
   const handleDragOver = (e) => {
