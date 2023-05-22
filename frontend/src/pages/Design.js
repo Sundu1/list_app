@@ -145,12 +145,36 @@ const Design = () => {
 
   const updateElementParent = (e) => {
     let test = new Object({});
+
+    let test_parent;
+    for (let i = 0; i < jsonValue.elements.length; i++) {
+      const test = jsonValue.elements[i];
+      if (test.parent == elementName.name) {
+        test_parent = test.parent;
+        break;
+      }
+    }
+
+    console.log("test_parent", test_parent);
+
     jsonValue.elements.map((element, i) => {
       if (
         element.id == elementName.name &&
         element.id !== e.target.value &&
-        element.id !== e.target.parent
+        element.id !== e.target.parent &&
+        element.id !== test_parent &&
+        e.target.id !== "Page"
       ) {
+        console.log(
+          "parent =",
+          element.parent,
+          "id =",
+          element.id,
+          "target =",
+          e.target.value,
+          "target.parent =",
+          e.target.parent
+        );
         const temp = jsonValue.elements.splice(i, 1)[0];
         temp[e.target.id] = e.target.value;
         test = temp;
@@ -165,6 +189,8 @@ const Design = () => {
       }));
     }
   };
+
+  console.log("jsonvalue", jsonValue);
 
   const handleAddElement = () => {
     setIsAddElement(!isAddElement);
@@ -271,6 +297,10 @@ const Design = () => {
     e.preventDefault();
   };
 
+  const handleDeleteElement = () => {
+    console.log("sdf");
+  };
+
   return (
     <div>
       <Navbar />
@@ -286,7 +316,7 @@ const Design = () => {
             <path
               id="test"
               onClick={handleAddElement}
-              className="fill-white scale-[1.5] hover:scale-[1.8] hover:fill-gray-500 hover:cursor-pointer
+              className="fill-white scale-[1.5] hover:fill-gray-500 hover:cursor-pointer
                          filter drop-shadow"
               d="M15.5 6h-5.5v-5.5c0-0.276-0.224-0.5-0.5-0.5h-3c-0.276 
                 0-0.5 0.224-0.5 0.5v5.5h-5.5c-0.276 0-0.5 0.224-0.5 
@@ -323,8 +353,15 @@ const Design = () => {
       elementName.values.type == "container" ? (
         <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
           <div className="text-white">
-            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg flex justify-between items-center">
               {elementName.values.id}
+              <div
+                className="p-2 bg-[rgba(71,73,88,.475)] rounded-lg 
+                              hover:bg-gray-900/90 hover:cursor-pointer"
+                onClick={handleDeleteElement}
+              >
+                Delete
+              </div>
             </h1>
             <div className="pt-5 px-10 h-full">
               Display

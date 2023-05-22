@@ -32,6 +32,7 @@ const HtmlRenderFunction = (
 
       if (element.type == "container") {
         newDiv.style.display = element.display;
+        newDiv.style.justifyContent = "space-between";
         newDiv.style.background = element.background_color;
         newDiv.style.height = element.height + "px";
         newDiv.style.width = element.width + "px";
