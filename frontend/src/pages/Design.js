@@ -90,19 +90,6 @@ const Design = () => {
     }
   }, [colorUpdate]);
 
-  // const matchAndUpdate = (updater, children) => {
-  //   return children.map(_child => {
-  //     if (updater.fam_id === _child.fam_id) {
-  //       return {
-  //         ...updater,
-  //         children: _child.children && Array.isArray(_child.children) ? matchAndUpdate(updater, _child.children) : null
-  //       };
-  //     } else {
-  //       return {..._child,children: _child.children && Array.isArray(_child.children) ? matchAndUpdate(updater,_child.children) : null};
-  //     }
-  //   });
-  // };
-
   const clickedElement = (e) => {
     if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
       const matchAndUpdate = (changeJson, children) => {
@@ -135,78 +122,48 @@ const Design = () => {
     }
   };
 
-  const unClickElement = (e) => {
-    if (
-      e.target.id == changeJson.name &&
-      changeJson.isClicked !== false &&
-      jsonValue &&
-      jsonValue.elements
-    ) {
-      const newState = jsonValue.elements.map((element) => {
-        if (element.id == changeJson.name) {
-          return { ...element, border: "" };
-        }
-        return { ...element };
-      });
-      setChangeJson({ name: undefined, values: {}, isClicked: false });
-      setJsonValue({ elements: newState });
-      return;
-    }
-  };
-
   const updateElementsValues = (e) => {
     if (e.target.id) {
+      const matchAndUpdate = (values, changeJson, children) => {
+        console.log(e.target.id, e.target.value, children, changeJson);
+        return children.map((_child) => {
+          if (changeJson.id === _child.id) {
+            return {
+              ...changeJson,
+              [values.id]: values.value,
+              children:
+                _child.children && Array.isArray(_child.children)
+                  ? matchAndUpdate(values, changeJson, _child.children)
+                  : null,
+            };
+          } else {
+            return {
+              ..._child,
+              children:
+                _child.children && Array.isArray(_child.children)
+                  ? matchAndUpdate(values, changeJson, _child.children)
+                  : null,
+            };
+          }
+        });
+      };
+      const newState = matchAndUpdate(
+        e.target,
+        changeJson.values,
+        jsonValue.elements
+      );
+
       setChangeJson((old) => ({
         ...old,
-        values: {
-          ...old.values,
-          [e.target.id]: e.target.value,
-        },
+        values: { ...old.values, [e.target.id]: e.target.value },
       }));
-    }
 
-    const newState = jsonValue.elements.map((element, i) => {
-      if (element.id == changeJson.name) {
-        return { ...changeJson.values, [e.target.id]: e.target.value };
-      }
-      return { ...element };
-    });
-    setJsonValue({ elements: newState });
+      setJsonValue({ elements: newState });
+    }
   };
 
   const updateElementParent = (e) => {
-    let test = new Object({});
-
-    let test_parent;
-    for (let i = 0; i < jsonValue.elements.length; i++) {
-      const test = jsonValue.elements[i];
-      if (test.parent == changeJson.name) {
-        test_parent = test.parent;
-        break;
-      }
-    }
-
-    jsonValue.elements.map((element, i) => {
-      if (
-        element.id == changeJson.name &&
-        element.id !== e.target.value &&
-        element.id !== e.target.parent &&
-        element.id !== test_parent &&
-        e.target.id !== "Page"
-      ) {
-        const temp = jsonValue.elements.splice(i, 1)[0];
-        temp[e.target.id] = e.target.value;
-        test = temp;
-        return;
-      }
-    });
-
-    if (Object.keys(test).length > 0) {
-      setJsonValue((old) => ({
-        ...old,
-        elements: [...old.elements, test],
-      }));
-    }
+    console.log("update");
   };
 
   const handleAddElement = () => {
