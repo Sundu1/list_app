@@ -17,12 +17,10 @@ const Design = () => {
   const { designTable } = useParams();
   const { value, setValue } = useContext(UserContext);
 
-  const [newCount, setNewCount] = useState(0);
-
-  const [changeJson, setChangeJson] = useState({
+  const [changeJson, setChangeJson] = useState({ isClicked: false });
+  const [elementName, setElementName] = useState({
     name: undefined,
     values: {},
-    isChanged: false,
   });
 
   const [colorUpdate, setColorUpdate] = useState({});
@@ -31,6 +29,7 @@ const Design = () => {
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
+        parent: "EditContainer",
         type: "container",
         id: "Page",
         height: "500",
@@ -49,10 +48,11 @@ const Design = () => {
         padding_left: "0",
         padding_right: "0",
         padding_bottom: "0",
-        children: [],
       },
     ],
   });
+
+  const [isClicked, setIsClicked] = useState(false);
 
   const refAddElement = useRef();
   useEffect(() => {
@@ -90,54 +90,28 @@ const Design = () => {
     }
   }, [colorUpdate]);
 
-  // const matchAndUpdate = (updater, children) => {
-  //   return children.map(_child => {
-  //     if (updater.fam_id === _child.fam_id) {
-  //       return {
-  //         ...updater,
-  //         children: _child.children && Array.isArray(_child.children) ? matchAndUpdate(updater, _child.children) : null
-  //       };
-  //     } else {
-  //       return {..._child,children: _child.children && Array.isArray(_child.children) ? matchAndUpdate(updater,_child.children) : null};
-  //     }
-  //   });
-  // };
-
   const clickedElement = (e) => {
-    if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
-      const matchAndUpdate = (changeJson, children) => {
-        return children.map((_child) => {
-          if (changeJson.id === _child.id) {
-            return {
-              ...changeJson,
-              border: "2px solid red",
-              children:
-                _child.children && Array.isArray(_child.children)
-                  ? matchAndUpdate(changeJson, _child.children)
-                  : null,
-            };
-          } else {
-            return {
-              ..._child,
-              border: "",
-              children:
-                _child.children && Array.isArray(_child.children)
-                  ? matchAndUpdate(changeJson, _child.children)
-                  : null,
-            };
-          }
-        });
-      };
+    const changeName = changeJson.name;
+    let newValues = {};
 
-      const newState = matchAndUpdate(changeJson.values, jsonValue.elements);
-      setChangeJson((old) => ({ ...old, isChanged: false }));
+    if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
+      const newState = jsonValue.elements.map((element) => {
+        if (element.id == changeName) {
+          newValues = { ...element, border: "2px red solid" };
+          return newValues;
+        }
+        return { ...element, border: "" };
+      });
+      setChangeJson((old) => ({ ...old, isClicked: false }));
       setJsonValue({ elements: newState });
+      setElementName({ name: changeName, values: newValues });
+      setIsClicked(true);
     }
   };
 
   const unClickElement = (e) => {
     if (
-      e.target.id == changeJson.name &&
+      e.target.id == elementName.name &&
       changeJson.isClicked !== false &&
       jsonValue &&
       jsonValue.elements
@@ -148,15 +122,17 @@ const Design = () => {
         }
         return { ...element };
       });
-      setChangeJson({ name: undefined, values: {}, isClicked: false });
+      setChangeJson((old) => ({ ...old, isClicked: false }));
       setJsonValue({ elements: newState });
+      setElementName({ name: undefined, values: {} });
+      setIsClicked(false);
       return;
     }
   };
 
   const updateElementsValues = (e) => {
     if (e.target.id) {
-      setChangeJson((old) => ({
+      setElementName((old) => ({
         ...old,
         values: {
           ...old.values,
@@ -166,8 +142,8 @@ const Design = () => {
     }
 
     const newState = jsonValue.elements.map((element, i) => {
-      if (element.id == changeJson.name) {
-        return { ...changeJson.values, [e.target.id]: e.target.value };
+      if (element.id == elementName.name) {
+        return { ...elementName.values, [e.target.id]: e.target.value };
       }
       return { ...element };
     });
@@ -180,7 +156,7 @@ const Design = () => {
     let test_parent;
     for (let i = 0; i < jsonValue.elements.length; i++) {
       const test = jsonValue.elements[i];
-      if (test.parent == changeJson.name) {
+      if (test.parent == elementName.name) {
         test_parent = test.parent;
         break;
       }
@@ -188,7 +164,7 @@ const Design = () => {
 
     jsonValue.elements.map((element, i) => {
       if (
-        element.id == changeJson.name &&
+        element.id == elementName.name &&
         element.id !== e.target.value &&
         element.id !== e.target.parent &&
         element.id !== test_parent &&
@@ -215,9 +191,14 @@ const Design = () => {
 
   const addNewElement = (e) => {
     if (e.target.id == "container_element") {
+      const container_all = jsonValue.elements.filter((element) =>
+        element.id.toLowerCase().includes("container")
+      ).length;
+
       const newElement = new Object({
+        parent: "Page",
         type: "container",
-        id: `Container-${newCount}`,
+        id: `Container-${container_all + 1}`,
         height: "100",
         width: "100",
         background_color: "black",
@@ -234,30 +215,30 @@ const Design = () => {
         padding_left: "0",
         padding_right: "0",
         padding_bottom: "0",
-        children: [],
       });
-
-      const matchAndAdd = (elements, parent, newElementValue) => {
-        return elements.map((ele) => {
-          if (ele.id == parent) {
-            return {
-              ...ele,
-              children: [...ele.children, newElementValue],
-            };
-          } else {
-            return {
-              ...ele,
-              children: matchAndAdd(ele.children, parent, newElementValue),
-            };
-          }
-        });
-      };
-
-      const new_test = matchAndAdd(jsonValue.elements, "Page", newElement);
-      setJsonValue({ elements: new_test });
+      setJsonValue((old) => ({
+        elements: [...old.elements, newElement],
+      }));
     }
+    if (e.target.id == "text") {
+      const container_all = jsonValue.elements.filter((element) =>
+        element.id.toLowerCase().includes("container")
+      ).length;
 
-    setNewCount(newCount + 1);
+      const newElement = new Object({
+        parent: "Page",
+        type: "text",
+        id: `Text-${container_all + 1}`,
+        text_value: "put your text here",
+        text_color: "black",
+        text_style: "",
+        text_size: "20",
+        text_fontfamily: "",
+      });
+      setJsonValue((old) => ({
+        elements: [...old.elements, newElement],
+      }));
+    }
   };
 
   const css_font_family = [
@@ -294,7 +275,7 @@ const Design = () => {
   const handleDrop = (e) => {
     e.preventDefault();
 
-    if (changeJson.name == "Page") return;
+    if (elementName.name == "Page") return;
     const newParentValue = new Object({
       target: {
         id: "parent",
@@ -362,11 +343,12 @@ const Design = () => {
       ></div>
       {/* Edit modal Begins here*/}
       {/* Container beginning */}
-      {changeJson.values && changeJson.values.type == "container" ? (
+      {elementName.name !== undefined &&
+      elementName.values.type == "container" ? (
         <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
           <div className="text-white">
             <h1 className="px-5 py-3 border-b-2 border-black text-lg flex justify-between items-center">
-              {changeJson.values.id}
+              {elementName.values.id}
               <div
                 className="p-2 bg-[rgba(71,73,88,.475)] rounded-lg 
                               hover:bg-gray-900/90 hover:cursor-pointer"
@@ -381,7 +363,7 @@ const Design = () => {
                 <select
                   id="display"
                   className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
-                  value={changeJson.values.display}
+                  value={elementName.values.display}
                   onChange={updateElementsValues}
                 >
                   <option value="flex" className="bg-[rgba(53,54,66,.9825)]">
@@ -406,17 +388,17 @@ const Design = () => {
               <div className="pb-2 flex">
                 <div
                   className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                  style={{ background: changeJson.values.background_color }}
+                  style={{ background: elementName.values.background_color }}
                 ></div>
                 <div className="">Background</div>
               </div>
               <input
                 id="background_color"
                 className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] p-2 w-full border-b-0"
-                value={changeJson.values.background_color}
+                value={elementName.values.background_color}
                 onChange={updateElementsValues}
               />
-              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+              <PickColor setColorUpdate={setColorUpdate} test={elementName} />
             </div>
             <div className="px-10 pt-3 absolute h-full">
               <div className="flex justify-between pt-3 pb-1">
@@ -424,7 +406,7 @@ const Design = () => {
                 <input
                   id="height"
                   className="mr-5 rounded px-1 w-[50px] bg-transparent "
-                  value={changeJson.values.height}
+                  value={elementName.values.height}
                   onChange={updateElementsValues}
                 />
               </div>
@@ -434,7 +416,7 @@ const Design = () => {
                   type="range"
                   max={1000}
                   className="slider_style"
-                  value={changeJson.values.height}
+                  value={elementName.values.height}
                   onChange={updateElementsValues}
                 />
               </div>
@@ -443,7 +425,7 @@ const Design = () => {
                 <input
                   id="width"
                   className="mr-5 rounded px-1 w-[50px] bg-transparent"
-                  value={changeJson.values.width}
+                  value={elementName.values.width}
                   onChange={updateElementsValues}
                 />
               </div>
@@ -452,7 +434,7 @@ const Design = () => {
                 type="range"
                 max={1000}
                 className="slider_style"
-                value={changeJson.values.width}
+                value={elementName.values.width}
                 onChange={updateElementsValues}
               />
               <div className="pt-5">
@@ -560,7 +542,7 @@ const Design = () => {
                       id="margin_top"
                       type="number"
                       className="margin_webkit"
-                      value={changeJson.values.margin_top}
+                      value={elementName.values.margin_top}
                       onChange={updateElementsValues}
                     />
                   </div>
@@ -569,7 +551,7 @@ const Design = () => {
                       id="margin_left"
                       type="number"
                       className="margin_webkit"
-                      value={changeJson.values.margin_left}
+                      value={elementName.values.margin_left}
                       onChange={updateElementsValues}
                     />
                   </div>
@@ -578,7 +560,7 @@ const Design = () => {
                       id="margin_right"
                       type="number"
                       className="margin_webkit"
-                      value={changeJson.values.margin_right}
+                      value={elementName.values.margin_right}
                       onChange={updateElementsValues}
                     />
                   </div>
@@ -587,7 +569,7 @@ const Design = () => {
                       id="margin_bottom"
                       type="number"
                       className="margin_webkit"
-                      value={changeJson.values.margin_bottom}
+                      value={elementName.values.margin_bottom}
                       onChange={updateElementsValues}
                     />
                   </div>
@@ -603,11 +585,11 @@ const Design = () => {
       {/* Container Ending */}
 
       {/* Text Beginning */}
-      {changeJson.name !== undefined && changeJson.values.type == "text" ? (
+      {elementName.name !== undefined && elementName.values.type == "text" ? (
         <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
           <div className="text-white h-full">
             <h1 className="px-5 py-3 border-b-2 border-black text-lg">
-              {changeJson.values.id}
+              {elementName.values.id}
             </h1>
             <div className="pt-5 px-10">
               <div className="pb-2">Text</div>
@@ -616,7 +598,7 @@ const Design = () => {
                 suppressContentEditableWarning={true}
                 id="text_value"
                 className="bg-[rgba(71,73,88,.475)] p-2 rounded-lg inline-block w-full"
-                value={changeJson.values.text_value}
+                value={elementName.values.text_value}
                 onChange={updateElementsValues}
               />
             </div>
@@ -625,7 +607,7 @@ const Design = () => {
               <select
                 id="text_fontfamily"
                 className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
-                value={changeJson.values.text_fontfamily}
+                value={elementName.values.text_fontfamily}
                 onChange={updateElementsValues}
               >
                 {css_font_family.map((font) => {
@@ -647,7 +629,7 @@ const Design = () => {
                 <input
                   id="text_size"
                   className="mr-5 rounded px-1 w-[50px] bg-transparent "
-                  value={changeJson.values.text_size}
+                  value={elementName.values.text_size}
                   onChange={updateElementsValues}
                 />
               </div>
@@ -656,7 +638,7 @@ const Design = () => {
                 type="range"
                 max={100}
                 className="slider_style w-full"
-                value={changeJson.values.text_size}
+                value={elementName.values.text_size}
                 onChange={updateElementsValues}
               />
             </div>
@@ -664,17 +646,17 @@ const Design = () => {
               <div className="pb-2 flex">
                 <div
                   className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                  style={{ background: changeJson.values.text_color }}
+                  style={{ background: elementName.values.text_color }}
                 ></div>
                 <div className="">Color</div>
               </div>
               <input
                 id="text_color"
                 className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
-                value={changeJson.values.text_color}
+                value={elementName.values.text_color}
                 onChange={updateElementsValues}
               />
-              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+              <PickColor setColorUpdate={setColorUpdate} test={elementName} />
             </div>
           </div>
         </div>
