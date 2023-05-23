@@ -1,5 +1,4 @@
 import React, { createElement } from "react";
-import { LoginProvider } from "./LoginProvider";
 
 const HtmlRenderFunction = (
   htmlValue,
@@ -54,7 +53,6 @@ const HtmlRenderFunction = (
         }
 
         parent.appendChild(newDiv);
-
         if (element.children == null || element.children.length == 0) return;
         traverse_dfs(element.children, element.id);
       });

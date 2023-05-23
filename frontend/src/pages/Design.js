@@ -17,7 +17,7 @@ const Design = () => {
   const { designTable } = useParams();
   const { value, setValue } = useContext(UserContext);
 
-  const [newCount, setNewCount] = useState(0);
+  const [newCount, setNewCount] = useState(1);
 
   const [changeJson, setChangeJson] = useState({
     name: undefined,
@@ -165,6 +165,37 @@ const Design = () => {
     setIsAddElement(!isAddElement);
   };
 
+  const matchAndAdd = (elements, parent, newElementValue) => {
+    return elements.map((ele) => {
+      if (ele.id == parent) {
+        return {
+          ...ele,
+          children: [...ele.children, newElementValue],
+        };
+      } else {
+        return {
+          ...ele,
+          children: matchAndAdd(ele.children, parent, newElementValue),
+        };
+      }
+    });
+  };
+
+  const matchAndDelete = (elements, deleteElement) => {
+    const removeRecursive = (obj) => {
+      if (obj.id === deleteElement.id) return null;
+
+      if (obj.children && Array.isArray(obj.children)) {
+        const updatedChildren = obj.children.map((child) =>
+          removeRecursive(child)
+        );
+        obj.children = updatedChildren.filter((child) => child !== null);
+      }
+      return obj;
+    };
+    return new Array(removeRecursive(elements[0]));
+  };
+
   const addNewElement = (e) => {
     if (e.target.id == "container_element") {
       const newElement = new Object({
@@ -188,22 +219,6 @@ const Design = () => {
         padding_bottom: "0",
         children: [],
       });
-
-      const matchAndAdd = (elements, parent, newElementValue) => {
-        return elements.map((ele) => {
-          if (ele.id == parent) {
-            return {
-              ...ele,
-              children: [...ele.children, newElementValue],
-            };
-          } else {
-            return {
-              ...ele,
-              children: matchAndAdd(ele.children, parent, newElementValue),
-            };
-          }
-        });
-      };
 
       const new_test = matchAndAdd(
         jsonValue.elements,
@@ -246,45 +261,14 @@ const Design = () => {
     const newParentEle = e.target.id;
     const newEle = changeJson.values;
 
-    const matchAndChangePosition = (newParentEle, changeJson, children) => {
-      return children.map((_child, i) => {
-        if (changeJson.id === _child.id) {
-          children.splice(i, 1);
-        }
-        if (newParentEle === _child.id) {
-          return {
-            ..._child,
-            children: [..._child.children, changeJson],
-          };
-        } else {
-          return {
-            ..._child,
-            children:
-              _child.children && Array.isArray(_child.children)
-                ? matchAndChangePosition(
-                    newParentEle,
-                    changeJson,
-                    _child.children
-                  )
-                : null,
-          };
-        }
-      });
-    };
-
-    const newState = matchAndChangePosition(
-      newParentEle,
-      newEle,
-      jsonValue.elements
-    );
-
-    console.log("newstaet", newState);
-    console.log(jsonValue.elements);
+    const deletedState = matchAndDelete(jsonValue.elements, newEle);
+    const newState = matchAndAdd(jsonValue.elements, newParentEle, newEle);
+    console.log("newstate", newState, "deleteState", deletedState);
+    setJsonValue({ elements: deletedState });
     setJsonValue({ elements: newState });
   };
 
   const handleDragStart = (e) => {};
-
   const handleDrop = (e) => {
     e.preventDefault();
 
@@ -297,7 +281,8 @@ const Design = () => {
   };
 
   const handleDeleteElement = () => {
-    console.log("sdf");
+    const deletedState = matchAndDelete(jsonValue.elements, changeJson.values);
+    setJsonValue({ elements: deletedState });
   };
 
   return (
