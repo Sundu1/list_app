@@ -54,6 +54,23 @@ const PickColor = ({ setColorUpdate, test }) => {
           },
         });
       }
+      if (test.values && test.values.type == "background") {
+        background_color_values = new Object({
+          target: {
+            id: "background_color",
+            value: hex,
+          },
+        });
+      }
+
+      if (test.values && test.values.type == "page") {
+        background_color_values = new Object({
+          target: {
+            id: "background_color",
+            value: hex,
+          },
+        });
+      }
 
       setColorUpdate(background_color_values);
     });

@@ -27,29 +27,40 @@ const Design = () => {
 
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
-  const [refresh, setRefresh] = useState(false);
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
-        type: "container",
-        id: "Page",
-        height: "500",
-        width: "500",
+        type: "background",
+        id: "Background",
+        height: "100%",
+        width: "100%",
+        position: "fixed",
         background_color: "white",
-        padding: "10px",
-        border: "2px solid black",
-        text: "testing ",
-        position: "",
-        display: "",
-        margin_top: "0",
-        margin_left: "0",
-        margin_right: "0",
-        margin_bottom: "0",
-        padding_top: "0",
-        padding_left: "0",
-        padding_right: "0",
-        padding_bottom: "0",
-        children: [],
+        background_style_type: "color",
+        children: [
+          {
+            type: "page",
+            id: "Page",
+            height: "500",
+            width: "500",
+            position_div: "relative",
+            position: "center",
+            background_color: "rgb(220,220,220)",
+            padding: "10px",
+            border: "2px solid black",
+            text: "testing ",
+            display: "",
+            margin_top: "0",
+            margin_left: "0",
+            margin_right: "0",
+            margin_bottom: "0",
+            padding_top: "0",
+            padding_left: "0",
+            padding_right: "0",
+            padding_bottom: "0",
+            children: [],
+          },
+        ],
       },
     ],
   });
@@ -82,15 +93,18 @@ const Design = () => {
       handleDrop
     );
     return () => {};
-  }, [jsonValue, refresh]);
+  }, [jsonValue]);
 
   useEffect(() => {
+    console.log(colorUpdate);
     if (colorUpdate.target) {
       updateElementsValues(colorUpdate);
     }
   }, [colorUpdate]);
 
   const clickedElement = (e) => {
+    console.log("jsonchange", changeJson);
+
     if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
       const matchAndUpdate = (changeJson, children) => {
         return children.map((_child) => {
@@ -261,11 +275,11 @@ const Design = () => {
     const newParentEle = e.target.id;
     const newEle = changeJson.values;
 
-    if (newParentEle == newEle.id) return;
+    console.log("newpa", newParentEle);
+    if (newParentEle == newEle.id || newParentEle == "Background") return;
 
     const deletedState = matchAndDelete(jsonValue.elements, newEle);
     const newState = matchAndAdd(jsonValue.elements, newParentEle, newEle);
-    console.log("newstate", newState, "deleteState", deletedState);
     setJsonValue({ elements: deletedState });
     setJsonValue({ elements: newState });
   };
@@ -287,6 +301,10 @@ const Design = () => {
     setChangeJson((old) => ({ ...old, values: {} }));
   };
 
+  const backgroundStyleOnChange = (e) => {
+    console.log("testing", e.target.value);
+  };
+
   return (
     <div>
       <Navbar />
@@ -302,8 +320,8 @@ const Design = () => {
             <path
               id="test"
               onClick={handleAddElement}
-              className="fill-white scale-[1.5] hover:fill-gray-500 hover:cursor-pointer
-                         filter drop-shadow"
+              className="fill-white scale-[1.5] hover:fill-gray-500 
+                         hover:cursor-pointer filter drop-shadow"
               d="M15.5 6h-5.5v-5.5c0-0.276-0.224-0.5-0.5-0.5h-3c-0.276 
                 0-0.5 0.224-0.5 0.5v5.5h-5.5c-0.276 0-0.5 0.224-0.5 
                 0.5v3c0 0.276 0.224 0.5 0.5 0.5h5.5v5.5c0 0.276 0.224 
@@ -327,18 +345,27 @@ const Design = () => {
       </div>
 
       {/* EditContainer is where all new divs will append to */}
+
       <div
         id="EditContainer"
-        className="fixed top-0 pt-[65px] flex justify-center bg-gray-300/50 w-full 
-                   h-full z-10 text-black overflow-auto"
+        className="fixed top-0 pt-[60px] flex justify-center bg-gray-300/50 w-full 
+                   h-full text-black overflow-auto"
         onPointerDown={clickedElement}
       ></div>
+
       {/* Edit modal Begins here*/}
+
       {/* Container beginning */}
       {changeJson.values && changeJson.values.type == "container" ? (
-        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
+        <div
+          className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)]
+                           z-50 overflow-auto"
+        >
           <div className="text-white">
-            <h1 className="px-5 py-3 border-b-2 border-black text-lg flex justify-between items-center">
+            <h1
+              className="px-5 py-3 border-b-2 border-black text-lg flex 
+                            justify-between items-center"
+            >
               {changeJson.values.id}
               <div
                 className="p-2 bg-[rgba(71,73,88,.475)] rounded-lg 
@@ -655,6 +682,119 @@ const Design = () => {
         ""
       )}
       {/* Text Ending */}
+
+      {/* Background container Beginning */}
+
+      {changeJson.values && changeJson.values.type == "background" ? (
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
+          <div className="text-white h-full">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+              {changeJson.values.id}
+            </h1>
+            <div className="pt-5 px-10">
+              Style
+              <div className="pt-2">
+                <select
+                  id="background_style_type"
+                  className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
+                  value={changeJson.values.background_style_type}
+                  onChange={updateElementsValues}
+                >
+                  <option value="color" className="bg-[rgba(53,54,66,.9825)]">
+                    Color
+                  </option>
+                  <option
+                    value="gradient"
+                    className="bg-[rgba(53,54,66,.9825)]"
+                  >
+                    Gradient
+                  </option>
+                  <option value="image" className="bg-[rgba(53,54,66,.9825)]">
+                    Image
+                  </option>
+                  <option value="video" className="bg-[rgba(53,54,66,.9825)]">
+                    Video
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div className="pt-5 px-10">
+              <div className="pb-2 flex">
+                <div
+                  className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                  style={{ background: changeJson.values.background_color }}
+                ></div>
+                <div className="">Color</div>
+              </div>
+              <input
+                id="background_color"
+                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                value={changeJson.values.background_color}
+                onChange={updateElementsValues}
+              />
+              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
+      {/* Background container Ending */}
+
+      {/* Page container Beginning */}
+
+      {changeJson.values && changeJson.values.type == "page" ? (
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-auto">
+          <div className="text-white h-full">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+              {changeJson.values.id}
+            </h1>
+            <div className="pt-5 px-10">
+              Position
+              <div className="pt-2">
+                <select
+                  id="position"
+                  className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
+                  value={changeJson.values.position}
+                  onChange={updateElementsValues}
+                >
+                  <option value="right" className="bg-[rgba(53,54,66,.9825)]">
+                    Right
+                  </option>
+                  <option value="center" className="bg-[rgba(53,54,66,.9825)]">
+                    Center
+                  </option>
+                  <option value="left" className="bg-[rgba(53,54,66,.9825)]">
+                    Left
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div className="pt-5 px-10 h-full">
+              <div className="pb-2 flex">
+                <div
+                  className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                  style={{ background: changeJson.values.text_color }}
+                ></div>
+                <div className="">Color</div>
+              </div>
+              <input
+                id="text_color"
+                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                value={changeJson.values.text_color}
+                onChange={updateElementsValues}
+              />
+              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+
+      {/* Page container Ending */}
+
       {/* Edit modal Ends here*/}
 
       {/* New element Beginning here */}

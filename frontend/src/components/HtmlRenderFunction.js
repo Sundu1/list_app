@@ -51,6 +51,40 @@ const HtmlRenderFunction = (
           newDiv.innerHTML = element.text_value;
           newDiv.style.border = element.border;
         }
+        if (element.type == "background") {
+          newDiv.removeAttribute("draggable");
+          newDiv.style.position = element.position;
+          newDiv.style.height = element.height;
+          newDiv.style.width = element.width;
+          newDiv.style.background = element.background_color;
+          newDiv.style.border = element.border;
+        }
+        if (element.type == "page") {
+          newDiv.removeAttribute("draggable");
+          newDiv.style.position = element.position_div;
+          newDiv.style.display = element.display;
+          newDiv.style.justifyContent = "space-between";
+          newDiv.style.background = element.background_color;
+          newDiv.style.height = element.height + "px";
+          newDiv.style.width = element.width + "px";
+          newDiv.style.border = element.border;
+          newDiv.style.marginLeft = element.margin_left + "px";
+          newDiv.style.marginRight = element.margin_right + "px";
+          newDiv.style.marginTop = element.margin_top + "px";
+          newDiv.style.marginBottom = element.margin_bottom + "px";
+
+          if (element.position == "center") {
+            newDiv.style.left = "50%";
+            newDiv.style.transform = "translateX(-50%)";
+          }
+          if (element.position == "left") {
+            newDiv.style.left = "0";
+          }
+          if (element.position == "right") {
+            newDiv.style.left = "100%";
+            newDiv.style.transform = "translateX(-100%)";
+          }
+        }
 
         parent.appendChild(newDiv);
         if (element.children == null || element.children.length == 0) return;
