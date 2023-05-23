@@ -52,15 +52,21 @@ const HtmlRenderFunction = (
           newDiv.style.border = element.border;
         }
         if (element.type == "background") {
+          console.log(jsonvalues);
+
           newDiv.removeAttribute("draggable");
           newDiv.style.position = element.position;
           newDiv.style.height = element.height;
           newDiv.style.width = element.width;
-          newDiv.style.background = element.background_color;
           newDiv.style.border = element.border;
+
+          const background_type = element.background_style_type;
+          newDiv.style.background =
+            element.background_style_types[background_type].background_color;
         }
         if (element.type == "page") {
           newDiv.removeAttribute("draggable");
+          newDiv.style.overflow = "hidden";
           newDiv.style.position = element.position_div;
           newDiv.style.display = element.display;
           newDiv.style.justifyContent = "space-between";

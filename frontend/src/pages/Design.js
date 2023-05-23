@@ -3,9 +3,7 @@ import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
-import Sidebar from "../components/Sidebar";
 
-import { ImPlus } from "react-icons/im";
 import { BsFillDatabaseFill } from "react-icons/bs";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
@@ -35,8 +33,15 @@ const Design = () => {
         height: "100%",
         width: "100%",
         position: "fixed",
-        background_color: "white",
         background_style_type: "color",
+        background_style_types: {
+          color: { background_color: "white" },
+          gradient: {
+            background_color: `linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(67,9,121,1) 35%,rgba(0,212,255,1) 100%)`,
+          },
+          image: "",
+          video: "",
+        },
         children: [
           {
             type: "page",
@@ -96,15 +101,12 @@ const Design = () => {
   }, [jsonValue]);
 
   useEffect(() => {
-    console.log(colorUpdate);
     if (colorUpdate.target) {
       updateElementsValues(colorUpdate);
     }
   }, [colorUpdate]);
 
   const clickedElement = (e) => {
-    console.log("jsonchange", changeJson);
-
     if (changeJson.isClicked !== false && jsonValue && jsonValue.elements) {
       const matchAndUpdate = (changeJson, children) => {
         return children.map((_child) => {
@@ -140,6 +142,20 @@ const Design = () => {
     if (e.target.id) {
       const matchAndUpdate = (values, changeJson, children) => {
         return children.map((_child) => {
+          if (changeJson.type === "background") {
+            return {
+              ...changeJson,
+              background_style_types: {
+                ...changeJson.background_style_types,
+                [changeJson.background_style_type]: {
+                  ...changeJson.background_style_types[
+                    changeJson.background_style_type
+                  ],
+                  [e.target.id]: e.target.value,
+                },
+              },
+            };
+          }
           if (changeJson.id === _child.id) {
             return {
               ...changeJson,
@@ -275,7 +291,6 @@ const Design = () => {
     const newParentEle = e.target.id;
     const newEle = changeJson.values;
 
-    console.log("newpa", newParentEle);
     if (newParentEle == newEle.id || newParentEle == "Background") return;
 
     const deletedState = matchAndDelete(jsonValue.elements, newEle);
@@ -302,7 +317,7 @@ const Design = () => {
   };
 
   const backgroundStyleOnChange = (e) => {
-    console.log("testing", e.target.value);
+    // console.log("testing", e.target.value);
   };
 
   return (
@@ -314,7 +329,7 @@ const Design = () => {
       >
         <div className="text-[28px] h-[50px]">
           <svg
-            className="block hover:icon_style h-full w-full text-center"
+            className="block h-full w-full text-center"
             viewBox="-13 0 50 30"
           >
             <path
@@ -775,14 +790,14 @@ const Design = () => {
               <div className="pb-2 flex">
                 <div
                   className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                  style={{ background: changeJson.values.text_color }}
+                  style={{ background: changeJson.values.background_color }}
                 ></div>
                 <div className="">Color</div>
               </div>
               <input
-                id="text_color"
+                id="background_color"
                 className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
-                value={changeJson.values.text_color}
+                value={changeJson.values.background_color}
                 onChange={updateElementsValues}
               />
               <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
