@@ -220,12 +220,12 @@ const Design = () => {
         children: [],
       });
 
-      const new_test = matchAndAdd(
+      const addedElement = matchAndAdd(
         jsonValue.elements,
         changeJson.values.id ? changeJson.values.id : "Page",
         newElement
       );
-      setJsonValue({ elements: new_test });
+      setJsonValue({ elements: addedElement });
     }
 
     setNewCount(newCount + 1);
@@ -261,6 +261,8 @@ const Design = () => {
     const newParentEle = e.target.id;
     const newEle = changeJson.values;
 
+    if (newParentEle == newEle.id) return;
+
     const deletedState = matchAndDelete(jsonValue.elements, newEle);
     const newState = matchAndAdd(jsonValue.elements, newParentEle, newEle);
     console.log("newstate", newState, "deleteState", deletedState);
@@ -271,7 +273,6 @@ const Design = () => {
   const handleDragStart = (e) => {};
   const handleDrop = (e) => {
     e.preventDefault();
-
     if (changeJson.values.id == "Page") return;
     updateElementParent(e);
   };
@@ -283,6 +284,7 @@ const Design = () => {
   const handleDeleteElement = () => {
     const deletedState = matchAndDelete(jsonValue.elements, changeJson.values);
     setJsonValue({ elements: deletedState });
+    setChangeJson((old) => ({ ...old, values: {} }));
   };
 
   return (
