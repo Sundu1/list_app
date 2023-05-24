@@ -820,9 +820,31 @@ const Design = () => {
                   changeJson.values.background_style_type
                 ].map((value, i) => {
                   return (
-                    <div key={i}>
-                      <div>{value.color}</div>
-                      <div>{value.percentage}</div>
+                    <div key={i} className="pt-5 px-10 h-full">
+                      <div className="pb-2 flex">
+                        <div
+                          className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                          style={{
+                            background: value.color,
+                          }}
+                        ></div>
+                        <div className="">Color</div>
+                      </div>
+                      <div className="flex">
+                        <input
+                          id="background_color"
+                          className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                          value={value.color}
+                          onChange={updateBackGround}
+                        />
+                        <input
+                          id="background_color"
+                          type="range"
+                          className="slider_style"
+                          value={value.percentage}
+                          onChange={updateBackGround}
+                        />
+                      </div>
                     </div>
                   );
                 })}
