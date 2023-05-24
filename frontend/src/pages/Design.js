@@ -36,9 +36,20 @@ const Design = () => {
         background_style_type: "color",
         background_style_types: {
           color: { background_color: "white" },
-          gradient: {
-            background_color: `linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(67,9,121,1) 35%,rgba(0,212,255,1) 100%)`,
-          },
+          gradient: [
+            {
+              color: "rgba(2,0,36,1)",
+              percentage: "0",
+            },
+            {
+              color: "rgba(67,9,121,1)",
+              percentage: "35",
+            },
+            {
+              color: "rgba(0,212,255,1)",
+              percentage: "100",
+            },
+          ],
           image: "",
           video: "",
         },
@@ -102,7 +113,11 @@ const Design = () => {
 
   useEffect(() => {
     if (colorUpdate.target) {
-      updateElementsValues(colorUpdate);
+      if (changeJson.values.type == "background") {
+        updateBackGround(colorUpdate);
+      } else {
+        updateElementsValues(colorUpdate);
+      }
     }
   }, [colorUpdate]);
 
@@ -304,6 +319,55 @@ const Design = () => {
 
   const backgroundStyleOnChange = (e) => {
     // console.log("testing", e.target.value);
+  };
+
+  const updateBackGround = (e) => {
+    if (e.target.id) {
+      const matchAndUpdate = (values, changeJson, children) => {
+        return children.map((_child) => {
+          if (changeJson.id === _child.id) {
+            return {
+              ...changeJson,
+              background_style_types: {
+                ...changeJson.background_style_types,
+                [changeJson.background_style_type]: {
+                  [e.target.id]: e.target.value,
+                },
+              },
+            };
+          } else {
+            return {
+              ..._child,
+              children:
+                _child.children && Array.isArray(_child.children)
+                  ? matchAndUpdate(values, changeJson, _child.children)
+                  : null,
+            };
+          }
+        });
+      };
+      const newState = matchAndUpdate(
+        e.target,
+        changeJson.values,
+        jsonValue.elements
+      );
+
+      setChangeJson((old) => ({
+        ...old,
+        values: {
+          ...old.values,
+          background_style_types: {
+            ...old.values.background_style_types,
+            [old.values.background_style_type]: {
+              [e.target.id]: e.target.value,
+            },
+          },
+        },
+      }));
+      setJsonValue({ elements: newState });
+
+      console.log("newState", newState);
+    }
   };
 
   return (
@@ -719,22 +783,42 @@ const Design = () => {
                 </select>
               </div>
             </div>
-            <div className="pt-5 px-10">
-              <div className="pb-2 flex">
-                <div
-                  className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                  style={{ background: changeJson.values.background_color }}
-                ></div>
-                <div className="">Color</div>
+            {changeJson.values.background_style_type == "color" ? (
+              <div className="pt-5 px-10">
+                <div className="pb-2 flex">
+                  <div
+                    className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                    style={{
+                      background:
+                        changeJson.values.background_style_types[
+                          changeJson.values.background_style_type
+                        ].background_color,
+                    }}
+                  ></div>
+                  <div className="">Color</div>
+                </div>
+                <input
+                  id="background_color"
+                  className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                  value={
+                    changeJson.values.background_style_types[
+                      changeJson.values.background_style_type
+                    ].background_color
+                  }
+                  onChange={updateBackGround}
+                />
+                <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
               </div>
-              <input
-                id="background_color"
-                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
-                value={changeJson.values.background_color}
-                onChange={updateElementsValues}
-              />
-              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
-            </div>
+            ) : (
+              ""
+            )}
+
+            {changeJson.values.background_style_type == "gradient" ? (
+              // linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(67,9,121,1) 35%,rgba(0,212,255,1) 100%)
+              <div></div>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       ) : (

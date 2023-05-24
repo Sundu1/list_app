@@ -1,3 +1,4 @@
+import { logDOM } from "@testing-library/react";
 import React, { createElement } from "react";
 
 const HtmlRenderFunction = (
@@ -52,18 +53,30 @@ const HtmlRenderFunction = (
           newDiv.style.border = element.border;
         }
         if (element.type == "background") {
-          console.log(jsonvalues);
-
           newDiv.removeAttribute("draggable");
           newDiv.style.position = element.position;
           newDiv.style.height = element.height;
           newDiv.style.width = element.width;
           newDiv.style.border = element.border;
 
-          const background_type = element.background_style_type;
-          newDiv.style.background =
-            element.background_style_types[background_type].background_color;
+          if (element.background_style_type == "color") {
+            const background_type = element.background_style_type;
+            newDiv.style.background =
+              element.background_style_types[background_type].background_color;
+          }
+          if (element.background_style_type == "gradient") {
+            const gradient_value = element.background_style_types[
+              element.background_style_type
+            ]
+              .map((value) => {
+                return `${value.color} ${value.percentage}%`;
+              })
+              .join(",");
+
+            newDiv.style.background = `linear-gradient(90deg, ${gradient_value})`;
+          }
         }
+
         if (element.type == "page") {
           newDiv.removeAttribute("draggable");
           newDiv.style.overflow = "hidden";
