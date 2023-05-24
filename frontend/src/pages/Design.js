@@ -142,20 +142,6 @@ const Design = () => {
     if (e.target.id) {
       const matchAndUpdate = (values, changeJson, children) => {
         return children.map((_child) => {
-          if (changeJson.type === "background") {
-            return {
-              ...changeJson,
-              background_style_types: {
-                ...changeJson.background_style_types,
-                [changeJson.background_style_type]: {
-                  ...changeJson.background_style_types[
-                    changeJson.background_style_type
-                  ],
-                  [e.target.id]: e.target.value,
-                },
-              },
-            };
-          }
           if (changeJson.id === _child.id) {
             return {
               ...changeJson,
