@@ -815,7 +815,18 @@ const Design = () => {
 
             {changeJson.values.background_style_type == "gradient" ? (
               // linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(67,9,121,1) 35%,rgba(0,212,255,1) 100%)
-              <div></div>
+              <div>
+                {changeJson.values.background_style_types[
+                  changeJson.values.background_style_type
+                ].map((value, i) => {
+                  return (
+                    <div key={i}>
+                      <div>{value.color}</div>
+                      <div>{value.percentage}</div>
+                    </div>
+                  );
+                })}
+              </div>
             ) : (
               ""
             )}
