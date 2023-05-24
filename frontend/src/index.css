@@ -2,7 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+  .input_color_picker {
+    @apply bg-[rgba(71,73,88,.475)] mr-5 rounded-[6px] px-1 w-full border-b-0 p-2 pl-2;
+  }
+}
+
 @layer components {
+  .color_picker {
+    display: none;
+  }
+  .color_picker.active {
+    display: block;
+  }
+
   .icon_style {
     filter: drop-shadow(3px 5px 2px rgb(0 0 0 / 0.4));
   }

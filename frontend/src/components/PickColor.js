@@ -90,6 +90,7 @@ const PickColor = ({ setColorUpdate, test }) => {
   return (
     <div>
       <canvas
+        id="canvas"
         ref={canvasRef}
         height="150"
         className="w-full rounded-b-[6px] border-2 border-t-0 border-[rgba(53,54,66,.9825)]"

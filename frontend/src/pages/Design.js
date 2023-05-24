@@ -23,6 +23,8 @@ const Design = () => {
     isChanged: false,
   });
 
+  const [inputColorPicker, setInputColorPicker] = useState({});
+
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
   const [jsonValue, setJsonValue] = useState({
@@ -418,6 +420,19 @@ const Design = () => {
       setJsonValue({ elements: newState });
     }
   };
+  document.onmousedown = (e) => {
+    if (e.target.id == inputColorPicker.id || e.target.id == "canvas") {
+      return;
+    }
+    setInputColorPicker({});
+  };
+
+  const handleColorPickerInput = (e) => {
+    if (e.target.id == "canvas" || e.target.id == inputColorPicker.id) {
+      return;
+    }
+    setInputColorPicker({ name: e.target.dataset.name, id: e.target.id });
+  };
 
   return (
     <div>
@@ -524,13 +539,28 @@ const Design = () => {
                 ></div>
                 <div className="">Background</div>
               </div>
-              <input
-                id="background_color"
-                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] p-2 w-full border-b-0"
-                value={changeJson.values.background_color}
-                onChange={updateElementsValues}
-              />
-              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+              <div onClick={handleColorPickerInput}>
+                <input
+                  data-name={changeJson.values.id}
+                  id="background_color"
+                  className="input_color_picker"
+                  value={changeJson.values.background_color}
+                  onChange={updateElementsValues}
+                />
+                <div
+                  className={
+                    inputColorPicker.name == changeJson.values.id &&
+                    inputColorPicker.id == "background_color"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
+                >
+                  <PickColor
+                    setColorUpdate={setColorUpdate}
+                    test={changeJson}
+                  />
+                </div>
+              </div>
             </div>
             <div className="px-10 pt-3 absolute h-full">
               <div className="flex justify-between pt-3 pb-1">
@@ -784,7 +814,7 @@ const Design = () => {
               </div>
               <input
                 id="text_color"
-                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                className="input_color_picker"
                 value={changeJson.values.text_color}
                 onChange={updateElementsValues}
               />
@@ -846,17 +876,32 @@ const Design = () => {
                   ></div>
                   <div className="">Color</div>
                 </div>
-                <input
-                  id="background_color"
-                  className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
-                  value={
-                    changeJson.values.background_style_types[
-                      changeJson.values.background_style_type
-                    ].background_color
-                  }
-                  onChange={updateBackGround}
-                />
-                <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+                <div onClick={handleColorPickerInput}>
+                  <input
+                    data-name={changeJson.values.id}
+                    id="background_color"
+                    className="input_color_picker"
+                    value={
+                      changeJson.values.background_style_types[
+                        changeJson.values.background_style_type
+                      ].background_color
+                    }
+                    onChange={updateBackGround}
+                  />
+                  <div
+                    className={
+                      inputColorPicker.name == changeJson.values.id &&
+                      inputColorPicker.id == "background_color"
+                        ? "color_picker active"
+                        : "color_picker"
+                    }
+                  >
+                    <PickColor
+                      setColorUpdate={setColorUpdate}
+                      test={changeJson}
+                    />
+                  </div>
+                </div>
               </div>
             ) : (
               ""
@@ -882,16 +927,39 @@ const Design = () => {
                         <input
                           data-indexvalue={i}
                           id="color"
-                          className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
+                          className="input_color_picker"
                           value={value.color}
                           onChange={updateBackGround}
                         />
+                        {/* <div onClick={handleColorPickerInput}>
+                          <input
+                            data-indexvalue={i}
+                            data-name={changeJson.values.id}
+                            id="color"
+                            className="input_color_picker"
+                            value={value.color}
+                            onChange={updateBackGround}
+                          />
+                          <div
+                            className={
+                              inputColorPicker.id == "color"
+                                ? "color_picker active"
+                                : "color_picker"
+                            }
+                          >
+                            <PickColor
+                              setColorUpdate={setColorUpdate}
+                              test={changeJson}
+                            />
+                          </div>
+                        </div> */}
+
                         <input
                           data-indexvalue={i}
                           max={100}
                           id="percentage"
                           type="range"
-                          className="slider_style"
+                          className="ml-2 slider_style"
                           value={value.percentage}
                           onChange={updateBackGround}
                         />
@@ -948,13 +1016,28 @@ const Design = () => {
                 ></div>
                 <div className="">Color</div>
               </div>
-              <input
-                id="background_color"
-                className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
-                value={changeJson.values.background_color}
-                onChange={updateElementsValues}
-              />
-              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+              <div onClick={handleColorPickerInput}>
+                <input
+                  data-name={changeJson.values.id}
+                  id="background_color"
+                  className="input_color_picker"
+                  value={changeJson.values.background_color}
+                  onChange={updateElementsValues}
+                />
+                <div
+                  className={
+                    inputColorPicker.name == changeJson.values.id &&
+                    inputColorPicker.id == "background_color"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
+                >
+                  <PickColor
+                    setColorUpdate={setColorUpdate}
+                    test={changeJson}
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
