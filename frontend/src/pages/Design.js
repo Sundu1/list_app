@@ -326,15 +326,38 @@ const Design = () => {
       const matchAndUpdate = (values, changeJson, children) => {
         return children.map((_child) => {
           if (changeJson.id === _child.id) {
-            return {
-              ...changeJson,
-              background_style_types: {
-                ...changeJson.background_style_types,
-                [changeJson.background_style_type]: {
-                  [e.target.id]: e.target.value,
+            if (_child.background_style_type == "color") {
+              return {
+                ...changeJson,
+                background_style_types: {
+                  ...changeJson.background_style_types,
+                  [changeJson.background_style_type]: {
+                    [e.target.id]: e.target.value,
+                  },
                 },
-              },
-            };
+              };
+            }
+            if (_child.background_style_type == "gradient") {
+              const updated_array = _child.background_style_types[
+                _child.background_style_type
+              ].map((value, i) => {
+                if (i == e.target.dataset.indexvalue) {
+                  return {
+                    ...value,
+                    [e.target.id]: e.target.value,
+                  };
+                }
+                return { ...value };
+              });
+
+              return {
+                ..._child,
+                background_style_types: {
+                  ..._child.background_style_types,
+                  [_child.background_style_type]: updated_array,
+                },
+              };
+            }
           } else {
             return {
               ..._child,
@@ -352,21 +375,47 @@ const Design = () => {
         jsonValue.elements
       );
 
-      setChangeJson((old) => ({
-        ...old,
-        values: {
-          ...old.values,
-          background_style_types: {
-            ...old.values.background_style_types,
-            [old.values.background_style_type]: {
-              [e.target.id]: e.target.value,
+      if (changeJson.values.background_style_type == "color") {
+        setChangeJson((old) => ({
+          ...old,
+          values: {
+            ...old.values,
+            background_style_types: {
+              ...old.values.background_style_types,
+              [old.values.background_style_type]: {
+                [e.target.id]: e.target.value,
+              },
             },
           },
-        },
-      }));
-      setJsonValue({ elements: newState });
+        }));
+      }
 
-      console.log("newState", newState);
+      if (changeJson.values.background_style_type == "gradient") {
+        const updated_array = changeJson.values.background_style_types[
+          changeJson.values.background_style_type
+        ].map((value, i) => {
+          if (i == e.target.dataset.indexvalue) {
+            return {
+              ...value,
+              [e.target.id]: e.target.value,
+            };
+          }
+          return { ...value };
+        });
+
+        setChangeJson((old) => ({
+          ...old,
+          values: {
+            ...old.values,
+            background_style_types: {
+              ...old.values.background_style_types,
+              [old.values.background_style_type]: updated_array,
+            },
+          },
+        }));
+      }
+
+      setJsonValue({ elements: newState });
     }
   };
 
@@ -814,7 +863,6 @@ const Design = () => {
             )}
 
             {changeJson.values.background_style_type == "gradient" ? (
-              // linear-gradient(90deg,rgba(2,0,36,1) 0%,rgba(67,9,121,1) 35%,rgba(0,212,255,1) 100%)
               <div>
                 {changeJson.values.background_style_types[
                   changeJson.values.background_style_type
@@ -832,13 +880,16 @@ const Design = () => {
                       </div>
                       <div className="flex">
                         <input
-                          id="background_color"
+                          data-indexvalue={i}
+                          id="color"
                           className="bg-[rgba(71,73,88,.475)] mr-5 rounded-t-[6px] px-1 w-full border-b-0 p-2"
                           value={value.color}
                           onChange={updateBackGround}
                         />
                         <input
-                          id="background_color"
+                          data-indexvalue={i}
+                          max={100}
+                          id="percentage"
                           type="range"
                           className="slider_style"
                           value={value.percentage}
