@@ -80,10 +80,13 @@ const HtmlRenderFunction = (
 
             // newDiv.style.background =
             //   element.background_style_types[background_type].background_color;
+
             newDiv.style.backgroundSize = "cover";
-            newDiv.style.backgroundPosition = "center center";
-            newDiv.style.backgroundImage =
-              element.background_style_types[background_type].background_url;
+            newDiv.style.backgroundPosition =
+              "center center, 0% 0%, center center";
+            newDiv.style.backgroundImage = `
+               radial-gradient(79% 150% at 29% 100%, rgba(135, 92, 161, 0.79) 0%, rgba(66, 95, 199, 0.69) 68%, rgba(0, 148, 255, 0.54) 100%),
+               ${element.background_style_types[background_type].background_url}`;
           }
         }
 

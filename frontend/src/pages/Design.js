@@ -343,9 +343,12 @@ const Design = () => {
             }
 
             if (_child.background_style_type == "image") {
-              const img_url = e.target.files[0]
-                ? `url(${URL.createObjectURL(e.target.files[0])})`
-                : "url()";
+              console.log("test", e.target.id, e.target.value, e.target.files);
+
+              const img_url =
+                e.target.files !== undefined
+                  ? `url(${URL.createObjectURL(e.target.files[0])})`
+                  : "url()";
               return {
                 ...changeJson,
                 background_style_types: {
@@ -354,7 +357,10 @@ const Design = () => {
                     ...changeJson.background_style_types[
                       changeJson.background_style_type
                     ],
-                    [e.target.id]: img_url,
+                    [e.target.id]:
+                      e.target.id == "background_url"
+                        ? img_url
+                        : e.target.value,
                   },
                 },
               };
@@ -437,21 +443,10 @@ const Design = () => {
         }));
       }
       if (changeJson.values.background_style_type == "image") {
-        const img_url = e.target.files[0]
-          ? `url(${URL.createObjectURL(e.target.files[0])})`
-          : "url()";
-        // return {
-        //   ...changeJson,
-        //   background_style_types: {
-        //     ...changeJson.background_style_types,
-        //     [changeJson.background_style_type]: {
-        //       ...changeJson.background_style_types[
-        //         changeJson.background_style_type
-        //       ],
-        //       [e.target.id]: img_url,
-        //     },
-        //   },
-        // };
+        const img_url =
+          e.target.files !== undefined
+            ? `url(${URL.createObjectURL(e.target.files[0])})`
+            : "url()";
 
         setChangeJson((old) => ({
           ...old,
@@ -463,7 +458,8 @@ const Design = () => {
                 ...old.values.background_style_types[
                   old.values.background_style_type
                 ],
-                [e.target.id]: img_url,
+                [e.target.id]:
+                  e.target.id == "background_url" ? img_url : e.target.value,
               },
             },
           },
@@ -985,29 +981,6 @@ const Design = () => {
                           value={value.color}
                           onChange={updateBackGround}
                         />
-                        {/* <div onClick={handleColorPickerInput}>
-                          <input
-                            data-indexvalue={i}
-                            data-name={changeJson.values.id}
-                            id="color"
-                            className="input_color_picker"
-                            value={value.color}
-                            onChange={updateBackGround}
-                          />
-                          <div
-                            className={
-                              inputColorPicker.id == "color"
-                                ? "color_picker active"
-                                : "color_picker"
-                            }
-                          >
-                            <PickColor
-                              setColorUpdate={setColorUpdate}
-                              test={changeJson}
-                            />
-                          </div>
-                        </div> */}
-
                         <input
                           data-indexvalue={i}
                           max={100}
@@ -1043,6 +1016,44 @@ const Design = () => {
                     type="file"
                     className="hidden"
                   />
+                  <div className="pb-2 flex">
+                    <div
+                      className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                      style={{
+                        background:
+                          changeJson.values.background_style_types[
+                            changeJson.values.background_style_type
+                          ].background_color,
+                      }}
+                    ></div>
+                    <div className="">Color</div>
+                  </div>
+                  <div onClick={handleColorPickerInput}>
+                    <input
+                      data-name={changeJson.values.id}
+                      id="background_color"
+                      className="input_color_picker"
+                      value={
+                        changeJson.values.background_style_types[
+                          changeJson.values.background_style_type
+                        ].background_color
+                      }
+                      onChange={updateBackGround}
+                    />
+                    <div
+                      className={
+                        inputColorPicker.name == changeJson.values.id &&
+                        inputColorPicker.id == "background_color"
+                          ? "color_picker active"
+                          : "color_picker"
+                      }
+                    >
+                      <PickColor
+                        setColorUpdate={setColorUpdate}
+                        test={changeJson}
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
             ) : (
@@ -1115,6 +1126,42 @@ const Design = () => {
                   />
                 </div>
               </div>
+              <div className="flex justify-between pt-3 pb-1">
+                <div>Height</div>
+                <input
+                  id="height"
+                  className="mr-5 rounded px-1 w-[50px] bg-transparent "
+                  value={changeJson.values.height}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div>
+                <input
+                  id="height"
+                  type="range"
+                  max={1000}
+                  className="slider_style"
+                  value={changeJson.values.height}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div className="flex justify-between pt-3 pb-1">
+                <div>Width</div>
+                <input
+                  id="width"
+                  className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                  value={changeJson.values.width}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <input
+                id="width"
+                type="range"
+                max={1000}
+                className="slider_style"
+                value={changeJson.values.width}
+                onChange={updateElementsValues}
+              />
             </div>
           </div>
         </div>
