@@ -971,6 +971,35 @@ const Design = () => {
             ) : (
               ""
             )}
+            {changeJson.values.background_style_type == "image" ? (
+              <div>
+                <div className="pt-5 px-10 h-full">
+                  <div className="pb-2">Image</div>
+                  <div className="">
+                    <input id="color" type="file" />
+                  </div>
+                </div>
+                <div className="pt-5 px-10 h-full">
+                  <div className="pb-2 flex">
+                    <div
+                      className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                      style={{
+                        background: value.color,
+                      }}
+                    ></div>
+                    <div className="">Color</div>
+                  </div>
+                  <input
+                    id="color"
+                    className="input_color_picker"
+                    value={value.color}
+                    onChange={updateBackGround}
+                  />
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
           </div>
         </div>
       ) : (
