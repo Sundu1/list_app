@@ -75,6 +75,16 @@ const HtmlRenderFunction = (
 
             newDiv.style.background = `linear-gradient(90deg, ${gradient_value})`;
           }
+          if (element.background_style_type == "image") {
+            const background_type = element.background_style_type;
+
+            // newDiv.style.background =
+            //   element.background_style_types[background_type].background_color;
+            newDiv.style.backgroundSize = "cover";
+            newDiv.style.backgroundPosition = "center center";
+            newDiv.style.backgroundImage =
+              element.background_style_types[background_type].background_url;
+          }
         }
 
         if (element.type == "page") {

@@ -52,8 +52,10 @@ const Design = () => {
               percentage: "100",
             },
           ],
-          image: "",
-          video: "",
+          image: {
+            background_color: "white",
+            background_url: "",
+          },
         },
         children: [
           {
@@ -83,7 +85,11 @@ const Design = () => {
     ],
   });
 
+  const [imgUrl, setImgUrl] = useState("");
+
+  const uploadImageRef = useRef(null);
   const refAddElement = useRef();
+
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
       if (
@@ -319,10 +325,6 @@ const Design = () => {
     setChangeJson((old) => ({ ...old, values: {} }));
   };
 
-  const backgroundStyleOnChange = (e) => {
-    // console.log("testing", e.target.value);
-  };
-
   const updateBackGround = (e) => {
     if (e.target.id) {
       const matchAndUpdate = (values, changeJson, children) => {
@@ -335,6 +337,24 @@ const Design = () => {
                   ...changeJson.background_style_types,
                   [changeJson.background_style_type]: {
                     [e.target.id]: e.target.value,
+                  },
+                },
+              };
+            }
+
+            if (_child.background_style_type == "image") {
+              const img_url = e.target.files[0]
+                ? `url(${URL.createObjectURL(e.target.files[0])})`
+                : "url()";
+              return {
+                ...changeJson,
+                background_style_types: {
+                  ...changeJson.background_style_types,
+                  [changeJson.background_style_type]: {
+                    ...changeJson.background_style_types[
+                      changeJson.background_style_type
+                    ],
+                    [e.target.id]: img_url,
                   },
                 },
               };
@@ -416,6 +436,39 @@ const Design = () => {
           },
         }));
       }
+      if (changeJson.values.background_style_type == "image") {
+        const img_url = e.target.files[0]
+          ? `url(${URL.createObjectURL(e.target.files[0])})`
+          : "url()";
+        // return {
+        //   ...changeJson,
+        //   background_style_types: {
+        //     ...changeJson.background_style_types,
+        //     [changeJson.background_style_type]: {
+        //       ...changeJson.background_style_types[
+        //         changeJson.background_style_type
+        //       ],
+        //       [e.target.id]: img_url,
+        //     },
+        //   },
+        // };
+
+        setChangeJson((old) => ({
+          ...old,
+          values: {
+            ...old.values,
+            background_style_types: {
+              ...old.values.background_style_types,
+              [old.values.background_style_type]: {
+                ...old.values.background_style_types[
+                  old.values.background_style_type
+                ],
+                [e.target.id]: img_url,
+              },
+            },
+          },
+        }));
+      }
 
       setJsonValue({ elements: newState });
     }
@@ -432,6 +485,10 @@ const Design = () => {
       return;
     }
     setInputColorPicker({ name: e.target.dataset.name, id: e.target.id });
+  };
+
+  const handleUploadImage = () => {
+    uploadImageRef.current.click();
   };
 
   return (
@@ -856,9 +913,6 @@ const Design = () => {
                   <option value="image" className="bg-[rgba(53,54,66,.9825)]">
                     Image
                   </option>
-                  <option value="video" className="bg-[rgba(53,54,66,.9825)]">
-                    Video
-                  </option>
                 </select>
               </div>
             </div>
@@ -974,26 +1028,20 @@ const Design = () => {
             {changeJson.values.background_style_type == "image" ? (
               <div>
                 <div className="pt-5 px-10 h-full">
-                  <div className="pb-2">Image</div>
-                  <div className="">
-                    <input id="color" type="file" />
-                  </div>
-                </div>
-                <div className="pt-5 px-10 h-full">
-                  <div className="pb-2 flex">
-                    <div
-                      className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                      style={{
-                        background: value.color,
-                      }}
-                    ></div>
-                    <div className="">Color</div>
+                  <div
+                    className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
+                    onClick={handleUploadImage}
+                  >
+                    <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
+                      Upload
+                    </div>
                   </div>
                   <input
-                    id="color"
-                    className="input_color_picker"
-                    value={value.color}
                     onChange={updateBackGround}
+                    ref={uploadImageRef}
+                    id="background_url"
+                    type="file"
+                    className="hidden"
                   />
                 </div>
               </div>
@@ -1102,7 +1150,6 @@ const Design = () => {
               Text
             </div>
             <div className="design_new_elements">Image</div>
-            <div className="design_new_elements">Video</div>
             <div className="design_new_elements">Icons</div>
             <div className="design_new_elements">Buttons</div>
           </div>
