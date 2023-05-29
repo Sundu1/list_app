@@ -26,7 +26,7 @@ const DesignList = () => {
   }, [value.Username, refreshList]);
 
   const handleSelectClick = () => {
-    console.log("testsetset");
+    navigate(`/design/newDesign`);
   };
 
   return (
