@@ -6,6 +6,8 @@ var bcrypt = require("bcryptjs");
 const configAuth = require("./auth/auth.config.js");
 require("dotenv").config();
 
+const Sunsql = require("./sql_utility.js");
+
 const app = express();
 const port = 5000;
 
@@ -133,8 +135,8 @@ async function createTable(tableName, user) {
     } else {
       const isTableExist =
         await pool.query(`CREATE TABLE ${user}.${tableName_replaced}(
-          PkId integer not null generated always as identity (increment by 1),
-          constraint pk_${tableName_replaced} primary key (PkId))`);
+            PkId integer not null generated always as identity (increment by 1),
+            constraint pk_${tableName_replaced} primary key (PkId))`);
       if (isTableExist) {
         await pool.query(`insert into ${user}.TableList (tablename, createdby, createat, modifiedby, modifiedat)
                           values ('${tableName_replaced}', '${user}', '${today}', '${user}', '${today}')`);
@@ -326,6 +328,51 @@ app.delete("/delete-column", async (req, res) => {
 app.put("/edit-row-data", async (req, res) => {
   const data = req.body;
   updateRowData(data);
+});
+
+const sunsql = new Sunsql({
+  user: process.env.USER,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD,
+  port: process.env.PORT,
+  ssl: {
+    rejectUnauthorized: false,
+  },
+});
+
+// sunsql.designTable.init("admin");
+// const create = await sunsql.designTable.create({
+//   data: {
+//     name: "test",
+//     json_value: "{sdfsd}",
+//   },
+//   checkDuplicates: false,
+// });
+// console.log(create);
+
+// const findMany = await sunsql.designTable.findMany({
+//   where: {
+//     name: "",
+//   },
+// });
+
+// const delete1 = await sunsql.designTable.delete({
+//   where: {
+//     name: "test",
+//   },
+// });
+// console.log(delete1);
+
+// const delete2 = await sunsql.designTable.deleteMany({
+//   where: { name: "" },
+// });
+// console.log(delete2);
+
+app.get("/designlist/:user", async (req, res) => {
+  sunsql.designTable.init("admin");
+  const result = await sunsql.designTable.findAll();
+  res.send(result);
 });
 
 app.listen(port, function () {

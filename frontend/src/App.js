@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import List from "./pages/List";
 import Signup from "./pages/Signup";
 import Design from "./pages/Design";
+import DesignList from "./pages/DesignList";
 
 import { Router, Route, Routes } from "react-router-dom";
 import {
@@ -55,9 +56,17 @@ function App() {
         <Route
           path="/design/:designTable"
           element={
-            // <LoginProvider>
-            <Design />
-            // </LoginProvider>
+            <LoginProvider>
+              <Design />
+            </LoginProvider>
+          }
+        />
+        <Route
+          path="/apps"
+          element={
+            <LoginProvider>
+              <DesignList />
+            </LoginProvider>
           }
         />
       </Routes>

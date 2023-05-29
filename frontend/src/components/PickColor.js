@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const PickColor = ({ setColorUpdate, test }) => {
+const PickColor = ({ setColorUpdate, test, type, idValue }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -39,13 +39,24 @@ const PickColor = ({ setColorUpdate, test }) => {
       let background_color_values;
 
       if (test.values && test.values.type == "container") {
-        background_color_values = new Object({
-          target: {
-            id: "background_color",
-            value: hex,
-          },
-        });
+        if ((type ||= "background_color")) {
+          background_color_values = new Object({
+            target: {
+              id: "background_color",
+              value: hex,
+            },
+          });
+        }
+        if (type == "border_color") {
+          background_color_values = new Object({
+            target: {
+              id: "border_color",
+              value: hex,
+            },
+          });
+        }
       }
+
       if (test.values && test.values.type == "text") {
         background_color_values = new Object({
           target: {
@@ -55,12 +66,25 @@ const PickColor = ({ setColorUpdate, test }) => {
         });
       }
       if (test.values && test.values.type == "background") {
-        background_color_values = new Object({
-          target: {
-            id: "background_color",
-            value: hex,
-          },
-        });
+        if ((type ||= "background_color")) {
+          background_color_values = new Object({
+            target: {
+              id: "background_color",
+              value: hex,
+            },
+          });
+        }
+        if (type == "color") {
+          background_color_values = new Object({
+            target: {
+              id: "color",
+              dataset: {
+                indexvalue: idValue,
+              },
+              value: hex,
+            },
+          });
+        }
       }
 
       if (test.values && test.values.type == "page") {

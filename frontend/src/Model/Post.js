@@ -86,4 +86,21 @@ const addColumnPost = async (tableName, user, columnInfo) => {
   }
 };
 
-export { createNewRow, SignIn, insertNewTable, addColumnPost };
+const createNewDesign = async (designName, user) => {
+  try {
+    const response = await axios({
+      method: "post",
+      url: `${BASE_URL}/create-design`,
+      data: {
+        designName,
+        user,
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { createNewRow, SignIn, insertNewTable, addColumnPost, createNewDesign };
