@@ -9,6 +9,10 @@
 }
 
 @layer components {
+  .column_expanded {
+    height: 100px;
+  }
+
   .color_picker {
     display: none;
   }

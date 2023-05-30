@@ -733,7 +733,17 @@ const Design = () => {
   };
 
   const handleColumnsButton = (e) => {
-    console.log("column", e.target.id);
+    if (
+      !e.target.parentElement.id.includes("column") ||
+      e.target.parentElement.id.includes("values")
+    )
+      return;
+    const text = new String("#" + e.target.parentElement.id);
+    const text_1 = new String("#" + e.target.parentElement.id + "_values");
+    const column = document.querySelector(text);
+    const column_1 = document.querySelector(text_1);
+    column.classList.toggle("column_expanded");
+    column_1.classList.toggle("hidden");
   };
 
   return (
@@ -832,21 +842,24 @@ const Design = () => {
                 <div className="">
                   <div>Columns</div>
                   <div className="border-2 rounded-lg border-[rgba(255,255,255,.075)]">
-                    <div className="border-b-2 border-[rgba(255,255,255,.075)]">
-                      <div
-                        id="first_column"
-                        className="p-2"
-                        onClick={handleColumnsButton}
-                      >
+                    <div
+                      id="first_column"
+                      className=""
+                      onClick={handleColumnsButton}
+                    >
+                      <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
                         First
                       </div>
+                      <div id="first_column_values" className="hidden">
+                        Width <input type="number" />
+                      </div>
                     </div>
-                    <div className="border-b-2 border-[rgba(255,255,255,.075)]">
-                      <div
-                        id="first_second"
-                        className="p-2"
-                        onClick={handleColumnsButton}
-                      >
+                    <div
+                      id="first_second"
+                      className=""
+                      onClick={handleColumnsButton}
+                    >
+                      <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
                         Second
                       </div>
                     </div>
