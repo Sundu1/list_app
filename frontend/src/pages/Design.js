@@ -851,7 +851,13 @@ const Design = () => {
                         First
                       </div>
                       <div id="first_column_values" className="hidden">
-                        Width <input type="number" />
+                        <div className="flex">
+                          <div className="ml-2 pr-3">Width</div>
+                          <input
+                            type="number"
+                            className="bg-[rgba(71,73,88,.475)] w-[50px] px-2 rounded"
+                          />
+                        </div>
                       </div>
                     </div>
                     <div
