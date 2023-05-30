@@ -24,7 +24,7 @@ const Login = () => {
     if (userInfo.result) {
       localStorage.setItem("user", JSON.stringify(userInfo));
       setValue(userInfo);
-      navigate("/home");
+      navigate("/apps");
       return;
     } else if (userInfo.message) {
       setLoading(false);

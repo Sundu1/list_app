@@ -56,6 +56,23 @@ const Design = () => {
           image: {
             background_color: "white",
             background_url: "",
+            gradient: [
+              {
+                color: "rgba(2,0,36,1)",
+                percentage: "0",
+                transparency: "0.79",
+              },
+              {
+                color: "rgba(67,9,121,1)",
+                percentage: "35",
+                transparency: "0.69",
+              },
+              {
+                color: "rgba(0,212,255,1)",
+                percentage: "100",
+                transparency: "0.54",
+              },
+            ],
           },
         },
         isActive: false,
@@ -551,20 +568,38 @@ const Design = () => {
             }
 
             if (_child.background_style_type == "image") {
-              const img_url =
-                e.target.files !== undefined
-                  ? `url(${URL.createObjectURL(e.target.files[0])})`
-                  : "url()";
+              if (e.target.id == "background_url") {
+                const img_url =
+                  e.target.files !== undefined
+                    ? `url(${URL.createObjectURL(e.target.files[0])})`
+                    : "url()";
 
-              setChangeJson((old) => ({
-                ...old,
-                values: {
-                  ...old.values,
+                setChangeJson((old) => ({
+                  ...old,
+                  values: {
+                    ...old.values,
+                    background_style_types: {
+                      ...old.values.background_style_types,
+                      [old.values.background_style_type]: {
+                        ...old.values.background_style_types[
+                          old.values.background_style_type
+                        ],
+                        [e.target.id]:
+                          e.target.id == "background_url"
+                            ? img_url
+                            : e.target.value,
+                      },
+                    },
+                  },
+                }));
+
+                return {
+                  ...changeJson,
                   background_style_types: {
-                    ...old.values.background_style_types,
-                    [old.values.background_style_type]: {
-                      ...old.values.background_style_types[
-                        old.values.background_style_type
+                    ...changeJson.background_style_types,
+                    [changeJson.background_style_type]: {
+                      ...changeJson.background_style_types[
+                        changeJson.background_style_type
                       ],
                       [e.target.id]:
                         e.target.id == "background_url"
@@ -572,24 +607,55 @@ const Design = () => {
                           : e.target.value,
                     },
                   },
-                },
-              }));
+                };
+              }
 
-              return {
-                ...changeJson,
-                background_style_types: {
-                  ...changeJson.background_style_types,
-                  [changeJson.background_style_type]: {
-                    ...changeJson.background_style_types[
-                      changeJson.background_style_type
-                    ],
-                    [e.target.id]:
-                      e.target.id == "background_url"
-                        ? img_url
-                        : e.target.value,
+              if (e.target.id == "color" || e.target.id == "percentage") {
+                const value_id = e.target.id.includes("color")
+                  ? "color"
+                  : e.target.id;
+
+                const updated_array = _child.background_style_types[
+                  _child.background_style_type
+                ].gradient.map((value, i) => {
+                  if (i == e.target.dataset.indexvalue) {
+                    return {
+                      ...value,
+                      [value_id]: e.target.value,
+                    };
+                  }
+                  return { ...value };
+                });
+
+                setChangeJson((old) => ({
+                  ...old,
+                  values: {
+                    ...old.values,
+                    background_style_types: {
+                      ...old.values.background_style_types,
+                      [old.values.background_style_type]: {
+                        ...old.values.background_style_types[
+                          old.values.background_style_type
+                        ],
+                        gradient: updated_array,
+                      },
+                    },
                   },
-                },
-              };
+                }));
+
+                return {
+                  ..._child,
+                  background_style_types: {
+                    ..._child.background_style_types,
+                    [_child.background_style_type]: {
+                      ..._child.background_style_types[
+                        _child.background_style_type
+                      ],
+                      gradient: updated_array,
+                    },
+                  },
+                };
+              }
             }
             if (_child.background_style_type == "gradient") {
               const value_id = e.target.id.includes("color")
@@ -664,6 +730,10 @@ const Design = () => {
 
   const handleUploadImage = () => {
     uploadImageRef.current.click();
+  };
+
+  const handleColumnsButton = (e) => {
+    console.log("column", e.target.id);
   };
 
   return (
@@ -747,26 +817,43 @@ const Design = () => {
                   value={changeJson.values.display}
                   onChange={updateElementsValues}
                 >
-                  <option value="flex" className="bg-[rgba(53,54,66,.9825)]">
-                    Flex
+                  <option value="default" className="bg-[rgba(53,54,66,.9825)]">
+                    Default
                   </option>
-                  <option value="Block" className="bg-[rgba(53,54,66,.9825)]">
-                    Block
-                  </option>
-                  <option value="Inline" className="bg-[rgba(53,54,66,.9825)]">
-                    Inline
-                  </option>
-                  <option value="Grid" className="bg-[rgba(53,54,66,.9825)]">
-                    Grid
-                  </option>
-                  <option value="" className="bg-[rgba(53,54,66,.9825)]">
-                    None
+                  <option value="columns" className="bg-[rgba(53,54,66,.9825)]">
+                    Columns
                   </option>
                 </select>
               </div>
             </div>
+
             <div className="pt-5 px-10">
-              <div className="pb-2 flex">
+              {changeJson.values.display == "columns" ? (
+                <div className="">
+                  <div>Columns</div>
+                  <div className="border-2 rounded-lg border-[rgba(255,255,255,.075)]">
+                    <div className="border-b-2 border-[rgba(255,255,255,.075)]">
+                      <div
+                        id="first_column"
+                        className="p-2"
+                        onClick={handleColumnsButton}
+                      >
+                        First
+                      </div>
+                    </div>
+                    <div className="border-b-2 border-[rgba(255,255,255,.075)]">
+                      <div
+                        id="first_second"
+                        className="p-2"
+                        onClick={handleColumnsButton}
+                      >
+                        Second
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+              <div className="py-2 flex">
                 <div
                   className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
                   style={{ background: changeJson.values.background_color }}
@@ -1416,32 +1503,61 @@ const Design = () => {
                     ></div>
                     <div className="">Color</div>
                   </div>
-                  <div onClick={handleColorPickerInput}>
-                    <input
-                      data-name={changeJson.values.id}
-                      id="background_color"
-                      className="input_color_picker"
-                      value={
-                        changeJson.values.background_style_types[
-                          changeJson.values.background_style_type
-                        ].background_color
-                      }
-                      onChange={updateBackGround}
-                    />
-                    <div
-                      className={
-                        inputColorPicker.name == changeJson.values.id &&
-                        inputColorPicker.id == "background_color"
-                          ? "color_picker active"
-                          : "color_picker"
-                      }
-                    >
-                      <PickColor
-                        setColorUpdate={setColorUpdate}
-                        test={changeJson}
-                      />
-                    </div>
-                  </div>
+                  {changeJson.values.background_style_types[
+                    changeJson.values.background_style_type
+                  ].gradient.map((value, i) => {
+                    return (
+                      <div key={i} className="pt-5 h-full">
+                        <div className="pb-2 flex">
+                          <div
+                            className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                            style={{
+                              background: value.color,
+                            }}
+                          ></div>
+                          <div className="">Color</div>
+                        </div>
+                        <div className="flex">
+                          <div
+                            onClick={handleColorPickerInput}
+                            className="w-[115px]"
+                          >
+                            <input
+                              data-indexvalue={i}
+                              id={`color-${i}`}
+                              className="input_color_picker"
+                              value={value.color}
+                              onChange={updateBackGround}
+                            />
+
+                            <div
+                              className={
+                                inputColorPicker.id == `color-${i}`
+                                  ? "color_picker active"
+                                  : "color_picker"
+                              }
+                            >
+                              <PickColor
+                                setColorUpdate={setColorUpdate}
+                                test={changeJson}
+                                type={"color"}
+                                idValue={i}
+                              />
+                            </div>
+                          </div>
+                          <input
+                            data-indexvalue={i}
+                            max={100}
+                            id="percentage"
+                            type="range"
+                            className="ml-2 slider_style w-[100px]"
+                            value={value.percentage}
+                            onChange={updateBackGround}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             ) : (

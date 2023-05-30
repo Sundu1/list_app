@@ -42,7 +42,6 @@ const HtmlRenderFunction = (
         // newDiv.addEventListener("mousemove", handleMouseMove);
 
         // if (element.isActive) {
-        //   console.log("dfsdfsdfsdf", element);
         //   newDiv.style.borderColor = "red";
         //   newDiv.style.borderStyle = "solid";
         //   newDiv.style.borderWidth = "2px";
@@ -123,13 +122,36 @@ const HtmlRenderFunction = (
             const background_type = element.background_style_type;
 
             // newDiv.style.background =
-            //   element.background_style_types[background_type].background_color;
+            // element.background_style_types[background_type].background_color;
+            // radial-gradient(79% 150% at 29% 100%, rgba(135, 92, 161, 0.79) 0%, rgba(66, 95, 199, 0.69) 68%, rgba(0, 148, 255, 0.54) 100%),
+            let radial_gradient = "";
+            element.background_style_types[background_type].gradient.forEach(
+              (value) => {
+                radial_gradient += `${hexToRgb(
+                  value.color,
+                  value.transparency
+                )} ${value.percentage}%,`;
+              }
+            );
 
+            function hexToRgb(hex, transparency) {
+              var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+                hex
+              );
+              return result
+                ? `rgb(${parseInt(result[1], 16)},${parseInt(
+                    result[2],
+                    16
+                  )},${parseInt(result[3], 16)},${transparency})`
+                : hex;
+            }
+
+            radial_gradient = radial_gradient.slice(0, -1);
             newDiv.style.backgroundSize = "cover";
             newDiv.style.backgroundPosition =
               "center center, 0% 0%, center center";
             newDiv.style.backgroundImage = `
-               radial-gradient(79% 150% at 29% 100%, rgba(135, 92, 161, 0.79) 0%, rgba(66, 95, 199, 0.69) 68%, rgba(0, 148, 255, 0.54) 100%),
+               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
                ${element.background_style_types[background_type].background_url}`;
           }
         }
