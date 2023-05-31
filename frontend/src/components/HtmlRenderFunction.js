@@ -71,8 +71,11 @@ const HtmlRenderFunction = (
 
         if (element.type == "container") {
           newDiv.setAttribute("data-type", "container");
-          newDiv.style.display = element.display;
-          newDiv.style.justifyContent = "space-between";
+          if (element.display == "columns") {
+            newDiv.style.display = "grid";
+            newDiv.style.gridTemplateColumns = "repeat(3, 1fr)";
+          }
+
           newDiv.style.background = element.background_color;
           newDiv.style.height = element.height + "px";
           newDiv.style.width = element.width + "px";
@@ -107,6 +110,7 @@ const HtmlRenderFunction = (
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
           }
+
           if (element.background_style_type == "gradient") {
             const gradient_value = element.background_style_types[
               element.background_style_type

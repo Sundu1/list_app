@@ -801,7 +801,7 @@ const Design = () => {
       changeJson.values.isActive &&
       changeJson.values.type == "container" ? (
         <div
-          className="fixed bottom-0 right-0 h-full w-[23em] bg-[rgba(53,54,66,.9825)]
+          className="fixed right-0 h-full w-[23em] bg-[rgba(53,54,66,.9825)]
                            z-50 overflow-y-auto"
         >
           <div className="text-white w-full">
