@@ -162,12 +162,19 @@ const HtmlRenderFunction = (
 
         if (element.type == "page") {
           newDiv.removeAttribute("draggable");
-          newDiv.style.overflow = "hidden";
           newDiv.style.position = element.position_div;
-          newDiv.style.justifyContent = "space-between";
+          newDiv.style.overflow = "hidden";
           newDiv.style.background = element.background_color;
-          newDiv.style.height = element.height + "px";
+
+          if (element.children.length == 0) {
+            const placeholder = document.createElement("div");
+            placeholder.innerHTML = "placeholder";
+            newDiv.appendChild(placeholder);
+          }
+
+          // newDiv.style.height = element.height + "px";
           newDiv.style.width = element.width + "px";
+          newDiv.style.display = "block";
           newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
           newDiv.style.marginTop = element.margin_top + "px";
