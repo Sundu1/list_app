@@ -71,14 +71,11 @@ const HtmlRenderFunction = (
 
         if (element.type == "container") {
           newDiv.setAttribute("data-type", "container");
-          if (element.display == "columns") {
-            newDiv.style.display = "grid";
-            newDiv.style.gridTemplateColumns = "repeat(3, 1fr)";
-          }
 
           newDiv.style.background = element.background_color;
           newDiv.style.height = element.height + "px";
-          newDiv.style.width = element.width + "px";
+          // newDiv.style.width = element.width + "px";
+          newDiv.style.width = element.width + "%";
           newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
           newDiv.style.marginTop = element.margin_top + "px";
@@ -88,6 +85,18 @@ const HtmlRenderFunction = (
           newDiv.style.paddingBottom = element.padding_vertical + "px";
           newDiv.style.paddingLeft = element.padding_horizontal + "px";
           newDiv.style.paddingRight = element.padding_horizontal + "px";
+
+          newDiv.style.display = "flex";
+          newDiv.style.justifyContent = "center";
+          newDiv.style.alignItems = "center";
+
+          const insideContainerDiv = document.createElement("div");
+          insideContainerDiv.style.border = "2px solid black";
+          insideContainerDiv.style.height = "50px";
+          insideContainerDiv.style.width = "50px";
+          insideContainerDiv.style.width = "100%";
+
+          newDiv.appendChild(insideContainerDiv);
         }
 
         if (element.type == "text") {
@@ -169,6 +178,8 @@ const HtmlRenderFunction = (
           if (element.children.length == 0) {
             const placeholder = document.createElement("div");
             placeholder.innerHTML = "placeholder";
+            placeholder.style.border = "2px solid black";
+            placeholder.style.padding = "10px";
             newDiv.appendChild(placeholder);
           }
 
