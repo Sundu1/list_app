@@ -8,9 +8,7 @@ const HtmlRenderFunction = (
   handleDragOver,
   handleDrop,
   handleDragging,
-  handleDragEnd,
-  handleMouseDown,
-  handleMouseMove
+  handleDragEnd
 ) => {
   let newDiv;
 
@@ -38,44 +36,19 @@ const HtmlRenderFunction = (
         newDiv.addEventListener("drop", handleDrop);
         newDiv.addEventListener("drag", handleDragging);
         newDiv.addEventListener("dragend", handleDragEnd);
-        // newDiv.addEventListener("mousedown", handleMouseDown);
-        // newDiv.addEventListener("mousemove", handleMouseMove);
-
-        // if (element.isActive) {
-        //   newDiv.style.borderColor = "red";
-        //   newDiv.style.borderStyle = "solid";
-        //   newDiv.style.borderWidth = "2px";
-        //   newDiv.style.borderRadius = "0";
-        // }
 
         newDiv.style.borderColor = element.border_color;
         newDiv.style.borderStyle = element.border_style;
         newDiv.style.borderWidth = element.border_size + "px";
         newDiv.style.borderRadius = element.border_roundness + "px";
 
-        if (element.type == "placeholder") {
-          newDiv.style.background = "grey";
-          newDiv.style.height = element.height + "px";
-          newDiv.style.width = element.width + "px";
-
-          newDiv.style.border = "3px solid #008080";
-          newDiv.style.borderStyle = "dashed";
-          newDiv.style.top = element.offsetTop + "px";
-          newDiv.style.left = element.offsetLeft + "px";
-
-          newDiv.style.marginLeft = element.margin_left + "px";
-          newDiv.style.marginRight = element.margin_right + "px";
-          newDiv.style.marginTop = element.margin_top + "px";
-          newDiv.style.marginBottom = element.margin_bottom + "px";
-        }
-
         if (element.type == "container") {
           newDiv.setAttribute("data-type", "container");
 
+          newDiv.style.position = element.position;
           newDiv.style.background = element.background_color;
           newDiv.style.height = element.height + "px";
           // newDiv.style.width = element.width + "px";
-          newDiv.style.width = element.width + "%";
           newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
           newDiv.style.marginTop = element.margin_top + "px";
@@ -90,13 +63,7 @@ const HtmlRenderFunction = (
           newDiv.style.justifyContent = "center";
           newDiv.style.alignItems = "center";
 
-          const insideContainerDiv = document.createElement("div");
-          insideContainerDiv.style.border = "2px solid black";
-          insideContainerDiv.style.height = "50px";
-          insideContainerDiv.style.width = "50px";
-          insideContainerDiv.style.width = "100%";
-
-          newDiv.appendChild(insideContainerDiv);
+          newDiv.innerHTML = "test";
         }
 
         if (element.type == "text") {
@@ -134,9 +101,6 @@ const HtmlRenderFunction = (
           if (element.background_style_type == "image") {
             const background_type = element.background_style_type;
 
-            // newDiv.style.background =
-            // element.background_style_types[background_type].background_color;
-            // radial-gradient(79% 150% at 29% 100%, rgba(135, 92, 161, 0.79) 0%, rgba(66, 95, 199, 0.69) 68%, rgba(0, 148, 255, 0.54) 100%),
             let radial_gradient = "";
             element.background_style_types[background_type].gradient.forEach(
               (value) => {
@@ -171,42 +135,65 @@ const HtmlRenderFunction = (
 
         if (element.type == "page") {
           newDiv.removeAttribute("draggable");
-          newDiv.style.position = element.position_div;
-          newDiv.style.overflow = "hidden";
-          newDiv.style.background = element.background_color;
-
-          if (element.children.length == 0) {
-            const placeholder = document.createElement("div");
-            placeholder.innerHTML = "placeholder";
-            placeholder.style.border = "2px solid black";
-            placeholder.style.padding = "10px";
-            newDiv.appendChild(placeholder);
-          }
+          // newDiv.style.position = element.position_div;
+          // newDiv.style.overflow = "hidden";
+          // newDiv.style.background = element.background_color;
 
           // newDiv.style.height = element.height + "px";
-          newDiv.style.width = element.width + "px";
-          newDiv.style.display = "block";
-          newDiv.style.marginLeft = element.margin_left + "px";
-          newDiv.style.marginRight = element.margin_right + "px";
-          newDiv.style.marginTop = element.margin_top + "px";
-          newDiv.style.marginBottom = element.margin_bottom + "px";
+          // newDiv.style.marginLeft = element.margin_left + "px";
+          // newDiv.style.marginRight = element.margin_right + "px";
+          // newDiv.style.marginTop = element.margin_top + "px";
+          // newDiv.style.marginBottom = element.margin_bottom + "px";
 
-          newDiv.style.paddingTop = element.padding_vertical + "px";
-          newDiv.style.paddingBottom = element.padding_vertical + "px";
-          newDiv.style.paddingLeft = element.padding_horizontal + "px";
-          newDiv.style.paddingRight = element.padding_horizontal + "px";
+          // newDiv.style.paddingTop = element.padding_vertical + "px";
+          // newDiv.style.paddingBottom = element.padding_vertical + "px";
+          // newDiv.style.paddingLeft = element.padding_horizontal + "px";
+          // newDiv.style.paddingRight = element.padding_horizontal + "px";
+          newDiv.innerHTML = "test";
+
+          const wrapperDiv = document.createElement("div");
+          wrapperDiv.setAttribute("id", "Page");
+          wrapperDiv.classList.add("page-wrapper");
+          wrapperDiv.removeAttribute("draggable");
+          wrapperDiv.style.position = element.position_div;
+          wrapperDiv.style.overflow = "hidden";
+          wrapperDiv.style.background = element.background_color;
+
+          wrapperDiv.style.width = element.width + "px";
+          wrapperDiv.style.marginLeft = element.margin_left + "px";
+          wrapperDiv.style.marginRight = element.margin_right + "px";
+          wrapperDiv.style.marginTop = element.margin_top + "px";
+          wrapperDiv.style.marginBottom = element.margin_bottom + "px";
+
+          wrapperDiv.style.paddingTop = element.padding_vertical + "px";
+          wrapperDiv.style.paddingBottom = element.padding_vertical + "px";
+          wrapperDiv.style.paddingLeft = element.padding_horizontal + "px";
+          wrapperDiv.style.paddingRight = element.padding_horizontal + "px";
 
           if (element.position == "center") {
-            newDiv.style.left = "50%";
-            newDiv.style.transform = "translateX(-50%)";
+            wrapperDiv.style.left = "50%";
+            wrapperDiv.style.transform = "translateX(-50%)";
           }
           if (element.position == "left") {
-            newDiv.style.left = "0";
+            wrapperDiv.style.left = "0";
           }
           if (element.position == "right") {
-            newDiv.style.left = "100%";
-            newDiv.style.transform = "translateX(-100%)";
+            wrapperDiv.style.left = "100%";
+            wrapperDiv.style.transform = "translateX(-100%)";
           }
+
+          wrapperDiv.id = element.id;
+          wrapperDiv.onpointerdown = function (e) {
+            if (e.target.id == element.id) {
+              setChangeJson({ values: element });
+            }
+          };
+
+          wrapperDiv.appendChild(newDiv);
+          parent.appendChild(wrapperDiv);
+          if (element.children == null || element.children.length == 0) return;
+          traverse_dfs(element.children, element.id);
+          return;
         }
 
         parent.appendChild(newDiv);
