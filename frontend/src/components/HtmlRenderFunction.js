@@ -44,11 +44,12 @@ const HtmlRenderFunction = (
 
         if (element.type == "container") {
           newDiv.setAttribute("data-type", "container");
+          newDiv.removeAttribute("draggable");
 
           newDiv.style.position = element.position;
           newDiv.style.background = element.background_color;
           newDiv.style.height = element.height + "px";
-          // newDiv.style.width = element.width + "px";
+          newDiv.style.width = element.width + "px";
           newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
           newDiv.style.marginTop = element.margin_top + "px";
@@ -63,7 +64,51 @@ const HtmlRenderFunction = (
           newDiv.style.justifyContent = "center";
           newDiv.style.alignItems = "center";
 
-          newDiv.innerHTML = "test";
+          const containerWrapperDiv = document.createElement("div");
+          containerWrapperDiv.classList.add("container-wrapper");
+          containerWrapperDiv.style.display = "flex";
+          containerWrapperDiv.style.justifyContent = "center";
+          containerWrapperDiv.style.alignItems = "center";
+
+          containerWrapperDiv.setAttribute("draggable", true);
+          containerWrapperDiv.addEventListener("dragstart", handleDragStart);
+          containerWrapperDiv.addEventListener("dragstart", () => {
+            containerWrapperDiv.style.height = element.height + "px";
+          });
+          containerWrapperDiv.addEventListener("dragover", handleDragOver);
+          containerWrapperDiv.addEventListener("drop", handleDrop);
+          containerWrapperDiv.addEventListener("drag", handleDragging);
+          containerWrapperDiv.addEventListener("dragend", handleDragEnd);
+
+          containerWrapperDiv.onpointerdown = function (e) {
+            if (
+              e.target.id == element.id ||
+              e.target.className == "container-wrapper"
+            ) {
+              setChangeJson({ values: element });
+            }
+          };
+
+          if (element.isActive) {
+            containerWrapperDiv.style.border = "solid 3px";
+            containerWrapperDiv.style.borderColor = "#33ada9";
+          }
+
+          containerWrapperDiv.appendChild(newDiv);
+          parent.appendChild(containerWrapperDiv);
+          if (element.children == null || element.children.length == 0) return;
+          traverse_dfs(element.children, element.id);
+          return;
+        }
+
+        if (element.type == "container-column") {
+          if (element.children.length == 0) {
+            newDiv.removeAttribute("draggable");
+            newDiv.style.background = "grey";
+            newDiv.innerHTML = "Empty";
+            newDiv.style.height = "50px";
+            newDiv.style.width = "50px";
+          }
         }
 
         if (element.type == "text") {
@@ -134,27 +179,11 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "page") {
-          newDiv.removeAttribute("draggable");
-          // newDiv.style.position = element.position_div;
-          // newDiv.style.overflow = "hidden";
-          // newDiv.style.background = element.background_color;
-
-          // newDiv.style.height = element.height + "px";
-          // newDiv.style.marginLeft = element.margin_left + "px";
-          // newDiv.style.marginRight = element.margin_right + "px";
-          // newDiv.style.marginTop = element.margin_top + "px";
-          // newDiv.style.marginBottom = element.margin_bottom + "px";
-
-          // newDiv.style.paddingTop = element.padding_vertical + "px";
-          // newDiv.style.paddingBottom = element.padding_vertical + "px";
-          // newDiv.style.paddingLeft = element.padding_horizontal + "px";
-          // newDiv.style.paddingRight = element.padding_horizontal + "px";
-          newDiv.innerHTML = "test";
-
           const wrapperDiv = document.createElement("div");
-          wrapperDiv.setAttribute("id", "Page");
           wrapperDiv.classList.add("page-wrapper");
           wrapperDiv.removeAttribute("draggable");
+          newDiv.removeAttribute("draggable");
+
           wrapperDiv.style.position = element.position_div;
           wrapperDiv.style.overflow = "hidden";
           wrapperDiv.style.background = element.background_color;
@@ -182,13 +211,19 @@ const HtmlRenderFunction = (
             wrapperDiv.style.transform = "translateX(-100%)";
           }
 
-          wrapperDiv.id = element.id;
           wrapperDiv.onpointerdown = function (e) {
-            if (e.target.id == element.id) {
+            if (
+              e.target.id == element.id ||
+              e.target.className == "page-wrapper"
+            ) {
               setChangeJson({ values: element });
             }
           };
 
+          if (element.isActive) {
+            wrapperDiv.style.border = "solid 3px";
+            wrapperDiv.style.borderColor = "#33ada9";
+          }
           wrapperDiv.appendChild(newDiv);
           parent.appendChild(wrapperDiv);
           if (element.children == null || element.children.length == 0) return;

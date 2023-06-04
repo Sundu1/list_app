@@ -23,7 +23,7 @@ const Design = () => {
   });
 
   const [inputColorPicker, setInputColorPicker] = useState({});
-
+  const [columnsCount, setColumnsCount] = useState(0);
   const [refresh, setRefresh] = useState(false);
 
   const [colorUpdate, setColorUpdate] = useState({});
@@ -142,9 +142,9 @@ const Design = () => {
       handleDragOver,
       handleDrop,
       handleDragging,
-      handleDragEnd,
-      handleMouseDown,
-      handleMouseMove
+      handleDragEnd
+      // handleMouseDown,
+      // handleMouseMove
       // handleMouseUp
     );
     return () => {};
@@ -206,6 +206,16 @@ const Design = () => {
   const matchAndAdd = (elements, parent, newElementValue) => {
     return elements.map((ele) => {
       if (ele.id == parent) {
+        if (parent.includes("Container")) {
+          return {
+            ...ele,
+            children: matchAndAdd(
+              ele.children,
+              ele.children[0].id,
+              newElementValue
+            ),
+          };
+        }
         return {
           ...ele,
           children: [...ele.children, newElementValue],
@@ -257,9 +267,18 @@ const Design = () => {
         border_style: "solid",
         border_size: "2",
         border_roundness: "0",
-        children: [],
+        children: [
+          {
+            type: "container-column",
+            id: `column-${columnsCount}`,
+            children: [],
+          },
+        ],
       });
+
+      setColumnsCount(columnsCount + 1);
     }
+
     if (e.target.id == "text_element") {
       newElement = new Object({
         type: "text",
@@ -378,18 +397,18 @@ const Design = () => {
 
   const matchAndGet = (obj, targetId) => {
     if (obj.id === targetId) {
-      return obj; // Found the target child object
+      return obj;
     }
 
     if (typeof obj !== "object" || obj === null) {
-      return null; // Not an object or null, return null
+      return null;
     }
 
     if (Array.isArray(obj)) {
       for (const item of obj) {
         const result = matchAndGet(item, targetId);
         if (result) {
-          return result; // Found the target child object in the array
+          return result;
         }
       }
     } else {
@@ -397,13 +416,13 @@ const Design = () => {
         if (obj.hasOwnProperty(key)) {
           const result = matchAndGet(obj[key], targetId);
           if (result) {
-            return result; // Found the target child object in the nested object
+            return result;
           }
         }
       }
     }
 
-    return null; // Target child object not found
+    return null;
   };
 
   const updateElementParent = (newElementId, parentElement) => {
@@ -448,56 +467,56 @@ const Design = () => {
     }
   };
 
-  const handleMouseDown = (e) => {
-    const currentDiv = document.querySelector(`#${e.target.id}`);
-    const x_value = e.clientX - currentDiv.offsetLeft;
-    const y_value = e.clientY - currentDiv.offsetTop;
+  // const handleMouseDown = (e) => {
+  //   const currentDiv = document.querySelector(`#${e.target.id}`);
+  //   const x_value = e.clientX - currentDiv.offsetLeft;
+  //   const y_value = e.clientY - currentDiv.offsetTop;
 
-    setOffset({ x: x_value, y: y_value });
+  //   setOffset({ x: x_value, y: y_value });
 
-    const matchedValue = matchAndGet(jsonValue.elements, e.target.id);
-    const test = matchAndGetIndex(jsonValue.elements, e.target.id);
+  //   const matchedValue = matchAndGet(jsonValue.elements, e.target.id);
+  //   const test = matchAndGetIndex(jsonValue.elements, e.target.id);
 
-    if (
-      matchedValue == undefined ||
-      matchedValue.type == "background" ||
-      matchedValue.type == "page"
-    )
-      return;
+  //   if (
+  //     matchedValue == undefined ||
+  //     matchedValue.type == "background" ||
+  //     matchedValue.type == "page"
+  //   )
+  //     return;
 
-    // setRefresh(!refresh);
-    setIsDragging(true);
-    setMovableDiv(matchedValue);
-    setRefresh(!refresh);
+  //   // setRefresh(!refresh);
+  //   setIsDragging(true);
+  //   setMovableDiv(matchedValue);
+  //   setRefresh(!refresh);
 
-    // placeholder div
-    const placeholderDiv = cloneObject(matchedValue);
+  //   // placeholder div
+  //   const placeholderDiv = cloneObject(matchedValue);
 
-    placeholderDiv.type = "placeholder";
-    placeholderDiv.id = "placeholder";
-    placeholderDiv.offsetLeft = currentDiv.offsetLeft;
-    placeholderDiv.offsetTop = currentDiv.offsetTop;
+  //   placeholderDiv.type = "placeholder";
+  //   placeholderDiv.id = "placeholder";
+  //   placeholderDiv.offsetLeft = currentDiv.offsetLeft;
+  //   placeholderDiv.offsetTop = currentDiv.offsetTop;
 
-    const parentDiv = currentDiv.parentElement.id;
-    const newState = matchAndAdd(jsonValue.elements, parentDiv, placeholderDiv);
+  //   const parentDiv = currentDiv.parentElement.id;
+  //   const newState = matchAndAdd(jsonValue.elements, parentDiv, placeholderDiv);
 
-    setPlaceholderDiv(placeholderDiv);
-    setRefresh(!refresh);
-    setJsonValue({ elements: newState });
-  };
+  //   setPlaceholderDiv(placeholderDiv);
+  //   setRefresh(!refresh);
+  //   setJsonValue({ elements: newState });
+  // };
 
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    const currentDiv = document.querySelector(`#${movableDiv.id}`);
+  // const handleMouseMove = (e) => {
+  //   if (!isDragging) return;
+  //   const currentDiv = document.querySelector(`#${movableDiv.id}`);
 
-    currentDiv.style.position = "absolute";
-    currentDiv.style.zIndex = "999";
-    currentDiv.style.left = e.clientX - offset.x + "px";
-    currentDiv.style.top = e.clientY - offset.y + "px";
-    setMoved(true);
+  //   currentDiv.style.position = "absolute";
+  //   currentDiv.style.zIndex = "999";
+  //   currentDiv.style.left = e.clientX - offset.x + "px";
+  //   currentDiv.style.top = e.clientY - offset.y + "px";
+  //   setMoved(true);
 
-    const allContainer = document.querySelectorAll("[data-type='container']");
-  };
+  //   const allContainer = document.querySelectorAll("[data-type='container']");
+  // };
 
   const handleDragStart = (e) => {
     e.dataTransfer.setData("dragging_container", e.target.id);
@@ -514,7 +533,7 @@ const Design = () => {
 
   const handleDrop = (e) => {
     e.preventDefault();
-
+    // if (changeJson.values.type == e.target.dataset.type) return;
     if (changeJson.values.id == "Page") return;
 
     updateElementParent(
@@ -738,6 +757,7 @@ const Design = () => {
       e.target.parentElement.id.includes("values")
     )
       return;
+
     const text = new String("#" + e.target.parentElement.id);
     const text_1 = new String("#" + e.target.parentElement.id + "_values");
     const column = document.querySelector(text);
@@ -1803,7 +1823,7 @@ const Design = () => {
                 </div>
               </div>
               <div className="flex justify-between pt-3 pb-1">
-                <div>Border roundness</div>
+                <div>Border Size</div>
                 <input
                   id="border_size"
                   className="mr-5 rounded px-1 w-[50px] bg-transparent"
