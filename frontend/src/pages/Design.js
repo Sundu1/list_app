@@ -206,16 +206,6 @@ const Design = () => {
   const matchAndAdd = (elements, parent, newElementValue) => {
     return elements.map((ele) => {
       if (ele.id == parent) {
-        if (parent.includes("Container")) {
-          return {
-            ...ele,
-            children: matchAndAdd(
-              ele.children,
-              ele.children[0].id,
-              newElementValue
-            ),
-          };
-        }
         return {
           ...ele,
           children: [...ele.children, newElementValue],
@@ -290,6 +280,15 @@ const Design = () => {
         text_value: "put your text here",
         children: [],
       });
+      const test = matchAndGetIndex(jsonValue.elements, changeJson.values.id)
+        .children[0].id;
+
+      if (newElement !== null) {
+        const addedElement = matchAndAdd(jsonValue.elements, test, newElement);
+        setJsonValue({ elements: addedElement });
+        setNewCount(newCount + 1);
+      }
+      return;
     }
 
     if (newElement !== null) {
@@ -766,6 +765,24 @@ const Design = () => {
     column_1.classList.toggle("hidden");
   };
 
+  const handleColumnElements = (e) => {
+    updateElementsValues(e);
+
+    const newColumn = new Object({
+      type: "container-column",
+      id: `column-${columnsCount}`,
+      children: [],
+    });
+
+    const newState = matchAndAdd(
+      jsonValue.elements,
+      changeJson.values.id,
+      newColumn
+    );
+
+    setJsonValue({ elements: newState });
+  };
+
   return (
     <div>
       <Navbar />
@@ -845,7 +862,7 @@ const Design = () => {
                   id="display"
                   className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
                   value={changeJson.values.display}
-                  onChange={updateElementsValues}
+                  onChange={handleColumnElements}
                 >
                   <option value="default" className="bg-[rgba(53,54,66,.9825)]">
                     Default
@@ -923,7 +940,7 @@ const Design = () => {
               </div>
             </div>
             <div className="px-10 pt-3 absolute">
-              <div className="flex justify-between pt-3 pb-1">
+              {/* <div className="flex justify-between pt-3 pb-1">
                 <div>Height</div>
                 <input
                   id="height"
@@ -941,7 +958,7 @@ const Design = () => {
                   value={changeJson.values.height}
                   onChange={updateElementsValues}
                 />
-              </div>
+              </div> */}
               <div className="flex justify-between pt-3 pb-1">
                 <div>Width</div>
                 <input
@@ -1671,7 +1688,7 @@ const Design = () => {
                   />
                 </div>
               </div>
-              <div className="flex justify-between pt-3 pb-1">
+              {/* <div className="flex justify-between pt-3 pb-1">
                 <div>Height</div>
                 <input
                   id="height"
@@ -1689,7 +1706,7 @@ const Design = () => {
                   value={changeJson.values.height}
                   onChange={updateElementsValues}
                 />
-              </div>
+              </div> */}
               <div className="flex justify-between pt-3 pb-1">
                 <div>Width</div>
                 <input

@@ -48,7 +48,7 @@ const HtmlRenderFunction = (
 
           newDiv.style.position = element.position;
           newDiv.style.background = element.background_color;
-          newDiv.style.height = element.height + "px";
+          // newDiv.style.height = element.height + "px";
           newDiv.style.width = element.width + "px";
           newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
@@ -73,7 +73,9 @@ const HtmlRenderFunction = (
           containerWrapperDiv.setAttribute("draggable", true);
           containerWrapperDiv.addEventListener("dragstart", handleDragStart);
           containerWrapperDiv.addEventListener("dragstart", () => {
-            containerWrapperDiv.style.height = element.height + "px";
+            containerWrapperDiv.style.height =
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .height + "px";
           });
           containerWrapperDiv.addEventListener("dragover", handleDragOver);
           containerWrapperDiv.addEventListener("drop", handleDrop);
