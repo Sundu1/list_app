@@ -1,6 +1,3 @@
-import { logDOM } from "@testing-library/react";
-import React, { createElement } from "react";
-
 const HtmlRenderFunction = (
   htmlValue,
   setChangeJson,
@@ -104,6 +101,8 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "container-column") {
+          console.log('column test', element.id);
+
           if (element.children.length == 0) {
             newDiv.removeAttribute("draggable");
             newDiv.style.background = "grey";

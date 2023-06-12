@@ -113,6 +113,7 @@ const Design = () => {
   const [placeholderDiv, setPlaceholderDiv] = useState({});
   const [moved, setMoved] = useState(false);
 
+  const [columnValue, setcolumnValue] = useState("")
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -246,7 +247,7 @@ const Design = () => {
         border: "",
         text: "testing ",
         position: "relative",
-        display: "flex",
+        display: "default",
         margin_top: "0",
         margin_left: "0",
         margin_right: "0",
@@ -280,15 +281,32 @@ const Design = () => {
         text_value: "put your text here",
         children: [],
       });
-      const test = matchAndGetIndex(jsonValue.elements, changeJson.values.id)
+      const firstColumn = matchAndGetIndex(jsonValue.elements, changeJson.values.id)
         .children[0].id;
 
       if (newElement !== null) {
-        const addedElement = matchAndAdd(jsonValue.elements, test, newElement);
+        const addedElement = matchAndAdd(jsonValue.elements, firstColumn, newElement);
         setJsonValue({ elements: addedElement });
         setNewCount(newCount + 1);
       }
       return;
+    }
+    
+    if(e.target.name == 'container-column'){
+      console.log(e.target.name);
+      newElement = new Object({
+          type: "container-column",
+          id: `column-${columnsCount}`,
+          isActive: false,
+          children: []
+      })
+
+      if (newElement !== null) {
+        const addedElement = matchAndAdd(jsonValue.elements, changeJson.values.id, newElement);
+        setJsonValue({ elements: addedElement });
+        setNewCount(newCount + 1);
+      }
+      return
     }
 
     if (newElement !== null) {
@@ -766,21 +784,8 @@ const Design = () => {
   };
 
   const handleColumnElements = (e) => {
+    addNewElement(e)
     updateElementsValues(e);
-
-    const newColumn = new Object({
-      type: "container-column",
-      id: `column-${columnsCount}`,
-      children: [],
-    });
-
-    const newState = matchAndAdd(
-      jsonValue.elements,
-      changeJson.values.id,
-      newColumn
-    );
-
-    setJsonValue({ elements: newState });
   };
 
   return (
@@ -860,6 +865,7 @@ const Design = () => {
               <div className="pt-2">
                 <select
                   id="display"
+                  name="container-column"
                   className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
                   value={changeJson.values.display}
                   onChange={handleColumnElements}
