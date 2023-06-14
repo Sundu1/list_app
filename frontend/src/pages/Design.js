@@ -534,6 +534,10 @@ const Design = () => {
 
   const handleDragOver = (e) => {
     e.preventDefault();
+
+    const hoverElement = matchAndGet(jsonValue.elements, e.target.id) 
+    if (hoverElement &&  hoverElement.type == "container-column")
+        console.log("over", hoverElement);
   };
 
   const handleDragEnd = (e) => {

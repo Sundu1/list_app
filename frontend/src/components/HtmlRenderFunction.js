@@ -102,6 +102,8 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "container-column") {
+          newDiv.style.padding = "10px"
+          newDiv.style.background = "black"
 
           if (element.children.length == 0) {
             newDiv.removeAttribute("draggable");
