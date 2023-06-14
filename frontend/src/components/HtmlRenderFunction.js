@@ -12,6 +12,7 @@ const HtmlRenderFunction = (
   const traverse_dfs = (jsonvalues, parentelement) => {
     if (typeof jsonvalues === "object") {
       jsonvalues.forEach((element) => {
+
         const parent = document.getElementById(parentelement);
         const element_value = document.getElementById(element.id);
 
@@ -101,7 +102,6 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "container-column") {
-          console.log('column test', element.id);
 
           if (element.children.length == 0) {
             newDiv.removeAttribute("draggable");
@@ -113,12 +113,76 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "text") {
+          newDiv.setAttribute("data-type", "text");
+          newDiv.removeAttribute("draggable");
+
           newDiv.style.wordBreak = "break-word";
           newDiv.style.marginBottom = element.margin_bottom + "px";
           newDiv.style.color = element.text_color;
           newDiv.style.fontSize = element.text_size + "px";
           newDiv.style.fontFamily = element.text_fontfamily;
           newDiv.innerHTML = element.text_value;
+
+          const containerWrapperDiv = document.createElement("div");
+          containerWrapperDiv.id = element.id
+          containerWrapperDiv.classList.add("text-wrapper");
+          containerWrapperDiv.style.display = "flex";
+          containerWrapperDiv.style.justifyContent = "center";
+          containerWrapperDiv.style.alignItems = "center";
+          containerWrapperDiv.style.padding = "10px";
+
+          containerWrapperDiv.setAttribute("draggable", true);
+          containerWrapperDiv.addEventListener(
+            "dragstart",
+            handleDragStart
+          );
+          containerWrapperDiv.addEventListener("dragstart", () => {
+            containerWrapperDiv.style.height =
+              document
+                .querySelector(`#${element.id}`)
+                .getBoundingClientRect().height + "px";
+            containerWrapperDiv.style.width =
+              document
+                .querySelector(`#${element.id}`)
+                .getBoundingClientRect().width + "px";
+          });
+          containerWrapperDiv.addEventListener(
+            "dragover",
+            handleDragOver
+          );
+          containerWrapperDiv.addEventListener("drop", handleDrop);
+          containerWrapperDiv.addEventListener(
+            "drag",
+            handleDragging
+          );
+          containerWrapperDiv.addEventListener(
+            "dragend",
+            handleDragEnd
+          );
+
+          containerWrapperDiv.onpointerdown = function (e) {
+            if (
+              e.target.id == element.id ||
+              e.target.className == "container-wrapper"
+            ) {
+              setChangeJson({ values: element });
+            }
+          };
+
+          if (element.isActive) {
+            containerWrapperDiv.style.border = "solid 3px";
+            containerWrapperDiv.style.borderColor = "#33ada9";
+          }
+
+          containerWrapperDiv.appendChild(newDiv);
+          parent.appendChild(containerWrapperDiv);
+          if (
+            element.children == null ||
+            element.children.length == 0
+          )
+            return;
+          traverse_dfs(element.children, element.id);
+          return;
         }
 
         if (element.type == "background") {

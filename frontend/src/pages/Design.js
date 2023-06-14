@@ -1,10 +1,10 @@
-import React, { useState, useEffect, useContext, useRef } from "react";
+import React, { useState, useEffect, useContext, useRef, Children } from "react";
 import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
 
-import { BsFillDatabaseFill } from "react-icons/bs";
+import { BsArrowReturnRight, BsFillDatabaseFill } from "react-icons/bs";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
@@ -113,7 +113,7 @@ const Design = () => {
   const [placeholderDiv, setPlaceholderDiv] = useState({});
   const [moved, setMoved] = useState(false);
 
-  const [columnValue, setcolumnValue] = useState("")
+  const [columnValue, setcolumnValue] = useState("");
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -237,6 +237,8 @@ const Design = () => {
 
   const addNewElement = (e) => {
     let newElement = null;
+    let addedElement = null;
+
     if (e.target.id == "container_element") {
       newElement = new Object({
         type: "container",
@@ -262,12 +264,18 @@ const Design = () => {
           {
             type: "container-column",
             id: `column-${columnsCount}`,
+            isActive: false,
             children: [],
           },
         ],
       });
 
       setColumnsCount(columnsCount + 1);
+      addedElement = matchAndAdd(
+        jsonValue.elements,
+        changeJson.values.id && changeJson.values.type != "container" ? changeJson.values.id  : "Page",
+        newElement
+      );
     }
 
     if (e.target.id == "text_element") {
@@ -281,42 +289,18 @@ const Design = () => {
         text_value: "put your text here",
         children: [],
       });
-      const firstColumn = matchAndGetIndex(jsonValue.elements, changeJson.values.id)
-        .children[0].id;
 
-      if (newElement !== null) {
-        const addedElement = matchAndAdd(jsonValue.elements, firstColumn, newElement);
-        setJsonValue({ elements: addedElement });
-        setNewCount(newCount + 1);
-      }
-      return;
-    }
-    
-    if(e.target.name == 'container-column'){
-      console.log(e.target.name);
-      newElement = new Object({
-          type: "container-column",
-          id: `column-${columnsCount}`,
-          isActive: false,
-          children: []
-      })
+      const containerValue = matchAndGet(
+        jsonValue.elements,
+        changeJson.values.id
+      );
 
-      if (newElement !== null) {
-        const addedElement = matchAndAdd(jsonValue.elements, changeJson.values.id, newElement);
-        setJsonValue({ elements: addedElement });
-        setNewCount(newCount + 1);
-      }
-      return
+      addedElement = matchAndAdd(jsonValue.elements, containerValue.children[0].id, newElement);
     }
 
     if (newElement !== null) {
-      const addedElement = matchAndAdd(
-        jsonValue.elements,
-        changeJson.values.id ? changeJson.values.id : "Page",
-        newElement
-      );
-      setJsonValue({ elements: addedElement });
-      setNewCount(newCount + 1);
+        setJsonValue({ elements: addedElement });
+        setNewCount(newCount + 1);
     }
   };
 
@@ -438,12 +422,12 @@ const Design = () => {
         }
       }
     }
-
     return null;
   };
 
-  const updateElementParent = (newElementId, parentElement) => {
-    const newElementValues = matchAndGet(jsonValue.elements[0], newElementId);
+  const updateElementParent = (newElementId, parentElementId) => {
+    const newElementValues = matchAndGet(jsonValue.elements, newElementId);
+    const parentElement = matchAndGet(jsonValue.elements, parentElementId)
 
     if (
       newElementValues == null ||
@@ -452,10 +436,12 @@ const Design = () => {
     )
       return;
 
+    if(parentElement.type == "container") return;
+    if(parentElement.type == newElementValues.type) return;
     const deletedState = matchAndDelete(jsonValue.elements, newElementValues);
     const newState = matchAndAdd(
       jsonValue.elements,
-      parentElement,
+      parentElement.id,
       newElementValues
     );
     setJsonValue({ elements: deletedState });
@@ -473,18 +459,6 @@ const Design = () => {
     return copy;
   }
 
-  const matchAndGetIndex = (elements, targetId) => {
-    for (const [index, element] of elements.entries()) {
-      if (element.id == targetId) {
-        element.index = index;
-        return element;
-      } else if (element.children && Array.isArray(element.children)) {
-        return matchAndGetIndex(element.children, targetId);
-      }
-    }
-  };
-
-  // const handleMouseDown = (e) => {
   //   const currentDiv = document.querySelector(`#${e.target.id}`);
   //   const x_value = e.clientX - currentDiv.offsetLeft;
   //   const y_value = e.clientY - currentDiv.offsetTop;
@@ -550,9 +524,8 @@ const Design = () => {
 
   const handleDrop = (e) => {
     e.preventDefault();
-    // if (changeJson.values.type == e.target.dataset.type) return;
-    if (changeJson.values.id == "Page") return;
 
+    if (changeJson.values.id == "Page") return;
     updateElementParent(
       e.dataTransfer.getData("dragging_container"),
       e.target.id
@@ -783,10 +756,72 @@ const Design = () => {
     column_1.classList.toggle("hidden");
   };
 
-  const handleColumnElements = (e) => {
-    addNewElement(e)
-    updateElementsValues(e);
-  };
+  const updateColumnValues = (e) =>{
+
+    const firstColumn = matchAndGet(
+        jsonValue.elements,
+        changeJson.values.id
+      );
+    
+    if(firstColumn && firstColumn.children.length >= 2) return
+    if (e.target.id && e.target.value == 'columns') {
+      const matchAndUpdate = (values, changeJson, children) => {
+        return children.map((_child) => {
+          if (changeJson.id === _child.id) {
+            return {
+              ..._child,
+              [values.id]: values.value,
+              children:
+                _child.children && Array.isArray(_child.children)
+                  ? matchAndUpdate(values, changeJson, _child.children)
+                  : null,
+            };
+          } else {
+            return {
+              ..._child,
+              children:
+                _child.children && Array.isArray(_child.children)
+                  ? matchAndUpdate(values, changeJson, _child.children)
+                  : null,
+            };
+          }
+        });
+      };
+      const newState = matchAndUpdate(
+        e.target,
+        changeJson.values,
+        jsonValue.elements
+      );
+
+      setChangeJson((old) => ({
+        ...old,
+        values: { ...old.values, [e.target.id]: e.target.value },
+      }));
+
+
+      let newElement = null;
+      let addedElement = null;
+
+      if(e.target.name == "container-column"){
+        newElement = new Object({
+          type: "container-column",
+          id: `column-${columnsCount}`,
+          isActive: false,
+          children: [],
+        });
+
+        addedElement = matchAndAdd(
+          newState,
+          changeJson.values.id,
+          newElement
+        );
+      }
+
+
+      setColumnsCount(columnsCount + 1);
+      setJsonValue({ elements: addedElement });
+    }
+  }
 
   return (
     <div>
@@ -868,7 +903,7 @@ const Design = () => {
                   name="container-column"
                   className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
                   value={changeJson.values.display}
-                  onChange={handleColumnElements}
+                  onChange={updateColumnValues}
                 >
                   <option value="default" className="bg-[rgba(53,54,66,.9825)]">
                     Default
