@@ -279,7 +279,14 @@ const Design = () => {
     }
 
     if (e.target.id == "text_element") {
+
+      const containerValue = matchAndGet(
+        jsonValue.elements,
+        changeJson.values.id
+      );
+
       newElement = new Object({
+        parent: `${containerValue.children[0].id}`,
         type: "text",
         id: `text-${newCount}`,
         wordBreak: "",
@@ -289,11 +296,6 @@ const Design = () => {
         text_value: "put your text here",
         children: [],
       });
-
-      const containerValue = matchAndGet(
-        jsonValue.elements,
-        changeJson.values.id
-      );
 
       addedElement = matchAndAdd(jsonValue.elements, containerValue.children[0].id, newElement);
     }
@@ -438,6 +440,8 @@ const Design = () => {
 
     if(parentElement.type == "container") return;
     if(parentElement.type == newElementValues.type) return;
+
+    newElementValues.parent = parentElementId;
     const deletedState = matchAndDelete(jsonValue.elements, newElementValues);
     const newState = matchAndAdd(
       jsonValue.elements,
@@ -525,7 +529,26 @@ const Design = () => {
   const handleDrop = (e) => {
     e.preventDefault();
 
-    if (changeJson.values.id == "Page") return;
+    if (changeJson.values.id == "Page" || e.target.id == "Background") return;
+
+    const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
+    if (hoverElement == null) return;
+    const columnEle = document.querySelector(`#${hoverElement.id}`);
+
+    if (hoverElement.type == "text") {
+      const parentEle = matchAndGet(
+        jsonValue.elements,
+        hoverElement.parent
+      );
+      updateElementParent(
+        e.dataTransfer.getData("dragging_container"),
+        parentEle.id
+      );
+    }
+
+    console.log("id", e.target.id)
+
+
     updateElementParent(
       e.dataTransfer.getData("dragging_container"),
       e.target.id
@@ -534,10 +557,6 @@ const Design = () => {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-
-    const hoverElement = matchAndGet(jsonValue.elements, e.target.id) 
-    if (hoverElement &&  hoverElement.type == "container-column")
-        console.log("over", hoverElement);
   };
 
   const handleDragEnd = (e) => {
