@@ -102,15 +102,13 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "container-column") {
-          newDiv.style.padding = "10px"
+          newDiv.style.padding = "5px"
 
           if (element.children.length == 0) {
             newDiv.removeAttribute("draggable");
             newDiv.style.background = "grey";
             newDiv.innerHTML = "Empty";
             newDiv.style.padding = "10px";
-            newDiv.style.height = "50px";
-            newDiv.style.width = "50px";
           }
         }
 
@@ -165,7 +163,7 @@ const HtmlRenderFunction = (
           containerWrapperDiv.onpointerdown = function (e) {
             if (
               e.target.id == element.id ||
-              e.target.className == "container-wrapper"
+              e.target.className == "text-wrapper"
             ) {
               setChangeJson({ values: element });
             }
@@ -187,6 +185,88 @@ const HtmlRenderFunction = (
           return;
         }
 
+        if(element.type == "image"){
+          const imgEle = document.createElement("img");
+          imgEle.setAttribute("data-type", "image");
+          imgEle.removeAttribute("draggable")
+          imgEle.style.pointerEvents = "none";
+          imgEle.src =
+            `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%22250%22%20height%3D%22250%22%20viewBox%3D%220%200%20250%20250%22%20preserveAspectRatio%3D%22none%22%3E%3Cstyle%3Eline%20%7Bstroke%3A%20rgba%28255%2C255%2C255%2C0.25%29%3Bstroke-width%3A%201px%3B%7Drect%20%7Bfill%3A%20rgba%2894%2C95%2C103%2C0.625%29%3B%7D%3C/style%3E%3Crect%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%22100%25%22%20x2%3D%22100%25%22%20y2%3D%220%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3C/svg%3E`;
+          imgEle.setAttribute("data-type", "text");
+          imgEle.removeAttribute("draggable");
+
+          imgEle.style.background = "black";
+          imgEle.style.height = "100px";
+          imgEle.style.width = "100px";
+
+          const containerWrapperDiv = document.createElement("div");
+          containerWrapperDiv.id = element.id;
+          containerWrapperDiv.classList.add("image-wrapper");
+          containerWrapperDiv.style.display = "flex";
+          containerWrapperDiv.style.justifyContent = "center";
+          containerWrapperDiv.style.alignItems = "center";
+          containerWrapperDiv.style.padding = "10px";
+
+          containerWrapperDiv.setAttribute("draggable", true);
+          containerWrapperDiv.addEventListener(
+            "dragstart",
+            handleDragStart
+          );
+
+          containerWrapperDiv.addEventListener("dragstart", () => {
+            containerWrapperDiv.style.height =
+              document
+                .querySelector(`#${element.id}`)
+                .getBoundingClientRect().height + "px";
+            containerWrapperDiv.style.width =
+              document
+                .querySelector(`#${element.id}`)
+                .getBoundingClientRect().width + "px";
+          });
+
+          containerWrapperDiv.addEventListener(
+            "dragover",
+            handleDragOver
+          );
+
+          containerWrapperDiv.addEventListener("drop", handleDrop);
+
+          containerWrapperDiv.addEventListener(
+            "drag",
+            handleDragging
+          );
+
+          containerWrapperDiv.addEventListener(
+            "dragend",
+            handleDragEnd
+          );
+
+          containerWrapperDiv.onpointerdown = function (e) {
+            if (
+              e.target.id == element.id ||
+              e.target.className == "image-wrapper"
+            ) {
+              setChangeJson({ values: element });
+            }
+          };
+
+          if (element.isActive) {
+            containerWrapperDiv.style.border = "solid 3px";
+            containerWrapperDiv.style.borderColor = "#33ada9";
+          }
+
+          containerWrapperDiv.appendChild(imgEle);
+          parent.appendChild(containerWrapperDiv);
+          if (
+            element.children == null ||
+            element.children.length == 0
+          )
+            return;
+          traverse_dfs(element.children, element.id);
+          return;
+        }
+
+        // Background
         if (element.type == "background") {
           newDiv.removeAttribute("draggable");
           newDiv.style.position = element.position;

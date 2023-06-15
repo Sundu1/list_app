@@ -244,7 +244,7 @@ const Design = () => {
         type: "container",
         id: `Container-${newCount}`,
         height: "100",
-        width: "100",
+        width: "200",
         background_color: "",
         border: "",
         text: "testing ",
@@ -273,7 +273,9 @@ const Design = () => {
       setColumnsCount(columnsCount + 1);
       addedElement = matchAndAdd(
         jsonValue.elements,
-        changeJson.values.id && changeJson.values.type != "container" ? changeJson.values.id  : "Page",
+        changeJson.values.id && changeJson.values.type != "container"
+          ? changeJson.values.id
+          : "Page",
         newElement
       );
     }
@@ -298,6 +300,27 @@ const Design = () => {
       });
 
       addedElement = matchAndAdd(jsonValue.elements, containerValue.children[0].id, newElement);
+    }
+
+    if(e.target.id == "img_element"){
+        const containerValue = matchAndGet(
+          jsonValue.elements,
+          changeJson.values.id
+        );
+
+        newElement = new Object({
+          parent: `${containerValue.children[0].id}`,
+          type: "image",
+          id: `image-${newCount}`,
+          url: "",
+          children: [],
+        });
+
+        addedElement = matchAndAdd(
+          jsonValue.elements,
+          containerValue.children[0].id,
+          newElement
+        );
     }
 
     if (newElement !== null) {
@@ -545,9 +568,6 @@ const Design = () => {
         parentEle.id
       );
     }
-
-    console.log("id", e.target.id)
-
 
     updateElementParent(
       e.dataTransfer.getData("dragging_container"),
@@ -1927,6 +1947,241 @@ const Design = () => {
         ""
       )}
 
+      {/* Image Container Beggining */}
+      {changeJson.values &&
+      changeJson.values.isActive &&
+      changeJson.values.type == "image" ? (
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-y-auto">
+          {/* <div className="text-white pb-[100px]">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+              {changeJson.values.id}
+            </h1>
+            <div className="pt-5 px-10">
+              Style
+              <div className="pt-2">
+                <select
+                  id="background_style_type"
+                  className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
+                  value={changeJson.values.background_style_type}
+                  onChange={updateElementsValues}
+                >
+                  <option value="color" className="bg-[rgba(53,54,66,.9825)]">
+                    Color
+                  </option>
+                  <option
+                    value="gradient"
+                    className="bg-[rgba(53,54,66,.9825)]"
+                  >
+                    Gradient
+                  </option>
+                  <option value="image" className="bg-[rgba(53,54,66,.9825)]">
+                    Image
+                  </option>
+                </select>
+              </div>
+            </div>
+            {changeJson.values.background_style_type == "color" ? (
+              <div className="pt-5 px-10">
+                <div className="pb-2 flex">
+                  <div
+                    className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                    style={{
+                      background:
+                        changeJson.values.background_style_types[
+                          changeJson.values.background_style_type
+                        ].background_color,
+                    }}
+                  ></div>
+                  <div className="">Color</div>
+                </div>
+                <div onClick={handleColorPickerInput}>
+                  <input
+                    data-name={changeJson.values.id}
+                    id="background_color"
+                    className="input_color_picker"
+                    value={
+                      changeJson.values.background_style_types[
+                        changeJson.values.background_style_type
+                      ].background_color
+                    }
+                    onChange={updateBackGround}
+                  />
+                  <div
+                    className={
+                      inputColorPicker.name == changeJson.values.id &&
+                      inputColorPicker.id == "background_color"
+                        ? "color_picker active"
+                        : "color_picker"
+                    }
+                  >
+                    <PickColor
+                      setColorUpdate={setColorUpdate}
+                      test={changeJson}
+                    />
+                  </div>
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
+            {changeJson.values.background_style_type == "gradient" ? (
+              <div>
+                {changeJson.values.background_style_types[
+                  changeJson.values.background_style_type
+                ].map((value, i) => {
+                  return (
+                    <div key={i} className="pt-5 px-10 h-full">
+                      <div className="pb-2 flex">
+                        <div
+                          className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                          style={{
+                            background: value.color,
+                          }}
+                        ></div>
+                        <div className="">Color</div>
+                      </div>
+                      <div className="flex">
+                        <div
+                          onClick={handleColorPickerInput}
+                          className="w-[115px]"
+                        >
+                          <input
+                            data-indexvalue={i}
+                            id={`color-${i}`}
+                            className="input_color_picker"
+                            value={value.color}
+                            onChange={updateBackGround}
+                          />
+
+                          <div
+                            className={
+                              inputColorPicker.id == `color-${i}`
+                                ? "color_picker active"
+                                : "color_picker"
+                            }
+                          >
+                            <PickColor
+                              setColorUpdate={setColorUpdate}
+                              test={changeJson}
+                              type={"color"}
+                              idValue={i}
+                            />
+                          </div>
+                        </div>
+                        <input
+                          data-indexvalue={i}
+                          max={100}
+                          id="percentage"
+                          type="range"
+                          className="ml-2 slider_style w-[100px]"
+                          value={value.percentage}
+                          onChange={updateBackGround}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              ""
+            )}
+            {changeJson.values.background_style_type == "image" ? (
+              <div>
+                <div className="pt-5 px-10 h-full">
+                  <div
+                    className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
+                    onClick={handleUploadImage}
+                  >
+                    <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
+                      Upload
+                    </div>
+                  </div>
+                  <input
+                    onChange={updateBackGround}
+                    ref={uploadImageRef}
+                    id="background_url"
+                    type="file"
+                    className="hidden"
+                  />
+                  <div className="pb-2 flex">
+                    <div
+                      className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                      style={{
+                        background:
+                          changeJson.values.background_style_types[
+                            changeJson.values.background_style_type
+                          ].background_color,
+                      }}
+                    ></div>
+                    <div className="">Color</div>
+                  </div>
+                  {changeJson.values.background_style_types[
+                    changeJson.values.background_style_type
+                  ].gradient.map((value, i) => {
+                    return (
+                      <div key={i} className="pt-5 h-full">
+                        <div className="pb-2 flex">
+                          <div
+                            className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                            style={{
+                              background: value.color,
+                            }}
+                          ></div>
+                          <div className="">Color</div>
+                        </div>
+                        <div className="flex">
+                          <div
+                            onClick={handleColorPickerInput}
+                            className="w-[115px]"
+                          >
+                            <input
+                              data-indexvalue={i}
+                              id={`color-${i}`}
+                              className="input_color_picker"
+                              value={value.color}
+                              onChange={updateBackGround}
+                            />
+
+                            <div
+                              className={
+                                inputColorPicker.id == `color-${i}`
+                                  ? "color_picker active"
+                                  : "color_picker"
+                              }
+                            >
+                              <PickColor
+                                setColorUpdate={setColorUpdate}
+                                test={changeJson}
+                                type={"color"}
+                                idValue={i}
+                              />
+                            </div>
+                          </div>
+                          <input
+                            data-indexvalue={i}
+                            max={100}
+                            id="percentage"
+                            type="range"
+                            className="ml-2 slider_style w-[100px]"
+                            value={value.percentage}
+                            onChange={updateBackGround}
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              ""
+            )}
+          </div> */}
+        </div>
+      ) : (
+        ""
+      )}
+      {/* Image Container Ending */}
+
       {/* Page container Ending */}
 
       {/* Edit modal Ends here*/}
@@ -1954,7 +2209,13 @@ const Design = () => {
             >
               Text
             </div>
-            <div className="design_new_elements">Image</div>
+            <div
+              className="design_new_elements"
+              id="img_element"
+              onClick={addNewElement}
+            >
+              Image
+            </div>
             <div className="design_new_elements">Icons</div>
             <div className="design_new_elements">Buttons</div>
           </div>
