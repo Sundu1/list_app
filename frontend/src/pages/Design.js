@@ -107,13 +107,15 @@ const Design = () => {
     ],
   });
 
-  const [isDragging, setIsDragging] = useState(false);
-  const [offset, setOffset] = useState({ x: 0, y: 0 });
-  const [movableDiv, setMovableDiv] = useState({});
-  const [placeholderDiv, setPlaceholderDiv] = useState({});
-  const [moved, setMoved] = useState(false);
+  // const [isDragging, setIsDragging] = useState(false);
+  // const [offset, setOffset] = useState({ x: 0, y: 0 });
+  // const [movableDiv, setMovableDiv] = useState({});
+  // const [placeholderDiv, setPlaceholderDiv] = useState({});
+  // const [moved, setMoved] = useState(false);
+  // const [columnValue, setcolumnValue] = useState("");
 
-  const [columnValue, setcolumnValue] = useState("");
+  const [savedColumns, setSavedColumns] = useState([])
+
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -161,30 +163,29 @@ const Design = () => {
     }
   }, [colorUpdate]);
 
+
+  const matchAndUpdate = (values, changeJson, children) => {
+    return children.map((_child) => {
+      if (changeJson.id === _child.id) {
+        return {
+          ..._child,
+          [values.id]: values.value,
+        };
+      } else {
+        return {
+          ..._child,
+          children:
+            _child.children && Array.isArray(_child.children)
+              ? matchAndUpdate(values, changeJson, _child.children)
+              : null,
+        };
+      }
+    });
+  };
+
   const updateElementsValues = (e) => {
     if (e.target.id) {
-      const matchAndUpdate = (values, changeJson, children) => {
-        return children.map((_child) => {
-          if (changeJson.id === _child.id) {
-            return {
-              ..._child,
-              [values.id]: values.value,
-              children:
-                _child.children && Array.isArray(_child.children)
-                  ? matchAndUpdate(values, changeJson, _child.children)
-                  : null,
-            };
-          } else {
-            return {
-              ..._child,
-              children:
-                _child.children && Array.isArray(_child.children)
-                  ? matchAndUpdate(values, changeJson, _child.children)
-                  : null,
-            };
-          }
-        });
-      };
+
       const newState = matchAndUpdate(
         e.target,
         changeJson.values,
@@ -800,36 +801,22 @@ const Design = () => {
   };
 
   const updateColumnValues = (e) =>{
-
-    const firstColumn = matchAndGet(
+    const selectedContainer = matchAndGet(
         jsonValue.elements,
         changeJson.values.id
       );
-    
-    if(firstColumn && firstColumn.children.length >= 2) return
-    if (e.target.id && e.target.value == 'columns') {
-      const matchAndUpdate = (values, changeJson, children) => {
-        return children.map((_child) => {
-          if (changeJson.id === _child.id) {
-            return {
-              ..._child,
-              [values.id]: values.value,
-              children:
-                _child.children && Array.isArray(_child.children)
-                  ? matchAndUpdate(values, changeJson, _child.children)
-                  : null,
-            };
-          } else {
-            return {
-              ..._child,
-              children:
-                _child.children && Array.isArray(_child.children)
-                  ? matchAndUpdate(values, changeJson, _child.children)
-                  : null,
-            };
-          }
-        });
-      };
+
+    if(e.target.id && e.target.value == "default"){
+      const columnArr = selectedContainer.children
+      .map((value, i) => {
+        if (i != 0) {
+          return value;
+        }
+      })
+      .filter((value) => value != undefined);
+      
+      setSavedColumns([...columnArr]);
+
       const newState = matchAndUpdate(
         e.target,
         changeJson.values,
@@ -841,29 +828,78 @@ const Design = () => {
         values: { ...old.values, [e.target.id]: e.target.value },
       }));
 
+      // match update children
+      const matchAndUpdateChildren = (obj, targetId) => {
+        if(Array.isArray(obj)){
+          return obj.map(value =>{
+            if(value.id == targetId){
+              return {
+              ...value,
+              children: [value.children[0]]
+              }
+            }
+            return {
+              ...value,
+              children: Array.isArray(value.children) ? matchAndUpdateChildren(value.children, targetId) : null
+            }
+          })
+        }
+      }
+
+      const test = matchAndUpdateChildren(newState, changeJson.values.id);
+      setJsonValue({elements: test})
+      return
+    }
+
+    if (e.target.id && e.target.value == 'columns') {
+      const newState = matchAndUpdate(
+        e.target,
+        changeJson.values,
+        jsonValue.elements
+      );
+
+      setChangeJson((old) => ({
+        ...old,
+        values: { ...old.values, [e.target.id]: e.target.value },
+      }));
 
       let newElement = null;
       let addedElement = null;
 
-      if(e.target.name == "container-column"){
-        newElement = new Object({
-          type: "container-column",
-          id: `column-${columnsCount}`,
-          isActive: false,
-          children: [],
-        });
+      if(savedColumns && savedColumns.length < 1){
+        console.log("savedColumns", savedColumns);
 
-        addedElement = matchAndAdd(
-          newState,
-          changeJson.values.id,
-          newElement
-        );
+        if (e.target.name == "container-column") {
+          newElement = new Object({
+            type: "container-column",
+            id: `column-${columnsCount}`,
+
+            isActive: false,
+            children: [],
+          });
+
+          addedElement = matchAndAdd(newState, changeJson.values.id, newElement);
+        }
+
+        setColumnsCount(columnsCount + 1);
+        setJsonValue({ elements: addedElement });
+      }else{
+          const test1 = matchAndAdd(jsonValue.elements, changeJson.values.id, ...savedColumns)
+          setJsonValue({elements: test1})
       }
-
-
-      setColumnsCount(columnsCount + 1);
-      setJsonValue({ elements: addedElement });
     }
+  }
+
+  const updateImageValue = (e) =>{
+    const img_url = e.target.files ? URL.createObjectURL(e.target.files[0]) : undefined;
+    const target = new Object({
+        target: {
+          id: e.target.id,
+          value: img_url,
+      },
+    });
+
+    updateElementsValues(target)
   }
 
   return (
@@ -1952,230 +1988,29 @@ const Design = () => {
       changeJson.values.isActive &&
       changeJson.values.type == "image" ? (
         <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-y-auto">
-          {/* <div className="text-white pb-[100px]">
+          <div className="text-white pb-[100px]">
             <h1 className="px-5 py-3 border-b-2 border-black text-lg">
               {changeJson.values.id}
             </h1>
             <div className="pt-5 px-10">
-              Style
-              <div className="pt-2">
-                <select
-                  id="background_style_type"
-                  className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
-                  value={changeJson.values.background_style_type}
-                  onChange={updateElementsValues}
-                >
-                  <option value="color" className="bg-[rgba(53,54,66,.9825)]">
-                    Color
-                  </option>
-                  <option
-                    value="gradient"
-                    className="bg-[rgba(53,54,66,.9825)]"
-                  >
-                    Gradient
-                  </option>
-                  <option value="image" className="bg-[rgba(53,54,66,.9825)]">
-                    Image
-                  </option>
-                </select>
+              <h1 className="pb-5">Image</h1>
+              <div
+                className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
+                onClick={handleUploadImage}
+              >
+                <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
+                  Upload
+                </div>
               </div>
+              <input
+                onChange={updateImageValue}
+                ref={uploadImageRef}
+                id="url"
+                type="file"
+                className="hidden"
+              />
             </div>
-            {changeJson.values.background_style_type == "color" ? (
-              <div className="pt-5 px-10">
-                <div className="pb-2 flex">
-                  <div
-                    className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                    style={{
-                      background:
-                        changeJson.values.background_style_types[
-                          changeJson.values.background_style_type
-                        ].background_color,
-                    }}
-                  ></div>
-                  <div className="">Color</div>
-                </div>
-                <div onClick={handleColorPickerInput}>
-                  <input
-                    data-name={changeJson.values.id}
-                    id="background_color"
-                    className="input_color_picker"
-                    value={
-                      changeJson.values.background_style_types[
-                        changeJson.values.background_style_type
-                      ].background_color
-                    }
-                    onChange={updateBackGround}
-                  />
-                  <div
-                    className={
-                      inputColorPicker.name == changeJson.values.id &&
-                      inputColorPicker.id == "background_color"
-                        ? "color_picker active"
-                        : "color_picker"
-                    }
-                  >
-                    <PickColor
-                      setColorUpdate={setColorUpdate}
-                      test={changeJson}
-                    />
-                  </div>
-                </div>
-              </div>
-            ) : (
-              ""
-            )}
-            {changeJson.values.background_style_type == "gradient" ? (
-              <div>
-                {changeJson.values.background_style_types[
-                  changeJson.values.background_style_type
-                ].map((value, i) => {
-                  return (
-                    <div key={i} className="pt-5 px-10 h-full">
-                      <div className="pb-2 flex">
-                        <div
-                          className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                          style={{
-                            background: value.color,
-                          }}
-                        ></div>
-                        <div className="">Color</div>
-                      </div>
-                      <div className="flex">
-                        <div
-                          onClick={handleColorPickerInput}
-                          className="w-[115px]"
-                        >
-                          <input
-                            data-indexvalue={i}
-                            id={`color-${i}`}
-                            className="input_color_picker"
-                            value={value.color}
-                            onChange={updateBackGround}
-                          />
-
-                          <div
-                            className={
-                              inputColorPicker.id == `color-${i}`
-                                ? "color_picker active"
-                                : "color_picker"
-                            }
-                          >
-                            <PickColor
-                              setColorUpdate={setColorUpdate}
-                              test={changeJson}
-                              type={"color"}
-                              idValue={i}
-                            />
-                          </div>
-                        </div>
-                        <input
-                          data-indexvalue={i}
-                          max={100}
-                          id="percentage"
-                          type="range"
-                          className="ml-2 slider_style w-[100px]"
-                          value={value.percentage}
-                          onChange={updateBackGround}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              ""
-            )}
-            {changeJson.values.background_style_type == "image" ? (
-              <div>
-                <div className="pt-5 px-10 h-full">
-                  <div
-                    className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
-                    onClick={handleUploadImage}
-                  >
-                    <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
-                      Upload
-                    </div>
-                  </div>
-                  <input
-                    onChange={updateBackGround}
-                    ref={uploadImageRef}
-                    id="background_url"
-                    type="file"
-                    className="hidden"
-                  />
-                  <div className="pb-2 flex">
-                    <div
-                      className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                      style={{
-                        background:
-                          changeJson.values.background_style_types[
-                            changeJson.values.background_style_type
-                          ].background_color,
-                      }}
-                    ></div>
-                    <div className="">Color</div>
-                  </div>
-                  {changeJson.values.background_style_types[
-                    changeJson.values.background_style_type
-                  ].gradient.map((value, i) => {
-                    return (
-                      <div key={i} className="pt-5 h-full">
-                        <div className="pb-2 flex">
-                          <div
-                            className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                            style={{
-                              background: value.color,
-                            }}
-                          ></div>
-                          <div className="">Color</div>
-                        </div>
-                        <div className="flex">
-                          <div
-                            onClick={handleColorPickerInput}
-                            className="w-[115px]"
-                          >
-                            <input
-                              data-indexvalue={i}
-                              id={`color-${i}`}
-                              className="input_color_picker"
-                              value={value.color}
-                              onChange={updateBackGround}
-                            />
-
-                            <div
-                              className={
-                                inputColorPicker.id == `color-${i}`
-                                  ? "color_picker active"
-                                  : "color_picker"
-                              }
-                            >
-                              <PickColor
-                                setColorUpdate={setColorUpdate}
-                                test={changeJson}
-                                type={"color"}
-                                idValue={i}
-                              />
-                            </div>
-                          </div>
-                          <input
-                            data-indexvalue={i}
-                            max={100}
-                            id="percentage"
-                            type="range"
-                            className="ml-2 slider_style w-[100px]"
-                            value={value.percentage}
-                            onChange={updateBackGround}
-                          />
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ) : (
-              ""
-            )}
-          </div> */}
+          </div>
         </div>
       ) : (
         ""

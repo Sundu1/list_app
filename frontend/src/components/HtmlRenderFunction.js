@@ -190,8 +190,14 @@ const HtmlRenderFunction = (
           imgEle.setAttribute("data-type", "image");
           imgEle.removeAttribute("draggable")
           imgEle.style.pointerEvents = "none";
-          imgEle.src =
+
+          if(element.url != ""){
+            imgEle.src = element.url;
+          } else {
+            imgEle.src =
             `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%22250%22%20height%3D%22250%22%20viewBox%3D%220%200%20250%20250%22%20preserveAspectRatio%3D%22none%22%3E%3Cstyle%3Eline%20%7Bstroke%3A%20rgba%28255%2C255%2C255%2C0.25%29%3Bstroke-width%3A%201px%3B%7Drect%20%7Bfill%3A%20rgba%2894%2C95%2C103%2C0.625%29%3B%7D%3C/style%3E%3Crect%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%22100%25%22%20x2%3D%22100%25%22%20y2%3D%220%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3C/svg%3E`;
+          }
+
           imgEle.setAttribute("data-type", "text");
           imgEle.removeAttribute("draggable");
 
