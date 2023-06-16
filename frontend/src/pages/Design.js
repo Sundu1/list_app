@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useContext, useRef, Children } from "react";
+import React, {
+  useState,
+  useEffect,
+  useContext,
+  useRef,
+  Children,
+} from "react";
 import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 
@@ -114,7 +120,7 @@ const Design = () => {
   // const [moved, setMoved] = useState(false);
   // const [columnValue, setcolumnValue] = useState("");
 
-  const [savedColumns, setSavedColumns] = useState([])
+  const [savedColumns, setSavedColumns] = useState([]);
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -163,7 +169,6 @@ const Design = () => {
     }
   }, [colorUpdate]);
 
-
   const matchAndUpdate = (values, changeJson, children) => {
     return children.map((_child) => {
       if (changeJson.id === _child.id) {
@@ -185,7 +190,6 @@ const Design = () => {
 
   const updateElementsValues = (e) => {
     if (e.target.id) {
-
       const newState = matchAndUpdate(
         e.target,
         changeJson.values,
@@ -282,7 +286,6 @@ const Design = () => {
     }
 
     if (e.target.id == "text_element") {
-
       const containerValue = matchAndGet(
         jsonValue.elements,
         changeJson.values.id
@@ -300,33 +303,37 @@ const Design = () => {
         children: [],
       });
 
-      addedElement = matchAndAdd(jsonValue.elements, containerValue.children[0].id, newElement);
+      addedElement = matchAndAdd(
+        jsonValue.elements,
+        containerValue.children[0].id,
+        newElement
+      );
     }
 
-    if(e.target.id == "img_element"){
-        const containerValue = matchAndGet(
-          jsonValue.elements,
-          changeJson.values.id
-        );
+    if (e.target.id == "img_element") {
+      const containerValue = matchAndGet(
+        jsonValue.elements,
+        changeJson.values.id
+      );
 
-        newElement = new Object({
-          parent: `${containerValue.children[0].id}`,
-          type: "image",
-          id: `image-${newCount}`,
-          url: "",
-          children: [],
-        });
+      newElement = new Object({
+        parent: `${containerValue.children[0].id}`,
+        type: "image",
+        id: `image-${newCount}`,
+        url: "",
+        children: [],
+      });
 
-        addedElement = matchAndAdd(
-          jsonValue.elements,
-          containerValue.children[0].id,
-          newElement
-        );
+      addedElement = matchAndAdd(
+        jsonValue.elements,
+        containerValue.children[0].id,
+        newElement
+      );
     }
 
     if (newElement !== null) {
-        setJsonValue({ elements: addedElement });
-        setNewCount(newCount + 1);
+      setJsonValue({ elements: addedElement });
+      setNewCount(newCount + 1);
     }
   };
 
@@ -453,7 +460,7 @@ const Design = () => {
 
   const updateElementParent = (newElementId, parentElementId) => {
     const newElementValues = matchAndGet(jsonValue.elements, newElementId);
-    const parentElement = matchAndGet(jsonValue.elements, parentElementId)
+    const parentElement = matchAndGet(jsonValue.elements, parentElementId);
 
     if (
       newElementValues == null ||
@@ -462,8 +469,8 @@ const Design = () => {
     )
       return;
 
-    if(parentElement.type == "container") return;
-    if(parentElement.type == newElementValues.type) return;
+    if (parentElement.type == "container") return;
+    if (parentElement.type == newElementValues.type) return;
 
     newElementValues.parent = parentElementId;
     const deletedState = matchAndDelete(jsonValue.elements, newElementValues);
@@ -560,10 +567,7 @@ const Design = () => {
     const columnEle = document.querySelector(`#${hoverElement.id}`);
 
     if (hoverElement.type == "text") {
-      const parentEle = matchAndGet(
-        jsonValue.elements,
-        hoverElement.parent
-      );
+      const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
       updateElementParent(
         e.dataTransfer.getData("dragging_container"),
         parentEle.id
@@ -800,21 +804,21 @@ const Design = () => {
     column_1.classList.toggle("hidden");
   };
 
-  const updateColumnValues = (e) =>{
+  const updateColumnValues = (e) => {
     const selectedContainer = matchAndGet(
-        jsonValue.elements,
-        changeJson.values.id
-      );
+      jsonValue.elements,
+      changeJson.values.id
+    );
 
-    if(e.target.id && e.target.value == "default"){
+    if (e.target.id && e.target.value == "default") {
       const columnArr = selectedContainer.children
-      .map((value, i) => {
-        if (i != 0) {
-          return value;
-        }
-      })
-      .filter((value) => value != undefined);
-      
+        .map((value, i) => {
+          if (i != 0) {
+            return value;
+          }
+        })
+        .filter((value) => value != undefined);
+
       setSavedColumns([...columnArr]);
 
       const newState = matchAndUpdate(
@@ -830,28 +834,31 @@ const Design = () => {
 
       // match update children
       const matchAndUpdateChildren = (obj, targetId) => {
-        if(Array.isArray(obj)){
-          return obj.map(value =>{
-            if(value.id == targetId){
+        if (Array.isArray(obj)) {
+          return obj.map((value) => {
+            if (value.id == targetId) {
               return {
-              ...value,
-              children: [value.children[0]]
-              }
+                ...value,
+                children: [value.children[0]],
+              };
             }
             return {
               ...value,
-              children: Array.isArray(value.children) ? matchAndUpdateChildren(value.children, targetId) : null
-            }
-          })
+              children: Array.isArray(value.children)
+                ? matchAndUpdateChildren(value.children, targetId)
+                : null,
+            };
+          });
         }
-      }
+      };
 
       const test = matchAndUpdateChildren(newState, changeJson.values.id);
-      setJsonValue({elements: test})
-      return
+      console.log(test);
+      setJsonValue({ elements: test });
+      return;
     }
 
-    if (e.target.id && e.target.value == 'columns') {
+    if (e.target.id && e.target.value == "columns") {
       const newState = matchAndUpdate(
         e.target,
         changeJson.values,
@@ -866,7 +873,7 @@ const Design = () => {
       let newElement = null;
       let addedElement = null;
 
-      if(savedColumns && savedColumns.length < 1){
+      if (savedColumns && savedColumns.length < 1) {
         console.log("savedColumns", savedColumns);
 
         if (e.target.name == "container-column") {
@@ -878,29 +885,41 @@ const Design = () => {
             children: [],
           });
 
-          addedElement = matchAndAdd(newState, changeJson.values.id, newElement);
+          addedElement = matchAndAdd(
+            newState,
+            changeJson.values.id,
+            newElement
+          );
         }
 
         setColumnsCount(columnsCount + 1);
         setJsonValue({ elements: addedElement });
-      }else{
-          const test1 = matchAndAdd(jsonValue.elements, changeJson.values.id, ...savedColumns)
-          setJsonValue({elements: test1})
+      } else {
+        const test1 = matchAndAdd(
+          jsonValue.elements,
+          changeJson.values.id,
+          ...savedColumns
+        );
+
+        const newState = matchAndUpdate(e.target, changeJson.values, test1);
+        setJsonValue({ elements: newState });
       }
     }
-  }
+  };
 
-  const updateImageValue = (e) =>{
-    const img_url = e.target.files ? URL.createObjectURL(e.target.files[0]) : undefined;
+  const updateImageValue = (e) => {
+    const img_url = e.target.files
+      ? URL.createObjectURL(e.target.files[0])
+      : undefined;
     const target = new Object({
-        target: {
-          id: e.target.id,
-          value: img_url,
+      target: {
+        id: e.target.id,
+        value: img_url,
       },
     });
 
-    updateElementsValues(target)
-  }
+    updateElementsValues(target);
+  };
 
   return (
     <div>
