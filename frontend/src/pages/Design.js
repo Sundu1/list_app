@@ -819,7 +819,7 @@ const Design = () => {
         })
         .filter((value) => value != undefined);
 
-      setSavedColumns([...columnArr]);
+      setSavedColumns( (old) => ({ ...old, [changeJson.values.id] : [...columnArr]}));
 
       const newState = matchAndUpdate(
         e.target,
@@ -852,9 +852,8 @@ const Design = () => {
         }
       };
 
-      const test = matchAndUpdateChildren(newState, changeJson.values.id);
-      console.log(test);
-      setJsonValue({ elements: test });
+      const defaultColumn = matchAndUpdateChildren(newState, changeJson.values.id);
+      setJsonValue({ elements: defaultColumn });
       return;
     }
 
@@ -873,14 +872,12 @@ const Design = () => {
       let newElement = null;
       let addedElement = null;
 
-      if (savedColumns && savedColumns.length < 1) {
+      if (savedColumns && !savedColumns[changeJson.values.id]) {
         console.log("savedColumns", savedColumns);
-
         if (e.target.name == "container-column") {
           newElement = new Object({
             type: "container-column",
             id: `column-${columnsCount}`,
-
             isActive: false,
             children: [],
           });
@@ -898,7 +895,7 @@ const Design = () => {
         const test1 = matchAndAdd(
           jsonValue.elements,
           changeJson.values.id,
-          ...savedColumns
+          ...savedColumns[changeJson.values.id]
         );
 
         const newState = matchAndUpdate(e.target, changeJson.values, test1);
