@@ -1123,7 +1123,7 @@ const Design = () => {
             <div className="pt-5 px-10">
               {changeJson.values.display == "columns" ? (
                 <div className="">
-                  <div>Columns</div>
+                  <div className="pb-3">Columns</div>
                   <div className="border-2 rounded-lg border-[rgba(255,255,255,.075)]">
                     <div
                       id="first_column"
@@ -1152,6 +1152,12 @@ const Design = () => {
                         Second
                       </div>
                     </div>
+                  </div>
+                  <div
+                    className="mt-2 border-2 border-white p-2 rounded-lg text-center 
+                                hover:bg-[rgba(255,255,255,.075)] hover:cursor-pointer"
+                  >
+                    Add
                   </div>
                 </div>
               ) : null}
