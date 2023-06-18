@@ -601,25 +601,7 @@ const Design = () => {
     )
       return;
 
-    const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
-
-    if (hoverElement == null) return;
-    if (hoverElement.type == "text" || hoverElement.type == "image") {
-      const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
-      updateElementParent(
-        e.dataTransfer.getData("dragging_container"),
-        parentEle.id
-      );
-    }
-    updateElementParent(
-      e.dataTransfer.getData("dragging_container"),
-      e.target.id
-    );
-  };
-
-  const handleDragOver = (e) => {
-    e.preventDefault();
-
+    // Swap Order
     if (e.target.className == "container-wrapper" && e.target.children[0]) {
       const newEle = matchAndGet(jsonValue.elements, dragValueTest);
 
@@ -641,7 +623,53 @@ const Design = () => {
         parentEle,
         newState1
       );
+
+      setJsonValue({ elements: newState2 });
+      return;
     }
+
+    // Update Parent
+    const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
+
+    if (hoverElement == null) return;
+    if (hoverElement.type == "text" || hoverElement.type == "image") {
+      const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
+      updateElementParent(
+        e.dataTransfer.getData("dragging_container"),
+        parentEle.id
+      );
+    }
+    updateElementParent(
+      e.dataTransfer.getData("dragging_container"),
+      e.target.id
+    );
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+
+    // if (e.target.className == "container-wrapper" && e.target.children[0]) {
+    //   const newEle = matchAndGet(jsonValue.elements, dragValueTest);
+
+    //   if (newEle == null) return;
+
+    //   const parentEle = matchAndGet(
+    //     jsonValue.elements,
+    //     e.target.children[0].id
+    //   );
+
+    //   const newState1 = matchAndUpdate(
+    //     { id: "order", value: parentEle.order },
+    //     newEle,
+    //     jsonValue.elements
+    //   );
+
+    //   const newState2 = matchAndUpdate(
+    //     { id: "order", value: newEle.order },
+    //     parentEle,
+    //     newState1
+    //   );
+    // }
   };
 
   const handleDragEnd = (e) => {

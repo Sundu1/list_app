@@ -10,11 +10,36 @@ const HtmlRenderFunction = (
   handleScroll,
   scrollValue
 ) => {
+  const quickSort = (arr) => {
+    if (arr.length <= 1) {
+      return arr;
+    }
+
+    const pivot = arr[Math.floor(arr.length / 2)].order;
+    const less = [];
+    const equal = [];
+    const greater = [];
+
+    for (let element of arr) {
+      if (element.order < pivot) {
+        less.push(element);
+      } else if (element.order > pivot) {
+        greater.push(element);
+      } else {
+        equal.push(element);
+      }
+    }
+
+    return [...quickSort(less), ...equal, ...quickSort(greater)];
+  };
+
   let newDiv;
 
   const traverse_dfs = (jsonvalues, parentelement) => {
     if (typeof jsonvalues === "object") {
-      jsonvalues.forEach((element) => {
+      const sortedArr = quickSort(jsonvalues);
+
+      sortedArr.forEach((element) => {
         const parent = document.getElementById(parentelement);
         const element_value = document.getElementById(element.id);
 
