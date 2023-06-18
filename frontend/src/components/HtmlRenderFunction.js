@@ -5,14 +5,16 @@ const HtmlRenderFunction = (
   handleDragOver,
   handleDrop,
   handleDragging,
-  handleDragEnd
+  handleDragEnd,
+
+  handleScroll,
+  scrollValue
 ) => {
   let newDiv;
 
   const traverse_dfs = (jsonvalues, parentelement) => {
     if (typeof jsonvalues === "object") {
       jsonvalues.forEach((element) => {
-
         const parent = document.getElementById(parentelement);
         const element_value = document.getElementById(element.id);
 
@@ -102,7 +104,7 @@ const HtmlRenderFunction = (
         }
 
         if (element.type == "container-column") {
-          newDiv.style.padding = "5px"
+          newDiv.style.padding = "5px";
 
           if (element.children.length == 0) {
             newDiv.removeAttribute("draggable");
@@ -124,7 +126,7 @@ const HtmlRenderFunction = (
           newDiv.innerHTML = element.text_value;
 
           const containerWrapperDiv = document.createElement("div");
-          containerWrapperDiv.id = element.id
+          containerWrapperDiv.id = element.id;
           containerWrapperDiv.classList.add("text-wrapper");
           containerWrapperDiv.style.display = "flex";
           containerWrapperDiv.style.justifyContent = "center";
@@ -132,33 +134,19 @@ const HtmlRenderFunction = (
           containerWrapperDiv.style.padding = "10px";
 
           containerWrapperDiv.setAttribute("draggable", true);
-          containerWrapperDiv.addEventListener(
-            "dragstart",
-            handleDragStart
-          );
+          containerWrapperDiv.addEventListener("dragstart", handleDragStart);
           containerWrapperDiv.addEventListener("dragstart", () => {
             containerWrapperDiv.style.height =
-              document
-                .querySelector(`#${element.id}`)
-                .getBoundingClientRect().height + "px";
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .height + "px";
             containerWrapperDiv.style.width =
-              document
-                .querySelector(`#${element.id}`)
-                .getBoundingClientRect().width + "px";
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .width + "px";
           });
-          containerWrapperDiv.addEventListener(
-            "dragover",
-            handleDragOver
-          );
+          containerWrapperDiv.addEventListener("dragover", handleDragOver);
           containerWrapperDiv.addEventListener("drop", handleDrop);
-          containerWrapperDiv.addEventListener(
-            "drag",
-            handleDragging
-          );
-          containerWrapperDiv.addEventListener(
-            "dragend",
-            handleDragEnd
-          );
+          containerWrapperDiv.addEventListener("drag", handleDragging);
+          containerWrapperDiv.addEventListener("dragend", handleDragEnd);
 
           containerWrapperDiv.onpointerdown = function (e) {
             if (
@@ -176,26 +164,21 @@ const HtmlRenderFunction = (
 
           containerWrapperDiv.appendChild(newDiv);
           parent.appendChild(containerWrapperDiv);
-          if (
-            element.children == null ||
-            element.children.length == 0
-          )
-            return;
+          if (element.children == null || element.children.length == 0) return;
           traverse_dfs(element.children, element.id);
           return;
         }
 
-        if(element.type == "image"){
+        if (element.type == "image") {
           const imgEle = document.createElement("img");
           imgEle.setAttribute("data-type", "image");
-          imgEle.removeAttribute("draggable")
+          imgEle.removeAttribute("draggable");
           imgEle.style.pointerEvents = "none";
 
-          if(element.url != ""){
+          if (element.url != "") {
             imgEle.src = element.url;
           } else {
-            imgEle.src =
-            `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%22250%22%20height%3D%22250%22%20viewBox%3D%220%200%20250%20250%22%20preserveAspectRatio%3D%22none%22%3E%3Cstyle%3Eline%20%7Bstroke%3A%20rgba%28255%2C255%2C255%2C0.25%29%3Bstroke-width%3A%201px%3B%7Drect%20%7Bfill%3A%20rgba%2894%2C95%2C103%2C0.625%29%3B%7D%3C/style%3E%3Crect%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%22100%25%22%20x2%3D%22100%25%22%20y2%3D%220%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3C/svg%3E`;
+            imgEle.src = `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%22250%22%20height%3D%22250%22%20viewBox%3D%220%200%20250%20250%22%20preserveAspectRatio%3D%22none%22%3E%3Cstyle%3Eline%20%7Bstroke%3A%20rgba%28255%2C255%2C255%2C0.25%29%3Bstroke-width%3A%201px%3B%7Drect%20%7Bfill%3A%20rgba%2894%2C95%2C103%2C0.625%29%3B%7D%3C/style%3E%3Crect%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%22100%25%22%20x2%3D%22100%25%22%20y2%3D%220%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3C/svg%3E`;
           }
 
           imgEle.setAttribute("data-type", "text");
@@ -214,38 +197,24 @@ const HtmlRenderFunction = (
           containerWrapperDiv.style.padding = "10px";
 
           containerWrapperDiv.setAttribute("draggable", true);
-          containerWrapperDiv.addEventListener(
-            "dragstart",
-            handleDragStart
-          );
+          containerWrapperDiv.addEventListener("dragstart", handleDragStart);
 
           containerWrapperDiv.addEventListener("dragstart", () => {
             containerWrapperDiv.style.height =
-              document
-                .querySelector(`#${element.id}`)
-                .getBoundingClientRect().height + "px";
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .height + "px";
             containerWrapperDiv.style.width =
-              document
-                .querySelector(`#${element.id}`)
-                .getBoundingClientRect().width + "px";
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .width + "px";
           });
 
-          containerWrapperDiv.addEventListener(
-            "dragover",
-            handleDragOver
-          );
+          containerWrapperDiv.addEventListener("dragover", handleDragOver);
 
           containerWrapperDiv.addEventListener("drop", handleDrop);
 
-          containerWrapperDiv.addEventListener(
-            "drag",
-            handleDragging
-          );
+          containerWrapperDiv.addEventListener("drag", handleDragging);
 
-          containerWrapperDiv.addEventListener(
-            "dragend",
-            handleDragEnd
-          );
+          containerWrapperDiv.addEventListener("dragend", handleDragEnd);
 
           containerWrapperDiv.onpointerdown = function (e) {
             if (
@@ -263,11 +232,7 @@ const HtmlRenderFunction = (
 
           containerWrapperDiv.appendChild(imgEle);
           parent.appendChild(containerWrapperDiv);
-          if (
-            element.children == null ||
-            element.children.length == 0
-          )
-            return;
+          if (element.children == null || element.children.length == 0) return;
           traverse_dfs(element.children, element.id);
           return;
         }
@@ -275,9 +240,13 @@ const HtmlRenderFunction = (
         // Background
         if (element.type == "background") {
           newDiv.removeAttribute("draggable");
+          newDiv.style.overflow = "scroll";
           newDiv.style.position = element.position;
           newDiv.style.height = element.height;
+          newDiv.style.paddingBottom = "30px";
           newDiv.style.width = element.width;
+
+          newDiv.addEventListener("scroll", handleScroll);
 
           if (element.background_style_type == "color") {
             const background_type = element.background_style_type;
@@ -296,6 +265,7 @@ const HtmlRenderFunction = (
 
             newDiv.style.background = `linear-gradient(90deg, ${gradient_value})`;
           }
+
           if (element.background_style_type == "image") {
             const background_type = element.background_style_type;
 

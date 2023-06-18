@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 
-const PickColor = ({ setColorUpdate, test, type, idValue }) => {
+const PickColor = ({ setColorUpdate, changeJson, type, idValue }) => {
   const canvasRef = useRef(null);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ const PickColor = ({ setColorUpdate, test, type, idValue }) => {
       const hex = valueToHex(r, g, b);
       let background_color_values;
 
-      if (test.values && test.values.type == "container") {
+      if (changeJson.values && changeJson.values.type == "container") {
         if ((type ||= "background_color")) {
           background_color_values = new Object({
             target: {
@@ -57,7 +57,7 @@ const PickColor = ({ setColorUpdate, test, type, idValue }) => {
         }
       }
 
-      if (test.values && test.values.type == "text") {
+      if (changeJson.values && changeJson.values.type == "text") {
         background_color_values = new Object({
           target: {
             id: "text_color",
@@ -65,7 +65,7 @@ const PickColor = ({ setColorUpdate, test, type, idValue }) => {
           },
         });
       }
-      if (test.values && test.values.type == "background") {
+      if (changeJson.values && changeJson.values.type == "background") {
         if ((type ||= "background_color")) {
           background_color_values = new Object({
             target: {
@@ -87,7 +87,7 @@ const PickColor = ({ setColorUpdate, test, type, idValue }) => {
         }
       }
 
-      if (test.values && test.values.type == "page") {
+      if (changeJson.values && changeJson.values.type == "page") {
         background_color_values = new Object({
           target: {
             id: "background_color",

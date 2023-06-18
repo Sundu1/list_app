@@ -5,13 +5,13 @@ import React, {
   useRef,
   Children,
 } from "react";
-import { json, useParams } from "react-router-dom";
-import { LoginProvider, UserContext } from "../components/LoginProvider";
+import { useParams } from "react-router-dom";
+import { UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
 
 import { BsArrowReturnRight, BsFillDatabaseFill } from "react-icons/bs";
-import { GiHamburgerMenu } from "react-icons/gi";
+import { GiDustCloud, GiHamburgerMenu } from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
@@ -34,11 +34,17 @@ const Design = () => {
 
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
+
+  const [scrollValue, setScrollValue] = useState(0);
+
+  const [dragValue, setDragValue] = useState("");
+
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
         type: "background",
         id: "Background",
+        scroll_top: 0,
         height: "100%",
         width: "100%",
         position: "fixed",
@@ -93,7 +99,7 @@ const Design = () => {
             position: "center",
             background_color: "rgb(220,220,220)",
             padding: "10px",
-            text: "testing ",
+            text: "text here",
             display: "",
             margin_top: "0",
             margin_left: "0",
@@ -131,7 +137,7 @@ const Design = () => {
         isAddElement &&
         refAddElement.current &&
         !refAddElement.current.contains(e.target) &&
-        e.target.id !== "test"
+        e.target.id !== "addElementBox"
       ) {
         setIsAddElement(false);
       }
@@ -151,11 +157,19 @@ const Design = () => {
       handleDragOver,
       handleDrop,
       handleDragging,
-      handleDragEnd
+      handleDragEnd,
       // handleMouseDown,
       // handleMouseMove
       // handleMouseUp
+      handleScroll,
+      scrollValue
     );
+
+    if (document.querySelector("#Background")) {
+      const bg = document.querySelector("#Background");
+      bg.scrollTo(scrollValue, scrollValue);
+    }
+
     return () => {};
   }, [jsonValue, refresh]);
 
@@ -244,96 +258,103 @@ const Design = () => {
     let newElement = null;
     let addedElement = null;
 
-    if (e.target.id == "container_element") {
-      newElement = new Object({
-        type: "container",
-        id: `Container-${newCount}`,
-        height: "100",
-        width: "200",
-        background_color: "",
-        border: "",
-        text: "testing ",
-        position: "relative",
-        display: "default",
-        margin_top: "0",
-        margin_left: "0",
-        margin_right: "0",
-        margin_bottom: "0",
-        padding_vertical: "30",
-        padding_horizontal: "30",
-        border_color: "black",
-        border_style: "solid",
-        border_size: "2",
-        border_roundness: "0",
-        children: [
-          {
-            type: "container-column",
-            id: `column-${columnsCount}`,
-            isActive: false,
-            children: [],
-          },
-        ],
-      });
+    if (
+      changeJson.values.type == "page" ||
+      changeJson.values.type == "container"
+    ) {
+      const containers = matchAndGet(jsonValue.elements, changeJson.values.id);
 
-      setColumnsCount(columnsCount + 1);
-      addedElement = matchAndAdd(
-        jsonValue.elements,
-        changeJson.values.id && changeJson.values.type != "container"
-          ? changeJson.values.id
-          : "Page",
-        newElement
-      );
-    }
+      if (e.target.id == "container_element") {
+        newElement = new Object({
+          type: "container",
+          id: `Container-${newCount}`,
+          order: containers.children.length + 1,
+          height: "100",
+          width: "200",
+          background_color: "",
+          border: "",
+          text: "text here",
+          position: "relative",
+          display: "default",
+          margin_top: "0",
+          margin_left: "0",
+          margin_right: "0",
+          margin_bottom: "0",
+          padding_vertical: "30",
+          padding_horizontal: "30",
+          border_color: "black",
+          border_style: "solid",
+          border_size: "2",
+          border_roundness: "0",
+          children: [
+            {
+              type: "container-column",
+              id: `column-${columnsCount}`,
+              isActive: false,
+              children: [],
+            },
+          ],
+        });
 
-    if (e.target.id == "text_element") {
-      const containerValue = matchAndGet(
-        jsonValue.elements,
-        changeJson.values.id
-      );
+        setColumnsCount(columnsCount + 1);
+        addedElement = matchAndAdd(
+          jsonValue.elements,
+          changeJson.values.id && changeJson.values.type != "container"
+            ? changeJson.values.id
+            : "Page",
+          newElement
+        );
+      }
 
-      newElement = new Object({
-        parent: `${containerValue.children[0].id}`,
-        type: "text",
-        id: `text-${newCount}`,
-        wordBreak: "",
-        text_color: "",
-        text_size: "",
-        text_fontfamily: "",
-        text_value: "put your text here",
-        children: [],
-      });
+      if (e.target.id == "text_element") {
+        const containerValue = matchAndGet(
+          jsonValue.elements,
+          changeJson.values.id
+        );
 
-      addedElement = matchAndAdd(
-        jsonValue.elements,
-        containerValue.children[0].id,
-        newElement
-      );
-    }
+        newElement = new Object({
+          parent: containerValue ? `${containerValue.children[0].id}` : null,
+          type: "text",
+          id: `text-${newCount}`,
+          wordBreak: "",
+          text_color: "",
+          text_size: "",
+          text_fontfamily: "",
+          text_value: "put your text here",
+          children: [],
+        });
 
-    if (e.target.id == "img_element") {
-      const containerValue = matchAndGet(
-        jsonValue.elements,
-        changeJson.values.id
-      );
+        addedElement = matchAndAdd(
+          jsonValue.elements,
+          containerValue.children[0].id,
+          newElement
+        );
+      }
+      if (e.target.id == "img_element") {
+        const containerValue = matchAndGet(
+          jsonValue.elements,
+          changeJson.values.id
+        );
 
-      newElement = new Object({
-        parent: `${containerValue.children[0].id}`,
-        type: "image",
-        id: `image-${newCount}`,
-        url: "",
-        children: [],
-      });
+        newElement = new Object({
+          parent: `${containerValue.children[0].id}`,
+          type: "image",
+          id: `image-${newCount}`,
+          url: "",
+          children: [],
+        });
 
-      addedElement = matchAndAdd(
-        jsonValue.elements,
-        containerValue.children[0].id,
-        newElement
-      );
-    }
+        addedElement = matchAndAdd(
+          jsonValue.elements,
+          containerValue.children[0].id,
+          newElement
+        );
+      }
 
-    if (newElement !== null) {
-      setJsonValue({ elements: addedElement });
-      setNewCount(newCount + 1);
+      if (newElement !== null) {
+        setJsonValue({ elements: addedElement });
+        setNewCount(newCount + 1);
+      }
     }
   };
 
@@ -463,6 +484,13 @@ const Design = () => {
     const parentElement = matchAndGet(jsonValue.elements, parentElementId);
 
     if (
+      newElementValues &&
+      newElementValues.type == "container" &&
+      parentElement.type != "page"
+    )
+      return;
+
+    if (
       newElementValues == null ||
       parentElement == newElementValues.id ||
       parentElement == "Background"
@@ -544,7 +572,14 @@ const Design = () => {
   //   const allContainer = document.querySelectorAll("[data-type='container']");
   // };
 
+  let dragValueTest = "";
+
   const handleDragStart = (e) => {
+    if (e.target.className == "container-wrapper") {
+      e.dataTransfer.setData("dragging_container", e.target.children[0].id);
+      dragValueTest = e.target.children[0].id;
+      return;
+    }
     e.dataTransfer.setData("dragging_container", e.target.id);
   };
 
@@ -560,20 +595,22 @@ const Design = () => {
   const handleDrop = (e) => {
     e.preventDefault();
 
-    if (changeJson.values.id == "Page" || e.target.id == "Background") return;
+    if (
+      // changeJson.values.id == "Page" ||
+      e.target.id == "Background"
+    )
+      return;
 
     const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
-    if (hoverElement == null) return;
-    const columnEle = document.querySelector(`#${hoverElement.id}`);
 
-    if (hoverElement.type == "text") {
+    if (hoverElement == null) return;
+    if (hoverElement.type == "text" || hoverElement.type == "image") {
       const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
       updateElementParent(
         e.dataTransfer.getData("dragging_container"),
         parentEle.id
       );
     }
-
     updateElementParent(
       e.dataTransfer.getData("dragging_container"),
       e.target.id
@@ -582,6 +619,29 @@ const Design = () => {
 
   const handleDragOver = (e) => {
     e.preventDefault();
+
+    if (e.target.className == "container-wrapper" && e.target.children[0]) {
+      const newEle = matchAndGet(jsonValue.elements, dragValueTest);
+
+      if (newEle == null) return;
+
+      const parentEle = matchAndGet(
+        jsonValue.elements,
+        e.target.children[0].id
+      );
+
+      const newState1 = matchAndUpdate(
+        { id: "order", value: parentEle.order },
+        newEle,
+        jsonValue.elements
+      );
+
+      const newState2 = matchAndUpdate(
+        { id: "order", value: newEle.order },
+        parentEle,
+        newState1
+      );
+    }
   };
 
   const handleDragEnd = (e) => {
@@ -819,7 +879,10 @@ const Design = () => {
         })
         .filter((value) => value != undefined);
 
-      setSavedColumns( (old) => ({ ...old, [changeJson.values.id] : [...columnArr]}));
+      setSavedColumns((old) => ({
+        ...old,
+        [changeJson.values.id]: [...columnArr],
+      }));
 
       const newState = matchAndUpdate(
         e.target,
@@ -852,7 +915,10 @@ const Design = () => {
         }
       };
 
-      const defaultColumn = matchAndUpdateChildren(newState, changeJson.values.id);
+      const defaultColumn = matchAndUpdateChildren(
+        newState,
+        changeJson.values.id
+      );
       setJsonValue({ elements: defaultColumn });
       return;
     }
@@ -873,7 +939,6 @@ const Design = () => {
       let addedElement = null;
 
       if (savedColumns && !savedColumns[changeJson.values.id]) {
-        console.log("savedColumns", savedColumns);
         if (e.target.name == "container-column") {
           newElement = new Object({
             type: "container-column",
@@ -892,13 +957,13 @@ const Design = () => {
         setColumnsCount(columnsCount + 1);
         setJsonValue({ elements: addedElement });
       } else {
-        const test1 = matchAndAdd(
+        const newValues = matchAndAdd(
           jsonValue.elements,
           changeJson.values.id,
           ...savedColumns[changeJson.values.id]
         );
 
-        const newState = matchAndUpdate(e.target, changeJson.values, test1);
+        const newState = matchAndUpdate(e.target, changeJson.values, newValues);
         setJsonValue({ elements: newState });
       }
     }
@@ -918,6 +983,23 @@ const Design = () => {
     updateElementsValues(target);
   };
 
+  const handleScroll = () => {
+    if (document.querySelector("#Background")) {
+      const bg = document.querySelector("#Background");
+
+      const change = new Object({
+        id: "Background",
+      });
+
+      const target = new Object({
+        id: "scroll_top",
+        value: bg.scrollTop,
+      });
+
+      setScrollValue(bg.scrollTop);
+    }
+  };
+
   return (
     <div>
       <Navbar />
@@ -931,7 +1013,7 @@ const Design = () => {
             viewBox="-13 0 50 30"
           >
             <path
-              id="test"
+              id="addElementBox"
               onClick={handleAddElement}
               className="fill-white scale-[1.5] hover:fill-gray-500 
                          hover:cursor-pointer filter drop-shadow"
@@ -1070,7 +1152,7 @@ const Design = () => {
                 >
                   <PickColor
                     setColorUpdate={setColorUpdate}
-                    test={changeJson}
+                    changeJson={changeJson}
                   />
                 </div>
               </div>
@@ -1323,7 +1405,7 @@ const Design = () => {
                   >
                     <PickColor
                       setColorUpdate={setColorUpdate}
-                      test={changeJson}
+                      changeJson={changeJson}
                       type="border_color"
                     />
                   </div>
@@ -1517,7 +1599,10 @@ const Design = () => {
                 value={changeJson.values.text_color}
                 onChange={updateElementsValues}
               />
-              <PickColor setColorUpdate={setColorUpdate} test={changeJson} />
+              <PickColor
+                setColorUpdate={setColorUpdate}
+                changeJson={changeJson}
+              />
             </div>
           </div>
         </div>
@@ -1596,7 +1681,7 @@ const Design = () => {
                   >
                     <PickColor
                       setColorUpdate={setColorUpdate}
-                      test={changeJson}
+                      changeJson={changeJson}
                     />
                   </div>
                 </div>
@@ -1642,7 +1727,7 @@ const Design = () => {
                           >
                             <PickColor
                               setColorUpdate={setColorUpdate}
-                              test={changeJson}
+                              changeJson={changeJson}
                               type={"color"}
                               idValue={i}
                             />
@@ -1731,7 +1816,7 @@ const Design = () => {
                             >
                               <PickColor
                                 setColorUpdate={setColorUpdate}
-                                test={changeJson}
+                                changeJson={changeJson}
                                 type={"color"}
                                 idValue={i}
                               />
@@ -1820,7 +1905,7 @@ const Design = () => {
                 >
                   <PickColor
                     setColorUpdate={setColorUpdate}
-                    test={changeJson}
+                    changeJson={changeJson}
                   />
                 </div>
               </div>
