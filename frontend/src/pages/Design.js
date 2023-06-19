@@ -636,16 +636,19 @@ const Design = () => {
       const prev = matchAndGet(jsonValue.elements, targetValue.id);
       const next = matchAndGet(jsonValue.elements, dragValue)
 
+      if(prev.order < next.order){
+        console.log(prev.order, next.order);
+      }
+
       const newContainers = containers.map((value, index) =>{
         if(value.id == next.id){
           value.order = prev.order + 1
           return value
-        } 
+        }
          if (value.id == prev.id){
           return value
         }
         else{
-          console.log(index);
           value.order = index + prev.order; 
           return value
         }
