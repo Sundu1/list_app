@@ -6,11 +6,11 @@ import React, {
   Children,
 } from "react";
 import { useParams } from "react-router-dom";
-import { UserContext } from "../components/LoginProvider";
+import { LoginProvider, UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
 
-import { BsArrowReturnRight, BsFillDatabaseFill } from "react-icons/bs";
+import { BsArrowReturnRight, BsFillDatabaseFill, BsFillTrainLightrailFrontFill } from "react-icons/bs";
 import { GiDustCloud, GiHamburgerMenu } from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
@@ -127,6 +127,7 @@ const Design = () => {
   // const [columnValue, setcolumnValue] = useState("");
 
   const [savedColumns, setSavedColumns] = useState([]);
+  const [newArr, setNewArr] = useState({})
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -602,15 +603,11 @@ const Design = () => {
       return;
 
     // Swap Order
-    if (e.target.className == "container-wrapper" && e.target.children[0]) {
-      const newEle = matchAndGet(jsonValue.elements, dragValueTest);
+    const swapOrderIndex = (drageValue, target) =>{
+      const newEle = matchAndGet(jsonValue.elements, drageValue);
 
       if (newEle == null) return;
-
-      const parentEle = matchAndGet(
-        jsonValue.elements,
-        e.target.children[0].id
-      );
+      const parentEle = matchAndGet(jsonValue.elements, target.id);
 
       const newState1 = matchAndUpdate(
         { id: "order", value: parentEle.order },
@@ -624,6 +621,18 @@ const Design = () => {
         newState1
       );
 
+      return newState2
+    }
+
+    if (e.target.className == "container-wrapper" && e.target.children[0]) {
+
+      const newState2 = swapOrderIndex(dragValueTest, e.target.children[0])
+      setJsonValue({ elements: newState2 });
+      return;
+    }
+
+    if(e.target.dataset.type == "container"){
+      const newState2 = swapOrderIndex(dragValueTest, e.target);
       setJsonValue({ elements: newState2 });
       return;
     }
@@ -892,6 +901,26 @@ const Design = () => {
     column_1.classList.toggle("hidden");
   };
 
+  const matchAndUpdateChildren = (obj, targetId, newChildren) => {
+    if (Array.isArray(obj)) {
+      return obj.map((value) => {
+        if (value.id == targetId) {
+          return {
+            ...value,
+            children: newChildren,
+          };
+        }
+
+        return {
+          ...value,
+          children: Array.isArray(value.children)
+            ? matchAndUpdateChildren(value.children, targetId, newChildren)
+            : null,
+        };
+      });
+    }
+  };
+
   const updateColumnValues = (e) => {
     const selectedContainer = matchAndGet(
       jsonValue.elements,
@@ -900,12 +929,6 @@ const Design = () => {
 
     if (e.target.id && e.target.value == "default") {
       const columnArr = selectedContainer.children
-        .map((value, i) => {
-          if (i != 0) {
-            return value;
-          }
-        })
-        .filter((value) => value != undefined);
 
       setSavedColumns((old) => ({
         ...old,
@@ -923,30 +946,23 @@ const Design = () => {
         values: { ...old.values, [e.target.id]: e.target.value },
       }));
 
-      // match update children
-      const matchAndUpdateChildren = (obj, targetId) => {
-        if (Array.isArray(obj)) {
-          return obj.map((value) => {
-            if (value.id == targetId) {
-              return {
-                ...value,
-                children: [value.children[0]],
-              };
-            }
-            return {
-              ...value,
-              children: Array.isArray(value.children)
-                ? matchAndUpdateChildren(value.children, targetId)
-                : null,
-            };
-          });
+      const fistColumn = cloneObject(columnArr[0]); 
+
+      let testArr = []
+      for (const value of columnArr){
+        for (const ele of value.children){
+          testArr.push(ele)
         }
-      };
+      }
+
+      fistColumn.children = testArr;
 
       const defaultColumn = matchAndUpdateChildren(
         newState,
-        changeJson.values.id
+        changeJson.values.id,
+        [fistColumn]
       );
+
       setJsonValue({ elements: defaultColumn });
       return;
     }
@@ -985,10 +1001,10 @@ const Design = () => {
         setColumnsCount(columnsCount + 1);
         setJsonValue({ elements: addedElement });
       } else {
-        const newValues = matchAndAdd(
+        const newValues = matchAndUpdateChildren(
           jsonValue.elements,
           changeJson.values.id,
-          ...savedColumns[changeJson.values.id]
+          savedColumns[changeJson.values.id]
         );
 
         const newState = matchAndUpdate(e.target, changeJson.values, newValues);
