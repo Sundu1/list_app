@@ -10,7 +10,11 @@ import { LoginProvider, UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
 
-import { BsArrowReturnRight, BsFillDatabaseFill, BsFillTrainLightrailFrontFill } from "react-icons/bs";
+import {
+  BsArrowReturnRight,
+  BsFillDatabaseFill,
+  BsFillTrainLightrailFrontFill,
+} from "react-icons/bs";
 import { GiDustCloud, GiHamburgerMenu } from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
@@ -127,7 +131,7 @@ const Design = () => {
   // const [columnValue, setcolumnValue] = useState("");
 
   const [savedColumns, setSavedColumns] = useState([]);
-  const [newArr, setNewArr] = useState({})
+  const [newArr, setNewArr] = useState({});
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -308,10 +312,7 @@ const Design = () => {
       }
 
       if (e.target.id == "text_element") {
-        const textEles = matchAndGet(
-          jsonValue.elements,
-          changeJson.values.id
-        );
+        const textEles = matchAndGet(jsonValue.elements, changeJson.values.id);
 
         const containerValue = matchAndGet(
           jsonValue.elements,
@@ -610,7 +611,7 @@ const Design = () => {
       return;
 
     // Swap Order
-    const swapOrderIndex = (drageValue, target) =>{
+    const swapOrderIndex = (drageValue, target) => {
       const newEle = matchAndGet(jsonValue.elements, drageValue);
 
       if (newEle == null) return;
@@ -628,46 +629,75 @@ const Design = () => {
         newState1
       );
 
-      return newState2
-    }
+      return newState2;
+    };
 
-    const insertIntoArray = (dragValue, targetValue) =>{
-      const containers  = matchAndGet(jsonValue.elements, "Page").children
-      const prev = matchAndGet(jsonValue.elements, targetValue.id);
-      const next = matchAndGet(jsonValue.elements, dragValue)
+    const insertIntoArray = (dragValue, targetValue) => {
+      const containers = matchAndGet(jsonValue.elements, "Page").children;
+      const target = matchAndGet(jsonValue.elements, targetValue.id);
 
-      if(prev.order < next.order){
-        console.log(prev.order, next.order);
-      }
+      const key = matchAndGet(jsonValue.elements, dragValue).order;
+      const prev = target.order;
+      const next = prev + 1;
 
-      const newContainers = containers.map((value, index) =>{
-        if(value.id == next.id){
-          value.order = prev.order + 1
-          return value
+      const newContainers = containers.map((value, index) => {
+        const newValue = cloneObject(value);
+
+        if (value.order == key && key < prev) {
+          newValue.order = next - 1;
+          return newValue;
         }
-         if (value.id == prev.id){
-          return value
+        if (value.order == next && key < prev) {
+          return newValue;
         }
-        else{
-          value.order = index + prev.order; 
-          return value
+        if (value.order > key && value.order < next && key < prev) {
+          newValue.order = value.order - 1;
+          return newValue;
         }
-      })
-      
-      console.log("containers", containers);
-      console.log("newContainers", newContainers);
-    }
+        if (value.order <= key && key < prev) {
+          return newValue;
+        }
+        if (value.order > next && key < prev) {
+          return newValue;
+        }
+
+        // key > prev
+        if (value.order == key && key > prev) {
+          newValue.order = next;
+          return newValue;
+        }
+        if (value.order >= next && key > prev) {
+          newValue.order = value.order + 1;
+          return newValue;
+        }
+        if (value.order < next && key > prev) {
+          return newValue;
+        }
+      });
+
+      console.log(newContainers);
+      return newContainers;
+    };
 
     if (e.target.className == "container-wrapper" && e.target.children[0]) {
-      // const newState2 = swapOrderIndex(dragValueTest, e.target.children[0])
-      // setJsonValue({ elements: newState2 });
-      const newState2 = insertIntoArray(dragValueTest, e.target.children[0]);
+      const newChildren = insertIntoArray(dragValueTest, e.target.children[0]);
+      const newState1 = matchAndUpdateChildren(
+        jsonValue.elements,
+        "Page",
+        newChildren
+      );
+      setJsonValue({ elements: newState1 });
       return;
     }
 
-    if(e.target.dataset.type == "container"){
-      const newState2 = swapOrderIndex(dragValueTest, e.target);
-      setJsonValue({ elements: newState2 });
+    if (e.target.dataset.type == "container") {
+      const newChildren = insertIntoArray(dragValueTest, e.target);
+      const newState1 = matchAndUpdateChildren(
+        jsonValue.elements,
+        "Page",
+        newChildren
+      );
+      setJsonValue({ elements: newState1 });
       return;
     }
 
@@ -962,7 +992,7 @@ const Design = () => {
     );
 
     if (e.target.id && e.target.value == "default") {
-      const columnArr = selectedContainer.children
+      const columnArr = selectedContainer.children;
 
       setSavedColumns((old) => ({
         ...old,
@@ -980,12 +1010,12 @@ const Design = () => {
         values: { ...old.values, [e.target.id]: e.target.value },
       }));
 
-      const fistColumn = cloneObject(columnArr[0]); 
+      const fistColumn = cloneObject(columnArr[0]);
 
-      let testArr = []
-      for (const value of columnArr){
-        for (const ele of value.children){
-          testArr.push(ele)
+      let testArr = [];
+      for (const value of columnArr) {
+        for (const ele of value.children) {
+          testArr.push(ele);
         }
       }
 
