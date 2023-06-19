@@ -308,6 +308,11 @@ const Design = () => {
       }
 
       if (e.target.id == "text_element") {
+        const textEles = matchAndGet(
+          jsonValue.elements,
+          changeJson.values.id
+        );
+
         const containerValue = matchAndGet(
           jsonValue.elements,
           changeJson.values.id
@@ -317,6 +322,7 @@ const Design = () => {
           parent: containerValue ? `${containerValue.children[0].id}` : null,
           type: "text",
           id: `text-${newCount}`,
+          order: newCount,
           wordBreak: "",
           text_color: "",
           text_size: "",
@@ -341,6 +347,7 @@ const Design = () => {
           parent: `${containerValue.children[0].id}`,
           type: "image",
           id: `image-${newCount}`,
+          order: newCount,
           url: "",
           children: [],
         });
@@ -624,10 +631,34 @@ const Design = () => {
       return newState2
     }
 
-    if (e.target.className == "container-wrapper" && e.target.children[0]) {
+    const insertIntoArray = (dragValue, targetValue) =>{
+      const containers  = matchAndGet(jsonValue.elements, "Page").children
+      const prev = matchAndGet(jsonValue.elements, targetValue.id);
+      const next = matchAndGet(jsonValue.elements, dragValue)
 
-      const newState2 = swapOrderIndex(dragValueTest, e.target.children[0])
-      setJsonValue({ elements: newState2 });
+      const newContainers = containers.map((value, index) =>{
+        if(value.id == next.id){
+          value.order = prev.order + 1
+          return value
+        } 
+         if (value.id == prev.id){
+          return value
+        }
+        else{
+          console.log(index);
+          value.order = index + prev.order; 
+          return value
+        }
+      })
+      
+      console.log("containers", containers);
+      console.log("newContainers", newContainers);
+    }
+
+    if (e.target.className == "container-wrapper" && e.target.children[0]) {
+      // const newState2 = swapOrderIndex(dragValueTest, e.target.children[0])
+      // setJsonValue({ elements: newState2 });
+      const newState2 = insertIntoArray(dragValueTest, e.target.children[0]);
       return;
     }
 
