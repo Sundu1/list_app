@@ -130,8 +130,8 @@ const Design = () => {
   // const [columnValue, setcolumnValue] = useState("");
 
   const [savedColumns, setSavedColumns] = useState([]);
-  
-  const [ctrlDown, setCtrlDown] = useState(false)
+
+  const [ctrlDown, setCtrlDown] = useState(false);
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -319,7 +319,10 @@ const Design = () => {
           jsonValue.elements,
           changeJson.values.id
         );
-        const parentId = containerValue.type == "container" ? containerValue.children[0].id : containerValue.id
+        const parentId =
+          containerValue.type == "container"
+            ? containerValue.children[0].id
+            : containerValue.id;
 
         newElement = new Object({
           parent: parentId,
@@ -338,18 +341,16 @@ const Design = () => {
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
       }
 
-      if (
-        e.target.id == "img_element"
-      ) {
+      if (e.target.id == "img_element") {
         const containerValue = matchAndGet(
           jsonValue.elements,
           changeJson.values.id
         );
 
         const parentId =
-                  containerValue.type == "container"
-                    ? containerValue.children[0].id
-                    : containerValue.id;
+          containerValue.type == "container"
+            ? containerValue.children[0].id
+            : containerValue.id;
 
         newElement = new Object({
           parent: parentId,
@@ -608,7 +609,7 @@ const Design = () => {
 
     if (
       // changeJson.values.id == "Page" ||
-      e.target.id == "Background" 
+      e.target.id == "Background"
     )
       return;
 
@@ -622,7 +623,7 @@ const Design = () => {
 
       const newContainers = containers.map((value, index) => {
         const newValue = cloneObject(value);
-        
+
         if (value.order == key && key < prev) {
           newValue.order = next - 1;
           return newValue;
@@ -646,41 +647,46 @@ const Design = () => {
           newValue.order = next;
           return newValue;
         }
-        if (value.order >= next && 
-            key > prev && 
-            value.order < containers.length &&  
-            key != next && 
-            value.order < key) {
-          if(value.order + 1 >= containers.length && key < containers.length){
-            return newValue
+        if (
+          value.order >= next &&
+          key > prev &&
+          value.order < containers.length &&
+          key != next &&
+          value.order < key
+        ) {
+          if (value.order + 1 >= containers.length && key < containers.length) {
+            return newValue;
           }
           newValue.order = value.order + 1;
           return newValue;
-        } 
-        return newValue
+        }
+        return newValue;
       });
 
-  //  function hasDuplicates(array) {
-  //    return new Set(array).size !== array.length;
-  //  }
-      
-  //     console.log(
-  //       "len =",
-  //       containers.length,
-  //       "key = ",
-  //       key,
-  //       "prev = ",
-  //       prev,
-  //       "next = ",
-  //       next,
-  //       newContainers.map((con) => con.order),
-  //       hasDuplicates(newContainers.map((con) => con.order))
-  //     );
+      //  function hasDuplicates(array) {
+      //    return new Set(array).size !== array.length;
+      //  }
+
+      //     console.log(
+      //       "len =",
+      //       containers.length,
+      //       "key = ",
+      //       key,
+      //       "prev = ",
+      //       prev,
+      //       "next = ",
+      //       next,
+      //       newContainers.map((con) => con.order),
+      //       hasDuplicates(newContainers.map((con) => con.order))
+      //     );
       return newContainers;
     };
 
-
-    if (e.target.className == "container-wrapper" && e.target.children[0] && dragValueTest != "") {
+    if (
+      e.target.className == "container-wrapper" &&
+      e.target.children[0] &&
+      dragValueTest != ""
+    ) {
       const newChildren = insertIntoArray(dragValueTest, e.target.children[0]);
       const newState1 = matchAndUpdateChildren(
         jsonValue.elements,
@@ -951,20 +957,20 @@ const Design = () => {
     uploadImageRef.current.click();
   };
 
-  const handleColumnsButton = (e) => {
-    if (
-      !e.target.parentElement.id.includes("column") ||
-      e.target.parentElement.id.includes("values")
-    )
-      return;
+  // const handleColumnsButton = (e) => {
+  //   if (
+  //     !e.target.parentElement.id.includes("column") ||
+  //     e.target.parentElement.id.includes("values")
+  //   )
+  //     return;
 
-    const text = new String("#" + e.target.parentElement.id);
-    const text_1 = new String("#" + e.target.parentElement.id + "_values");
-    const column = document.querySelector(text);
-    const column_1 = document.querySelector(text_1);
-    column.classList.toggle("column_expanded");
-    column_1.classList.toggle("hidden");
-  };
+  //   const text = new String("#" + e.target.parentElement.id);
+  //   const text_1 = new String("#" + e.target.parentElement.id + "_values");
+  //   const column = document.querySelector(text);
+  //   const column_1 = document.querySelector(text_1);
+  //   column.classList.toggle("column_expanded");
+  //   column_1.classList.toggle("hidden");
+  // };
 
   const matchAndUpdateChildren = (obj, targetId, newChildren) => {
     if (Array.isArray(obj)) {
@@ -1064,7 +1070,7 @@ const Design = () => {
           );
         }
 
-        const newChangeJson = matchAndGet(addedElement, changeJson.values.id)
+        const newChangeJson = matchAndGet(addedElement, changeJson.values.id);
         setColumnsCount(columnsCount + 1);
         setJsonValue({ elements: addedElement });
         setChangeJson((old) => ({ ...old, values: newChangeJson }));
@@ -1098,36 +1104,33 @@ const Design = () => {
   const handleScroll = () => {
     if (document.querySelector("#Background")) {
       const bg = document.querySelector("#Background");
-
-      const change = new Object({
-        id: "Background",
-      });
-
-      const target = new Object({
-        id: "scroll_top",
-        value: bg.scrollTop,
-      });
-
       setScrollValue(bg.scrollTop);
     }
   };
 
-  document.addEventListener("keydown", (e) =>{
-    if(e.key == "Delete" && changeJson.values && changeJson.values.id){
-      if(changeJson.values.type == "page" || changeJson.values.type == "background") return 
-      const deletedState = matchAndDelete(jsonValue.elements, changeJson.values);
-      setJsonValue({elements: deletedState})
+  document.addEventListener("keydown", (e) => {
+    if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
+      if (
+        changeJson.values.type == "page" ||
+        changeJson.values.type == "background"
+      )
+        return;
+      const deletedState = matchAndDelete(
+        jsonValue.elements,
+        changeJson.values
+      );
+      setJsonValue({ elements: deletedState });
       setChangeJson({
-          name: undefined,
-          values: {},
-        })
+        name: undefined,
+        values: {},
+      });
     }
 
-    if(e.key == "Control") setCtrlDown(true)
+    if (e.key == "Control") setCtrlDown(true);
     if (ctrlDown && e.key == "v") {
       console.log("yes", e.key);
     }
-  })
+  });
 
   return (
     <div>
@@ -1229,21 +1232,13 @@ const Design = () => {
                     {changeJson.values.children.map((column) => {
                       return (
                         <div
-                          id="first_column"
-                          className=""
-                          onClick={handleColumnsButton}
+                          key={column.id}
+                          id={column.id}
+                          className="h-[100px]"
+                          // onClick={handleColumnsButton}
                         >
                           <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
                             {column.id}
-                          </div>
-                          <div id="first_column_values" className="hidden">
-                            <div className="flex">
-                              <div className="ml-2 pr-3">Width</div>
-                              <input
-                                type="number"
-                                className="bg-[rgba(71,73,88,.475)] w-[50px] px-2 rounded"
-                              />
-                            </div>
                           </div>
                         </div>
                       );
