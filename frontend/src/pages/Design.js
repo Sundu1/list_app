@@ -40,7 +40,6 @@ const Design = () => {
   const [isAddElement, setIsAddElement] = useState(false);
 
   const [scrollValue, setScrollValue] = useState(0);
-
   const [dragValue, setDragValue] = useState("");
 
   const [jsonValue, setJsonValue] = useState({
@@ -131,7 +130,8 @@ const Design = () => {
   // const [columnValue, setcolumnValue] = useState("");
 
   const [savedColumns, setSavedColumns] = useState([]);
-  const [newArr, setNewArr] = useState({});
+  
+  const [ctrlDown, setCtrlDown] = useState(false)
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -296,6 +296,7 @@ const Design = () => {
               type: "container-column",
               id: `column-${columnsCount}`,
               isActive: false,
+              usecolumnasaplaceholder: false,
               children: [],
             },
           ],
@@ -312,40 +313,46 @@ const Design = () => {
       }
 
       if (e.target.id == "text_element") {
-        const textEles = matchAndGet(jsonValue.elements, changeJson.values.id);
+        // const textEles = matchAndGet(jsonValue.elements, changeJson.values.id);
 
         const containerValue = matchAndGet(
           jsonValue.elements,
           changeJson.values.id
         );
+        const parentId = containerValue.type == "container" ? containerValue.children[0].id : containerValue.id
 
         newElement = new Object({
-          parent: containerValue ? `${containerValue.children[0].id}` : null,
+          parent: parentId,
           type: "text",
           id: `text-${newCount}`,
           order: newCount,
           wordBreak: "",
           text_color: "",
-          text_size: "",
+          text_size: "15",
           text_fontfamily: "",
           text_value: "put your text here",
+          text_align: "center",
           children: [],
         });
 
-        addedElement = matchAndAdd(
-          jsonValue.elements,
-          containerValue.children[0].id,
-          newElement
-        );
+        addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
       }
-      if (e.target.id == "img_element") {
+
+      if (
+        e.target.id == "img_element"
+      ) {
         const containerValue = matchAndGet(
           jsonValue.elements,
           changeJson.values.id
         );
 
+        const parentId =
+                  containerValue.type == "container"
+                    ? containerValue.children[0].id
+                    : containerValue.id;
+
         newElement = new Object({
-          parent: `${containerValue.children[0].id}`,
+          parent: parentId,
           type: "image",
           id: `image-${newCount}`,
           order: newCount,
@@ -353,11 +360,7 @@ const Design = () => {
           children: [],
         });
 
-        addedElement = matchAndAdd(
-          jsonValue.elements,
-          containerValue.children[0].id,
-          newElement
-        );
+        addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
       }
 
       if (newElement !== null) {
@@ -521,7 +524,6 @@ const Design = () => {
   };
 
   // Begin testing new thing
-
   function cloneObject(obj) {
     if (obj == null || typeof obj != "object") return obj;
     const copy = obj.constructor();
@@ -606,31 +608,9 @@ const Design = () => {
 
     if (
       // changeJson.values.id == "Page" ||
-      e.target.id == "Background"
+      e.target.id == "Background" 
     )
       return;
-
-    // Swap Order
-    const swapOrderIndex = (drageValue, target) => {
-      const newEle = matchAndGet(jsonValue.elements, drageValue);
-
-      if (newEle == null) return;
-      const parentEle = matchAndGet(jsonValue.elements, target.id);
-
-      const newState1 = matchAndUpdate(
-        { id: "order", value: parentEle.order },
-        newEle,
-        jsonValue.elements
-      );
-
-      const newState2 = matchAndUpdate(
-        { id: "order", value: newEle.order },
-        parentEle,
-        newState1
-      );
-
-      return newState2;
-    };
 
     const insertIntoArray = (dragValue, targetValue) => {
       const containers = matchAndGet(jsonValue.elements, "Page").children;
@@ -642,7 +622,7 @@ const Design = () => {
 
       const newContainers = containers.map((value, index) => {
         const newValue = cloneObject(value);
-
+        
         if (value.order == key && key < prev) {
           newValue.order = next - 1;
           return newValue;
@@ -666,20 +646,41 @@ const Design = () => {
           newValue.order = next;
           return newValue;
         }
-        if (value.order >= next && key > prev) {
+        if (value.order >= next && 
+            key > prev && 
+            value.order < containers.length &&  
+            key != next && 
+            value.order < key) {
+          if(value.order + 1 >= containers.length && key < containers.length){
+            return newValue
+          }
           newValue.order = value.order + 1;
           return newValue;
-        }
-        if (value.order < next && key > prev) {
-          return newValue;
-        }
+        } 
+        return newValue
       });
 
-      console.log(newContainers);
+  //  function hasDuplicates(array) {
+  //    return new Set(array).size !== array.length;
+  //  }
+      
+  //     console.log(
+  //       "len =",
+  //       containers.length,
+  //       "key = ",
+  //       key,
+  //       "prev = ",
+  //       prev,
+  //       "next = ",
+  //       next,
+  //       newContainers.map((con) => con.order),
+  //       hasDuplicates(newContainers.map((con) => con.order))
+  //     );
       return newContainers;
     };
 
-    if (e.target.className == "container-wrapper" && e.target.children[0]) {
+
+    if (e.target.className == "container-wrapper" && e.target.children[0] && dragValueTest != "") {
       const newChildren = insertIntoArray(dragValueTest, e.target.children[0]);
       const newState1 = matchAndUpdateChildren(
         jsonValue.elements,
@@ -690,7 +691,7 @@ const Design = () => {
       return;
     }
 
-    if (e.target.dataset.type == "container") {
+    if (e.target.dataset.type == "container" && dragValueTest != "") {
       const newChildren = insertIntoArray(dragValueTest, e.target);
       const newState1 = matchAndUpdateChildren(
         jsonValue.elements,
@@ -1051,6 +1052,7 @@ const Design = () => {
           newElement = new Object({
             type: "container-column",
             id: `column-${columnsCount}`,
+            usecolumnasaplaceholder: false,
             isActive: false,
             children: [],
           });
@@ -1062,8 +1064,10 @@ const Design = () => {
           );
         }
 
+        const newChangeJson = matchAndGet(addedElement, changeJson.values.id)
         setColumnsCount(columnsCount + 1);
         setJsonValue({ elements: addedElement });
+        setChangeJson((old) => ({ ...old, values: newChangeJson }));
       } else {
         const newValues = matchAndUpdateChildren(
           jsonValue.elements,
@@ -1107,6 +1111,23 @@ const Design = () => {
       setScrollValue(bg.scrollTop);
     }
   };
+
+  document.addEventListener("keydown", (e) =>{
+    if(e.key == "Delete" && changeJson.values && changeJson.values.id){
+      if(changeJson.values.type == "page" || changeJson.values.type == "background") return 
+      const deletedState = matchAndDelete(jsonValue.elements, changeJson.values);
+      setJsonValue({elements: deletedState})
+      setChangeJson({
+          name: undefined,
+          values: {},
+        })
+    }
+
+    if(e.key == "Control") setCtrlDown(true)
+    if (ctrlDown && e.key == "v") {
+      console.log("yes", e.key);
+    }
+  })
 
   return (
     <div>
@@ -1205,33 +1226,46 @@ const Design = () => {
                 <div className="">
                   <div className="pb-3">Columns</div>
                   <div className="border-2 rounded-lg border-[rgba(255,255,255,.075)]">
-                    <div
-                      id="first_column"
-                      className=""
-                      onClick={handleColumnsButton}
-                    >
-                      <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
-                        First
-                      </div>
-                      <div id="first_column_values" className="hidden">
-                        <div className="flex">
-                          <div className="ml-2 pr-3">Width</div>
-                          <input
-                            type="number"
-                            className="bg-[rgba(71,73,88,.475)] w-[50px] px-2 rounded"
-                          />
+                    {changeJson.values.children.map((column) => {
+                      return (
+                        <div
+                          id="first_column"
+                          className=""
+                          onClick={handleColumnsButton}
+                        >
+                          <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
+                            {column.id}
+                          </div>
+                          <div id="first_column_values" className="hidden">
+                            <div className="flex">
+                              <div className="ml-2 pr-3">Width</div>
+                              <input
+                                type="number"
+                                className="bg-[rgba(71,73,88,.475)] w-[50px] px-2 rounded"
+                              />
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                    <div
-                      id="first_second"
-                      className=""
-                      onClick={handleColumnsButton}
-                    >
-                      <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
-                        Second
-                      </div>
-                    </div>
+                      );
+                    })}
+                  </div>
+                  <div className="py-3 flex">
+                    {/* <input
+                      id="usecolumnasaplaceholder"
+                      type="checkbox"
+                      className="mr-3"
+                      checked={changeJson.values.usecolumnasaplaceholder}
+                      onChange={(e) =>
+                        updateElementsValues({
+                          target: {
+                            id: "usecolumnasaplaceholder",
+                            value: e.target.checked,
+                          },
+                        })
+                      }
+                    /> */}
+                    <input type="checkbox" className="mr-3" />
+                    <div>Use column as a placeholder</div>
                   </div>
                   <div
                     className="mt-2 border-2 border-white p-2 rounded-lg text-center 
@@ -1658,6 +1692,25 @@ const Design = () => {
                 value={changeJson.values.text_value}
                 onChange={updateElementsValues}
               />
+            </div>
+            <div className="pt-5 px-10">
+              <div className="pb-2">Align Text</div>
+              <select
+                id="text_align"
+                className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
+                value={changeJson.values.text_align}
+                onChange={updateElementsValues}
+              >
+                <option value="left" className="bg-[rgba(53,54,66,.9825)]">
+                  Left
+                </option>
+                <option value="center" className="bg-[rgba(53,54,66,.9825)]">
+                  Center
+                </option>
+                <option value="right" className="bg-[rgba(53,54,66,.9825)]">
+                  Right
+                </option>
+              </select>
             </div>
             <div className="pt-5 px-10">
               <div className="pb-2">Font type</div>
