@@ -1,4 +1,4 @@
-import quickSort from './quickSort'
+import quickSort from "./quickSort";
 
 const HtmlRenderFunction = (
   htmlValue,
@@ -10,7 +10,6 @@ const HtmlRenderFunction = (
   handleDragEnd,
   handleScroll
 ) => {
-
   let newDiv;
 
   const traverse_dfs = (jsonvalues, parentelement) => {
@@ -71,9 +70,7 @@ const HtmlRenderFunction = (
           if (element.background_style_type == "color") {
             const background_type = element.background_style_type;
             newDiv.style.background =
-              element.background_style_types[
-                background_type
-              ].background_color;
+              element.background_style_types[background_type].background_color;
           }
 
           if (element.background_style_type == "gradient") {
@@ -94,10 +91,11 @@ const HtmlRenderFunction = (
             let radial_gradient = "";
             element.background_style_types[background_type].gradient.forEach(
               (value) => {
-                if(value.color != ""){
-                    radial_gradient += `${hexToRgb(value.color, value.transparency)} ${
-                      value.percentage
-                    }%,`;
+                if (value.color != "") {
+                  radial_gradient += `${hexToRgb(
+                    value.color,
+                    value.transparency
+                  )} ${value.percentage}%,`;
                 }
               }
             );
@@ -114,14 +112,15 @@ const HtmlRenderFunction = (
                 : hex;
             }
 
-            radial_gradient = radial_gradient != "" ? radial_gradient.slice(0, -1) : "";
+            radial_gradient =
+              radial_gradient != "" ? radial_gradient.slice(0, -1) : "";
             console.log(radial_gradient);
-            
-            if (radial_gradient == ""){
+
+            if (radial_gradient == "") {
               newDiv.style.backgroundImage =
                 element.background_style_types[background_type].background_url;
               newDiv.style.backgroundSize = "100% 100%";
-            }else{
+            } else {
               newDiv.style.backgroundImage = `
               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
               ${element.background_style_types[background_type].background_url}`;
@@ -171,21 +170,21 @@ const HtmlRenderFunction = (
 
         if (element.type == "container-column") {
           newDiv.style.padding = "5px";
-          newDiv.style.width = '100%'
+          newDiv.style.width = "100%";
 
           if (element.children.length == 0) {
-            if(element.isSpace){
+            if (element.isSpace) {
               newDiv.removeAttribute("draggable");
-              newDiv.setAttribute("dropdownzone", false)
+              newDiv.setAttribute("dropdownzone", false);
               newDiv.style.padding = "10px";
             }
-            if(!element.isSpace){
-            newDiv.removeAttribute("draggable");
-            newDiv.style.background = "#a4a4a4";
-            newDiv.style.textAlign = "center";
-            newDiv.style.color = "white";
-            newDiv.innerText = "Empty";
-            newDiv.style.padding = "10px";
+            if (!element.isSpace) {
+              newDiv.removeAttribute("draggable");
+              newDiv.style.background = "#a4a4a4";
+              newDiv.style.textAlign = "center";
+              newDiv.style.color = "white";
+              newDiv.innerText = "Empty";
+              newDiv.style.padding = "10px";
             }
           }
         }
@@ -208,7 +207,7 @@ const HtmlRenderFunction = (
           containerWrapperDiv.style.justifyContent = element.text_align;
           containerWrapperDiv.style.alignItems = "center";
           containerWrapperDiv.style.padding = "10px";
-          containerWrapperDiv.style.width = '100%'
+          containerWrapperDiv.style.width = "100%";
 
           containerWrapperDiv.setAttribute("draggable", true);
           containerWrapperDiv.addEventListener("dragstart", handleDragStart);
@@ -230,6 +229,66 @@ const HtmlRenderFunction = (
             if (
               e.target.id == element.id ||
               e.target.className == "text-wrapper"
+            ) {
+              setChangeJson({ values: element });
+            }
+          };
+
+          if (element.isActive) {
+            containerWrapperDiv.style.border = "solid 3px";
+            containerWrapperDiv.style.borderColor = "#33ada9";
+          }
+
+          containerWrapperDiv.appendChild(newDiv);
+          parent.appendChild(containerWrapperDiv);
+          if (element.children == null || element.children.length == 0) return;
+          traverse_dfs(element.children, element.id);
+          return;
+        }
+
+        if (element.type == "button") {
+          newDiv.setAttribute("data-type", "button");
+          newDiv.removeAttribute("draggable");
+
+          newDiv.classList.add("button");
+          newDiv.style.height = "30px";
+          newDiv.style.width = "80px";
+          newDiv.style.background = "white";
+          newDiv.style.borderRadius = "5%";
+          newDiv.style.cursor = "pointer";
+          newDiv.style.textAlign = "center";
+          newDiv.style.paddingTop = "2px";
+          newDiv.innerText = element.text;
+
+          const containerWrapperDiv = document.createElement("div");
+          containerWrapperDiv.id = element.id;
+          containerWrapperDiv.classList.add("button-wrapper");
+          containerWrapperDiv.style.display = "flex";
+          containerWrapperDiv.style.justifyContent = element.text_align;
+          containerWrapperDiv.style.alignItems = "center";
+          containerWrapperDiv.style.padding = "10px";
+          containerWrapperDiv.style.width = "100%";
+
+          containerWrapperDiv.setAttribute("draggable", true);
+          containerWrapperDiv.addEventListener("dragstart", handleDragStart);
+          containerWrapperDiv.addEventListener("dragstart", () => {
+            containerWrapperDiv.style.height =
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .height + "px";
+            containerWrapperDiv.style.width =
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .width + "px";
+          });
+
+          containerWrapperDiv.addEventListener("dragover", handleDragOver);
+          containerWrapperDiv.addEventListener("drop", handleDrop);
+          containerWrapperDiv.addEventListener("drag", handleDragging);
+          containerWrapperDiv.addEventListener("dragend", handleDragEnd);
+
+          containerWrapperDiv.onpointerdown = function (e) {
+            if (
+              e.target.id == element.id ||
+              e.target.className == "button-wrapper"
             ) {
               setChangeJson({ values: element });
             }

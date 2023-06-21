@@ -15,7 +15,11 @@ import {
   BsFillDatabaseFill,
   BsFillTrainLightrailFrontFill,
 } from "react-icons/bs";
-import { GiDustCloud, GiHamburgerMenu, GiJamesBondAperture } from "react-icons/gi";
+import {
+  GiDustCloud,
+  GiHamburgerMenu,
+  GiJamesBondAperture,
+} from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
@@ -90,7 +94,7 @@ const Design = () => {
             ],
           },
         },
-        
+
         isActive: false,
         children: [
           {
@@ -132,7 +136,10 @@ const Design = () => {
 
   const [savedColumns, setSavedColumns] = useState([]);
   const [ctrlDown, setCtrlDown] = useState(false);
-  const [columnDropDown, setColumnDropDown] = useState({name: "", isActive: false})
+  const [columnDropDown, setColumnDropDown] = useState({
+    name: "",
+    isActive: false,
+  });
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -178,7 +185,10 @@ const Design = () => {
 
   useEffect(() => {
     if (colorUpdate.target) {
-      if (changeJson.values.type == "background" || changeJson.values.type == "container") {
+      if (
+        changeJson.values.type == "background" ||
+        changeJson.values.type == "container"
+      ) {
         updateBackGround(colorUpdate);
       } else {
         updateElementsValues(colorUpdate);
@@ -393,6 +403,29 @@ const Design = () => {
           id: `image-${newCount}`,
           order: newCount,
           url: "",
+          children: [],
+        });
+
+        addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
+      }
+
+      if (e.target.id == "button_element") {
+        const containerValue = matchAndGet(
+          jsonValue.elements,
+          changeJson.values.id
+        );
+
+        const parentId =
+          containerValue.type == "container"
+            ? containerValue.children[0].id
+            : containerValue.id;
+
+        newElement = new Object({
+          parent: parentId,
+          type: "button",
+          id: `button-${newCount}`,
+          text: "Button",
+          order: newCount,
           children: [],
         });
 
@@ -679,7 +712,7 @@ const Design = () => {
     // Update Parent
     const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
 
-    if (e.target.getAttribute("dropdownzone")) return 
+    if (e.target.getAttribute("dropdownzone")) return;
     if (hoverElement == null) return;
     if (hoverElement.type == "text" || hoverElement.type == "image") {
       const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
@@ -781,9 +814,9 @@ const Design = () => {
                 };
               }
               const value_id = e.target.id.includes("color")
-              ? "color"
-              : e.target.id;
-              
+                ? "color"
+                : e.target.id;
+
               if (value_id) {
                 const updated_array = _child.background_style_types[
                   _child.background_style_type
@@ -931,8 +964,8 @@ const Design = () => {
     if (e.target.id && e.target.value == "default") {
       const columnArr = selectedContainer.children;
 
-      const isEmtpy = columnArr.some(column => column.children.length > 0)
-      if (isEmtpy){
+      const isEmtpy = columnArr.some((column) => column.children.length > 0);
+      if (isEmtpy) {
         setSavedColumns((old) => ({
           ...old,
           [changeJson.values.id]: [...columnArr],
@@ -1021,7 +1054,7 @@ const Design = () => {
     }
   };
 
-  const updateColumnValues = (e, columnId) =>{
+  const updateColumnValues = (e, columnId) => {
     const newState = matchAndUpdate(
       e.target,
       { id: columnId },
@@ -1031,7 +1064,7 @@ const Design = () => {
     const newChangeJson = matchAndGet(newState, changeJson.values.id);
     setJsonValue({ elements: newState });
     setChangeJson((old) => ({ ...old, values: newChangeJson }));
-  }
+  };
 
   const updateImageValue = (e) => {
     const img_url = e.target.files
@@ -1086,18 +1119,19 @@ const Design = () => {
     4: "Fifth",
   });
 
-  const handleColumnDropDown = (e) =>{
-    if (columnDropDown.name == e.target.getAttribute("name") && columnDropDown.isActive){
-      setColumnDropDown({name: "", isActive: false})
-      return
+  const handleColumnDropDown = (e) => {
+    if (
+      columnDropDown.name == e.target.getAttribute("name") &&
+      columnDropDown.isActive
+    ) {
+      setColumnDropDown({ name: "", isActive: false });
+      return;
     }
     setColumnDropDown({
       name: e.target.getAttribute("name"),
       isActive: true,
     });
-  }
-  
-  console.log("jsonValue", jsonValue.elements);
+  };
 
   return (
     <div>
@@ -1320,77 +1354,77 @@ const Design = () => {
                 ""
               )}
               {changeJson.values.background_style_type == "image" ? (
-                  <div className="h-full">
-                    <div
-                      className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
-                      onClick={handleUploadImage}
-                    >
-                      <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
-                        Upload
-                      </div>
+                <div className="h-full">
+                  <div
+                    className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
+                    onClick={handleUploadImage}
+                  >
+                    <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
+                      Upload
                     </div>
-                    <input
-                      onChange={updateBackGround}
-                      ref={uploadImageRef}
-                      id="background_url"
-                      type="file"
-                      className="hidden"
-                    />
-                    {changeJson.values.background_style_types[
-                      changeJson.values.background_style_type
-                    ].gradient.map((value, i) => {
-                      return (
-                        <div key={i} className="pt-5 h-full">
-                          <div className="pb-2 flex">
-                            <div
-                              className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                              style={{
-                                background: value.color,
-                              }}
-                            ></div>
-                            <div className="">Color</div>
-                          </div>
-                          <div className="flex">
-                            <div
-                              onClick={handleColorPickerInput}
-                              className="w-[115px]"
-                            >
-                              <input
-                                data-indexvalue={i}
-                                id={`color-${i}`}
-                                className="input_color_picker"
-                                value={value.color}
-                                onChange={updateBackGround}
-                              />
-                              <div
-                                className={
-                                  inputColorPicker.id == `color-${i}`
-                                    ? "color_picker active"
-                                    : "color_picker"
-                                }
-                              >
-                                <PickColor
-                                  setColorUpdate={setColorUpdate}
-                                  changeJson={changeJson}
-                                  type={"color"}
-                                  idValue={i}
-                                />
-                              </div>
-                            </div>
+                  </div>
+                  <input
+                    onChange={updateBackGround}
+                    ref={uploadImageRef}
+                    id="background_url"
+                    type="file"
+                    className="hidden"
+                  />
+                  {changeJson.values.background_style_types[
+                    changeJson.values.background_style_type
+                  ].gradient.map((value, i) => {
+                    return (
+                      <div key={i} className="pt-5 h-full">
+                        <div className="pb-2 flex">
+                          <div
+                            className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                            style={{
+                              background: value.color,
+                            }}
+                          ></div>
+                          <div className="">Color</div>
+                        </div>
+                        <div className="flex">
+                          <div
+                            onClick={handleColorPickerInput}
+                            className="w-[115px]"
+                          >
                             <input
                               data-indexvalue={i}
-                              max={100}
-                              id="percentage"
-                              type="range"
-                              className="ml-2 slider_style w-[100px]"
-                              value={value.percentage}
+                              id={`color-${i}`}
+                              className="input_color_picker"
+                              value={value.color}
                               onChange={updateBackGround}
                             />
+                            <div
+                              className={
+                                inputColorPicker.id == `color-${i}`
+                                  ? "color_picker active"
+                                  : "color_picker"
+                              }
+                            >
+                              <PickColor
+                                setColorUpdate={setColorUpdate}
+                                changeJson={changeJson}
+                                type={"color"}
+                                idValue={i}
+                              />
+                            </div>
                           </div>
+                          <input
+                            data-indexvalue={i}
+                            max={100}
+                            id="percentage"
+                            type="range"
+                            className="ml-2 slider_style w-[100px]"
+                            value={value.percentage}
+                            onChange={updateBackGround}
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
+                      </div>
+                    );
+                  })}
+                </div>
               ) : (
                 ""
               )}
@@ -1776,6 +1810,7 @@ const Design = () => {
               <div className="pb-2">Text</div>
               <textarea
                 contentEditable
+                rows={1}
                 suppressContentEditableWarning={true}
                 id="text_value"
                 className="bg-[rgba(71,73,88,.475)] p-2 rounded-lg inline-block w-full"
@@ -2408,12 +2443,14 @@ const Design = () => {
             >
               Image
             </div>
+            <div
+              className="design_new_elements"
+              id="button_element"
+              onClick={addNewElement}
+            >
+              Buttons
+            </div>
             <div className="design_new_elements">Icons</div>
-            <div 
-                 className="design_new_elements"
-                 id="buttton_element"
-                 onClick={addNewElement}
-                 >Buttons</div>
           </div>
         </div>
       ) : null}

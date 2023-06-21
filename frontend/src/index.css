@@ -9,11 +9,14 @@
 }
 
 @layer components {
+  .button:hover {
+    transform: scale(1.2);
+  }
+
   .column_expanded {
     height: 100px;
   }
-
-  .color_picker {
+  button .color_picker {
     display: none;
   }
   .color_picker.active {
