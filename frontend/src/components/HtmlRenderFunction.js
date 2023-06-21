@@ -92,18 +92,19 @@ const HtmlRenderFunction = (
             const background_type = element.background_style_type;
 
             let radial_gradient = "";
-            element.background_style_types[
-              background_type
-            ].gradient.forEach((value) => {
-              radial_gradient += `${hexToRgb(
-                value.color,
-                value.transparency
-              )} ${value.percentage}%,`;
-            });
+            element.background_style_types[background_type].gradient.forEach(
+              (value) => {
+                radial_gradient += `${hexToRgb(
+                  value.color,
+                  value.transparency
+                )} ${value.percentage}%,`;
+              }
+            );
 
             function hexToRgb(hex, transparency) {
-              var result =
-                /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+              var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(
+                hex
+              );
               return result
                 ? `rgb(${parseInt(result[1], 16)},${parseInt(
                     result[2],
@@ -113,12 +114,9 @@ const HtmlRenderFunction = (
             }
 
             radial_gradient = radial_gradient.slice(0, -1);
-            newDiv.style.backgroundSize = "cover";
-            newDiv.style.backgroundPosition =
-              "center center, 0% 0%, center center";
             newDiv.style.backgroundImage = `
-      radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
-      ${element.background_style_types[background_type].background_url}`;
+               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
+               ${element.background_style_types[background_type].background_url}`;
           }
           // background ending
 

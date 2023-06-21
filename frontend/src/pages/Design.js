@@ -75,18 +75,22 @@ const Design = () => {
               {
                 color: " rgba(135, 92, 161, 0.79)",
                 percentage: "21",
+                transparency: "0.79",
               },
               {
                 color: "rgba(66, 95, 199, 0.69)",
                 percentage: "68",
+                transparency: "0.69",
               },
               {
                 color: "rgba(0, 148, 255, 0.54)",
                 percentage: "100",
+                transparency: "0.54",
               },
             ],
           },
         },
+        
         isActive: false,
         children: [
           {
@@ -307,17 +311,17 @@ const Design = () => {
               background_url: "",
               gradient: [
                 {
-                  color: "rgba(2,0,36,1)",
-                  percentage: "0",
+                  color: " rgba(135, 92, 161, 0.79)",
+                  percentage: "21",
                   transparency: "0.79",
                 },
                 {
-                  color: "rgba(67,9,121,1)",
-                  percentage: "35",
+                  color: "rgba(66, 95, 199, 0.69)",
+                  percentage: "68",
                   transparency: "0.69",
                 },
                 {
-                  color: "rgba(0,212,255,1)",
+                  color: "rgba(0, 148, 255, 0.54)",
                   percentage: "100",
                   transparency: "0.54",
                 },
