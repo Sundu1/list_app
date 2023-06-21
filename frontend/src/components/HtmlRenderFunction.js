@@ -8,9 +8,7 @@ const HtmlRenderFunction = (
   handleDrop,
   handleDragging,
   handleDragEnd,
-
-  handleScroll,
-  scrollValue
+  handleScroll
 ) => {
 
   let newDiv;
@@ -69,6 +67,61 @@ const HtmlRenderFunction = (
           newDiv.style.justifyContent = "center";
           newDiv.style.alignItems = "center";
 
+          // background begginig
+          if (element.background_style_type == "color") {
+            const background_type = element.background_style_type;
+            newDiv.style.background =
+              element.background_style_types[
+                background_type
+              ].background_color;
+          }
+
+          if (element.background_style_type == "gradient") {
+            const gradient_value = element.background_style_types[
+              element.background_style_type
+            ]
+              .map((value) => {
+                return `${value.color} ${value.percentage}%`;
+              })
+              .join(",");
+
+            newDiv.style.background = `linear-gradient(90deg, ${gradient_value})`;
+          }
+
+          if (element.background_style_type == "image") {
+            const background_type = element.background_style_type;
+
+            let radial_gradient = "";
+            element.background_style_types[
+              background_type
+            ].gradient.forEach((value) => {
+              radial_gradient += `${hexToRgb(
+                value.color,
+                value.transparency
+              )} ${value.percentage}%,`;
+            });
+
+            function hexToRgb(hex, transparency) {
+              var result =
+                /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+              return result
+                ? `rgb(${parseInt(result[1], 16)},${parseInt(
+                    result[2],
+                    16
+                  )},${parseInt(result[3], 16)},${transparency})`
+                : hex;
+            }
+
+            radial_gradient = radial_gradient.slice(0, -1);
+            newDiv.style.backgroundSize = "cover";
+            newDiv.style.backgroundPosition =
+              "center center, 0% 0%, center center";
+            newDiv.style.backgroundImage = `
+      radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
+      ${element.background_style_types[background_type].background_url}`;
+          }
+          // background ending
+
           const containerWrapperDiv = document.createElement("div");
           containerWrapperDiv.classList.add("container-wrapper");
           containerWrapperDiv.style.display = "flex";
@@ -113,12 +166,19 @@ const HtmlRenderFunction = (
           newDiv.style.width = '100%'
 
           if (element.children.length == 0) {
+            if(element.isSpace){
+              newDiv.removeAttribute("draggable");
+              newDiv.setAttribute("dropdownzone", false)
+              newDiv.style.padding = "10px";
+            }
+            if(!element.isSpace){
             newDiv.removeAttribute("draggable");
             newDiv.style.background = "#a4a4a4";
-            newDiv.style.textAlign = "center"
-            newDiv.style.color = 'white'
-            newDiv.innerHTML = "Empty";
+            newDiv.style.textAlign = "center";
+            newDiv.style.color = "white";
+            newDiv.innerText = "Empty";
             newDiv.style.padding = "10px";
+            }
           }
         }
 
@@ -302,12 +362,10 @@ const HtmlRenderFunction = (
             }
 
             radial_gradient = radial_gradient.slice(0, -1);
-            newDiv.style.backgroundSize = "cover";
-            newDiv.style.backgroundPosition =
-              "center center, 0% 0%, center center";
             newDiv.style.backgroundImage = `
                radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
                ${element.background_style_types[background_type].background_url}`;
+
           }
         }
 

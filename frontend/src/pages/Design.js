@@ -15,7 +15,7 @@ import {
   BsFillDatabaseFill,
   BsFillTrainLightrailFrontFill,
 } from "react-icons/bs";
-import { GiDustCloud, GiHamburgerMenu } from "react-icons/gi";
+import { GiDustCloud, GiHamburgerMenu, GiJamesBondAperture } from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
@@ -56,15 +56,15 @@ const Design = () => {
           color: { background_color: "white" },
           gradient: [
             {
-              color: "rgba(2,0,36,1)",
-              percentage: "0",
+              color: " rgba(135, 92, 161, 0.79)",
+              percentage: "21",
             },
             {
-              color: "rgba(67,9,121,1)",
-              percentage: "35",
+              color: "rgba(66, 95, 199, 0.69)",
+              percentage: "68",
             },
             {
-              color: "rgba(0,212,255,1)",
+              color: "rgba(0, 148, 255, 0.54)",
               percentage: "100",
             },
           ],
@@ -73,19 +73,16 @@ const Design = () => {
             background_url: "",
             gradient: [
               {
-                color: "rgba(2,0,36,1)",
-                percentage: "0",
-                transparency: "0.79",
+                color: " rgba(135, 92, 161, 0.79)",
+                percentage: "21",
               },
               {
-                color: "rgba(67,9,121,1)",
-                percentage: "35",
-                transparency: "0.69",
+                color: "rgba(66, 95, 199, 0.69)",
+                percentage: "68",
               },
               {
-                color: "rgba(0,212,255,1)",
+                color: "rgba(0, 148, 255, 0.54)",
                 percentage: "100",
-                transparency: "0.54",
               },
             ],
           },
@@ -130,8 +127,8 @@ const Design = () => {
   // const [columnValue, setcolumnValue] = useState("");
 
   const [savedColumns, setSavedColumns] = useState([]);
-
   const [ctrlDown, setCtrlDown] = useState(false);
+  const [columnDropDown, setColumnDropDown] = useState({name: "", isActive: false})
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -163,9 +160,6 @@ const Design = () => {
       handleDrop,
       handleDragging,
       handleDragEnd,
-      // handleMouseDown,
-      // handleMouseMove
-      // handleMouseUp
       handleScroll,
       scrollValue
     );
@@ -180,7 +174,7 @@ const Design = () => {
 
   useEffect(() => {
     if (colorUpdate.target) {
-      if (changeJson.values.type == "background") {
+      if (changeJson.values.type == "background" || changeJson.values.type == "container") {
         updateBackGround(colorUpdate);
       } else {
         updateElementsValues(colorUpdate);
@@ -291,12 +285,51 @@ const Design = () => {
           border_style: "solid",
           border_size: "2",
           border_roundness: "0",
+          background_style_type: "color",
+          background_style_types: {
+            color: { background_color: "white" },
+            gradient: [
+              {
+                color: "rgba(2,0,36,1)",
+                percentage: "0",
+              },
+              {
+                color: "rgba(67,9,121,1)",
+                percentage: "35",
+              },
+              {
+                color: "rgba(0,212,255,1)",
+                percentage: "100",
+              },
+            ],
+            image: {
+              background_color: "white",
+              background_url: "",
+              gradient: [
+                {
+                  color: "rgba(2,0,36,1)",
+                  percentage: "0",
+                  transparency: "0.79",
+                },
+                {
+                  color: "rgba(67,9,121,1)",
+                  percentage: "35",
+                  transparency: "0.69",
+                },
+                {
+                  color: "rgba(0,212,255,1)",
+                  percentage: "100",
+                  transparency: "0.54",
+                },
+              ],
+            },
+          },
           children: [
             {
               type: "container-column",
               id: `column-${columnsCount}`,
               isActive: false,
-              usecolumnasaplaceholder: false,
+              isSpace: false,
               children: [],
             },
           ],
@@ -313,8 +346,6 @@ const Design = () => {
       }
 
       if (e.target.id == "text_element") {
-        // const textEles = matchAndGet(jsonValue.elements, changeJson.values.id);
-
         const containerValue = matchAndGet(
           jsonValue.elements,
           changeJson.values.id
@@ -398,23 +429,6 @@ const Design = () => {
   // };
 
   const clickedElement = (e) => {
-    // if (placeholderDiv.id) {
-    //   const deleteState = matchAndDelete(jsonValue.elements, placeholderDiv);
-    //   setJsonValue({ elements: deleteState });
-    // }
-    // if (moved) {
-    //   setMoved(false);
-    //   setIsDragging(false);
-    //   setRefresh(!refresh);
-    //   // if (placeholderDiv.id) {
-    //   //   const deleteState = matchAndDelete(jsonValue.elements, placeholderDiv);
-    //   //   setJsonValue({ elements: deleteState });
-    //   // }
-    //   return;
-    // }
-
-    // setIsDragging(false);
-
     if (jsonValue && jsonValue.elements) {
       const matchAndUpdate = (changeJson, children) => {
         return children.map((_child) => {
@@ -533,56 +547,6 @@ const Design = () => {
     }
     return copy;
   }
-
-  //   const currentDiv = document.querySelector(`#${e.target.id}`);
-  //   const x_value = e.clientX - currentDiv.offsetLeft;
-  //   const y_value = e.clientY - currentDiv.offsetTop;
-
-  //   setOffset({ x: x_value, y: y_value });
-
-  //   const matchedValue = matchAndGet(jsonValue.elements, e.target.id);
-  //   const test = matchAndGetIndex(jsonValue.elements, e.target.id);
-
-  //   if (
-  //     matchedValue == undefined ||
-  //     matchedValue.type == "background" ||
-  //     matchedValue.type == "page"
-  //   )
-  //     return;
-
-  //   // setRefresh(!refresh);
-  //   setIsDragging(true);
-  //   setMovableDiv(matchedValue);
-  //   setRefresh(!refresh);
-
-  //   // placeholder div
-  //   const placeholderDiv = cloneObject(matchedValue);
-
-  //   placeholderDiv.type = "placeholder";
-  //   placeholderDiv.id = "placeholder";
-  //   placeholderDiv.offsetLeft = currentDiv.offsetLeft;
-  //   placeholderDiv.offsetTop = currentDiv.offsetTop;
-
-  //   const parentDiv = currentDiv.parentElement.id;
-  //   const newState = matchAndAdd(jsonValue.elements, parentDiv, placeholderDiv);
-
-  //   setPlaceholderDiv(placeholderDiv);
-  //   setRefresh(!refresh);
-  //   setJsonValue({ elements: newState });
-  // };
-
-  // const handleMouseMove = (e) => {
-  //   if (!isDragging) return;
-  //   const currentDiv = document.querySelector(`#${movableDiv.id}`);
-
-  //   currentDiv.style.position = "absolute";
-  //   currentDiv.style.zIndex = "999";
-  //   currentDiv.style.left = e.clientX - offset.x + "px";
-  //   currentDiv.style.top = e.clientY - offset.y + "px";
-  //   setMoved(true);
-
-  //   const allContainer = document.querySelectorAll("[data-type='container']");
-  // };
 
   let dragValueTest = "";
 
@@ -711,6 +675,7 @@ const Design = () => {
     // Update Parent
     const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
 
+    if (e.target.getAttribute("dropdownzone")) return 
     if (hoverElement == null) return;
     if (hoverElement.type == "text" || hoverElement.type == "image") {
       const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
@@ -727,29 +692,6 @@ const Design = () => {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-
-    // if (e.target.className == "container-wrapper" && e.target.children[0]) {
-    //   const newEle = matchAndGet(jsonValue.elements, dragValueTest);
-
-    //   if (newEle == null) return;
-
-    //   const parentEle = matchAndGet(
-    //     jsonValue.elements,
-    //     e.target.children[0].id
-    //   );
-
-    //   const newState1 = matchAndUpdate(
-    //     { id: "order", value: parentEle.order },
-    //     newEle,
-    //     jsonValue.elements
-    //   );
-
-    //   const newState2 = matchAndUpdate(
-    //     { id: "order", value: newEle.order },
-    //     parentEle,
-    //     newState1
-    //   );
-    // }
   };
 
   const handleDragEnd = (e) => {
@@ -834,12 +776,11 @@ const Design = () => {
                   },
                 };
               }
-
-              if (e.target.id == "color" || e.target.id == "percentage") {
-                const value_id = e.target.id.includes("color")
-                  ? "color"
-                  : e.target.id;
-
+              const value_id = e.target.id.includes("color")
+              ? "color"
+              : e.target.id;
+              
+              if (value_id) {
                 const updated_array = _child.background_style_types[
                   _child.background_style_type
                 ].gradient.map((value, i) => {
@@ -851,6 +792,8 @@ const Design = () => {
                   }
                   return { ...value };
                 });
+
+                console.log("updated_array", updated_array);
 
                 setChangeJson((old) => ({
                   ...old,
@@ -957,21 +900,6 @@ const Design = () => {
     uploadImageRef.current.click();
   };
 
-  // const handleColumnsButton = (e) => {
-  //   if (
-  //     !e.target.parentElement.id.includes("column") ||
-  //     e.target.parentElement.id.includes("values")
-  //   )
-  //     return;
-
-  //   const text = new String("#" + e.target.parentElement.id);
-  //   const text_1 = new String("#" + e.target.parentElement.id + "_values");
-  //   const column = document.querySelector(text);
-  //   const column_1 = document.querySelector(text_1);
-  //   column.classList.toggle("column_expanded");
-  //   column_1.classList.toggle("hidden");
-  // };
-
   const matchAndUpdateChildren = (obj, targetId, newChildren) => {
     if (Array.isArray(obj)) {
       return obj.map((value) => {
@@ -992,7 +920,7 @@ const Design = () => {
     }
   };
 
-  const updateColumnValues = (e) => {
+  const updateColumn = (e) => {
     const selectedContainer = matchAndGet(
       jsonValue.elements,
       changeJson.values.id
@@ -1001,11 +929,13 @@ const Design = () => {
     if (e.target.id && e.target.value == "default") {
       const columnArr = selectedContainer.children;
 
-      setSavedColumns((old) => ({
-        ...old,
-        [changeJson.values.id]: [...columnArr],
-      }));
-
+      const isEmtpy = columnArr.some(column => column.children.length > 0)
+      if (isEmtpy){
+        setSavedColumns((old) => ({
+          ...old,
+          [changeJson.values.id]: [...columnArr],
+        }));
+      }
       const newState = matchAndUpdate(
         e.target,
         changeJson.values,
@@ -1058,7 +988,7 @@ const Design = () => {
           newElement = new Object({
             type: "container-column",
             id: `column-${columnsCount}`,
-            usecolumnasaplaceholder: false,
+            isSpace: false,
             isActive: false,
             children: [],
           });
@@ -1082,10 +1012,24 @@ const Design = () => {
         );
 
         const newState = matchAndUpdate(e.target, changeJson.values, newValues);
+        const newChangeJson = matchAndGet(newState, changeJson.values.id);
         setJsonValue({ elements: newState });
+        setChangeJson((old) => ({ ...old, values: newChangeJson }));
       }
     }
   };
+
+  const updateColumnValues = (e, columnId) =>{
+    const newState = matchAndUpdate(
+      e.target,
+      { id: columnId },
+      jsonValue.elements
+    );
+
+    const newChangeJson = matchAndGet(newState, changeJson.values.id);
+    setJsonValue({ elements: newState });
+    setChangeJson((old) => ({ ...old, values: newChangeJson }));
+  }
 
   const updateImageValue = (e) => {
     const img_url = e.target.files
@@ -1132,6 +1076,25 @@ const Design = () => {
     }
   });
 
+  const columnNames = new Object({
+    0: "First",
+    1: "Second",
+    2: "Third",
+    3: "Fourth",
+    4: "Fifth",
+  });
+
+  const handleColumnDropDown = (e) =>{
+    if (columnDropDown.name == e.target.getAttribute("name") && columnDropDown.isActive){
+      setColumnDropDown({name: "", isActive: false})
+      return
+    }
+    setColumnDropDown({
+      name: e.target.getAttribute("name"),
+      isActive: true,
+    });
+  }
+  
   return (
     <div>
       <Navbar />
@@ -1212,7 +1175,7 @@ const Design = () => {
                   name="container-column"
                   className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
                   value={changeJson.values.display}
-                  onChange={updateColumnValues}
+                  onChange={updateColumn}
                 >
                   <option value="default" className="bg-[rgba(53,54,66,.9825)]">
                     Default
@@ -1223,44 +1186,57 @@ const Design = () => {
                 </select>
               </div>
             </div>
-
             <div className="pt-5 px-10">
               {changeJson.values.display == "columns" ? (
-                <div className="">
+                <div className="pb-5">
                   <div className="pb-3">Columns</div>
                   <div className="border-2 rounded-lg border-[rgba(255,255,255,.075)]">
-                    {changeJson.values.children.map((column) => {
+                    {changeJson.values.children.map((column, index) => {
                       return (
                         <div
+                          className="border-b-2 border-[rgba(255,255,255,.075)] 
+                     "
                           key={column.id}
-                          id={column.id}
-                          className="h-[100px]"
-                          // onClick={handleColumnsButton}
                         >
-                          <div className="p-2 border-b-2 border-[rgba(255,255,255,.075)]">
-                            {column.id}
+                          <div
+                            className="p-2 hover:cursor-pointer 
+                                          hover:bg-[rgba(71,73,88,.475)]"
+                            name={column.id}
+                            onClick={handleColumnDropDown}
+                          >
+                            {columnNames[index]}
+                          </div>
+                          <div
+                            className={
+                              columnDropDown.name == column.id &&
+                              columnDropDown.isActive
+                                ? "px-2"
+                                : "hidden"
+                            }
+                          >
+                            <div className="py-3 flex">
+                              <input
+                                type="checkbox"
+                                className="mr-3"
+                                checked={column.isSpace}
+                                onChange={(e) =>
+                                  updateColumnValues(
+                                    {
+                                      target: {
+                                        id: "isSpace",
+                                        value: e.target.checked,
+                                      },
+                                    },
+                                    column.id
+                                  )
+                                }
+                              />
+                              <div>Use column as a placeholder</div>
+                            </div>
                           </div>
                         </div>
                       );
                     })}
-                  </div>
-                  <div className="py-3 flex">
-                    {/* <input
-                      id="usecolumnasaplaceholder"
-                      type="checkbox"
-                      className="mr-3"
-                      checked={changeJson.values.usecolumnasaplaceholder}
-                      onChange={(e) =>
-                        updateElementsValues({
-                          target: {
-                            id: "usecolumnasaplaceholder",
-                            value: e.target.checked,
-                          },
-                        })
-                      }
-                    /> */}
-                    <input type="checkbox" className="mr-3" />
-                    <div>Use column as a placeholder</div>
                   </div>
                   <div
                     className="mt-2 border-2 border-white p-2 rounded-lg text-center 
@@ -1270,12 +1246,156 @@ const Design = () => {
                   </div>
                 </div>
               ) : null}
-              <div className="py-2 flex">
+
+              <div className="pb-5">
+                Background Type
+                <div className="pt-2">
+                  <select
+                    id="background_style_type"
+                    className="bg-[rgba(71,73,88,.475)] rounded w-full p-2"
+                    value={changeJson.values.background_style_type}
+                    onChange={updateElementsValues}
+                  >
+                    <option value="color" className="bg-[rgba(53,54,66,.9825)]">
+                      Color
+                    </option>
+                    <option
+                      value="gradient"
+                      className="bg-[rgba(53,54,66,.9825)]"
+                    >
+                      Gradient
+                    </option>
+                    <option value="image" className="bg-[rgba(53,54,66,.9825)]">
+                      Image
+                    </option>
+                  </select>
+                </div>
+              </div>
+              {changeJson.values.background_style_type == "color" ? (
+                <div className="">
+                  <div className="pb-2 flex">
+                    <div
+                      className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                      style={{
+                        background:
+                          changeJson.values.background_style_types[
+                            changeJson.values.background_style_type
+                          ].background_color,
+                      }}
+                    ></div>
+                    <div className="">Color</div>
+                  </div>
+                  <div onClick={handleColorPickerInput}>
+                    <input
+                      data-name={changeJson.values.id}
+                      id="background_color"
+                      className="input_color_picker"
+                      value={
+                        changeJson.values.background_style_types[
+                          changeJson.values.background_style_type
+                        ].background_color
+                      }
+                      onChange={updateBackGround}
+                    />
+                    <div
+                      className={
+                        inputColorPicker.name == changeJson.values.id &&
+                        inputColorPicker.id == "background_color"
+                          ? "color_picker active"
+                          : "color_picker"
+                      }
+                    >
+                      <PickColor
+                        setColorUpdate={setColorUpdate}
+                        changeJson={changeJson}
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                ""
+              )}
+              {changeJson.values.background_style_type == "image" ? (
+                  <div className="h-full">
+                    <div
+                      className="h-[150px] w-full bg-black flex justify-center items-center rounded-lg"
+                      onClick={handleUploadImage}
+                    >
+                      <div className="p-3 bg-[#33ada9] font-bold rounded-lg text-[15px] hover:cursor-pointer w-[50%] text-center">
+                        Upload
+                      </div>
+                    </div>
+                    <input
+                      onChange={updateBackGround}
+                      ref={uploadImageRef}
+                      id="background_url"
+                      type="file"
+                      className="hidden"
+                    />
+                    {changeJson.values.background_style_types[
+                      changeJson.values.background_style_type
+                    ].gradient.map((value, i) => {
+                      return (
+                        <div key={i} className="pt-5 h-full">
+                          <div className="pb-2 flex">
+                            <div
+                              className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
+                              style={{
+                                background: value.color,
+                              }}
+                            ></div>
+                            <div className="">Color</div>
+                          </div>
+                          <div className="flex">
+                            <div
+                              onClick={handleColorPickerInput}
+                              className="w-[115px]"
+                            >
+                              <input
+                                data-indexvalue={i}
+                                id={`color-${i}`}
+                                className="input_color_picker"
+                                value={value.color}
+                                onChange={updateBackGround}
+                              />
+                              <div
+                                className={
+                                  inputColorPicker.id == `color-${i}`
+                                    ? "color_picker active"
+                                    : "color_picker"
+                                }
+                              >
+                                <PickColor
+                                  setColorUpdate={setColorUpdate}
+                                  changeJson={changeJson}
+                                  type={"color"}
+                                  idValue={i}
+                                />
+                              </div>
+                            </div>
+                            <input
+                              data-indexvalue={i}
+                              max={100}
+                              id="percentage"
+                              type="range"
+                              className="ml-2 slider_style w-[100px]"
+                              value={value.percentage}
+                              onChange={updateBackGround}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+              ) : (
+                ""
+              )}
+              {/* <div className="py-2 flex">
                 <div
                   className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
                   style={{ background: changeJson.values.background_color }}
                 ></div>
-                <div className="">Background</div>
+                <div className="">Background Color</div>
               </div>
               <div onClick={handleColorPickerInput}>
                 <input
@@ -1298,7 +1418,7 @@ const Design = () => {
                     changeJson={changeJson}
                   />
                 </div>
-              </div>
+              </div> */}
             </div>
             <div className="px-10 pt-3 absolute">
               {/* <div className="flex justify-between pt-3 pb-1">
@@ -1879,7 +1999,6 @@ const Design = () => {
                             value={value.color}
                             onChange={updateBackGround}
                           />
-
                           <div
                             className={
                               inputColorPicker.id == `color-${i}`
