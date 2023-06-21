@@ -55,6 +55,17 @@ const PickColor = ({ setColorUpdate, changeJson, type, idValue }) => {
             },
           });
         }
+        if (type == "color") {
+          background_color_values = new Object({
+            target: {
+              id: "color",
+              dataset: {
+                indexvalue: idValue,
+              },
+              value: hex,
+            },
+          });
+        }
       }
 
       if (changeJson.values && changeJson.values.type == "text") {

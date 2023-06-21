@@ -797,8 +797,6 @@ const Design = () => {
                   return { ...value };
                 });
 
-                console.log("updated_array", updated_array);
-
                 setChangeJson((old) => ({
                   ...old,
                   values: {
@@ -1099,6 +1097,8 @@ const Design = () => {
     });
   }
   
+  console.log("jsonValue", jsonValue.elements);
+
   return (
     <div>
       <Navbar />
@@ -1394,35 +1394,6 @@ const Design = () => {
               ) : (
                 ""
               )}
-              {/* <div className="py-2 flex">
-                <div
-                  className="w-[20px] h-[20px] mr-2 mt-1 border-2 border-black rounded-sm"
-                  style={{ background: changeJson.values.background_color }}
-                ></div>
-                <div className="">Background Color</div>
-              </div>
-              <div onClick={handleColorPickerInput}>
-                <input
-                  data-name={changeJson.values.id}
-                  id="background_color"
-                  className="input_color_picker"
-                  value={changeJson.values.background_color}
-                  onChange={updateElementsValues}
-                />
-                <div
-                  className={
-                    inputColorPicker.name == changeJson.values.id &&
-                    inputColorPicker.id == "background_color"
-                      ? "color_picker active"
-                      : "color_picker"
-                  }
-                >
-                  <PickColor
-                    setColorUpdate={setColorUpdate}
-                    changeJson={changeJson}
-                  />
-                </div>
-              </div> */}
             </div>
             <div className="px-10 pt-3 absolute">
               {/* <div className="flex justify-between pt-3 pb-1">
@@ -2438,11 +2409,14 @@ const Design = () => {
               Image
             </div>
             <div className="design_new_elements">Icons</div>
-            <div className="design_new_elements">Buttons</div>
+            <div 
+                 className="design_new_elements"
+                 id="buttton_element"
+                 onClick={addNewElement}
+                 >Buttons</div>
           </div>
         </div>
       ) : null}
-
       {/* New element Ending here */}
     </div>
   );

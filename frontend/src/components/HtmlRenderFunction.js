@@ -94,10 +94,11 @@ const HtmlRenderFunction = (
             let radial_gradient = "";
             element.background_style_types[background_type].gradient.forEach(
               (value) => {
-                radial_gradient += `${hexToRgb(
-                  value.color,
-                  value.transparency
-                )} ${value.percentage}%,`;
+                if(value.color != ""){
+                    radial_gradient += `${hexToRgb(value.color, value.transparency)} ${
+                      value.percentage
+                    }%,`;
+                }
               }
             );
 
@@ -113,10 +114,19 @@ const HtmlRenderFunction = (
                 : hex;
             }
 
-            radial_gradient = radial_gradient.slice(0, -1);
-            newDiv.style.backgroundImage = `
-               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
-               ${element.background_style_types[background_type].background_url}`;
+            radial_gradient = radial_gradient != "" ? radial_gradient.slice(0, -1) : "";
+            console.log(radial_gradient);
+            
+            if (radial_gradient == ""){
+              newDiv.style.backgroundImage =
+                element.background_style_types[background_type].background_url;
+              newDiv.style.backgroundSize = "100% 100%";
+            }else{
+              newDiv.style.backgroundImage = `
+              radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
+              ${element.background_style_types[background_type].background_url}`;
+              newDiv.style.backgroundSize = "100% 100%";
+            }
           }
           // background ending
 
@@ -363,7 +373,7 @@ const HtmlRenderFunction = (
             newDiv.style.backgroundImage = `
                radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
                ${element.background_style_types[background_type].background_url}`;
-
+            newDiv.style.backgroundSize = "100% 100%";
           }
         }
 
