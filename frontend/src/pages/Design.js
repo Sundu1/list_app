@@ -142,20 +142,76 @@ const Design = () => {
     isActive: false,
   });
 
+  const [testRender, setTestRender] = useState(1);
+
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
-
 
   // Icons
   const iconItems = [
     "ArrowDown",
     "ArrowLeft",
+    "ArrowRight",
     "Mail",
     "Phone",
     "SocialFacebook",
     "SocialInstagram",
     "SocialTiktok",
   ];
+
+  // document.addEventListener("keydown", (e) => {
+  //   if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
+  //     if (
+  //       changeJson.values.type == "page" ||
+  //       changeJson.values.type == "background"
+  //     )
+  //       return;
+  //     const deletedState = matchAndDelete(
+  //       jsonValue.elements,
+  //       changeJson.values
+  //     );
+
+  //     console.log("keydown delete");
+  //     setJsonValue({ elements: deletedState });
+  //     setChangeJson({
+  //       name: undefined,
+  //       values: {},
+  //     });
+  //   }
+  //   if (e.key == "Control") setCtrlDown(true);
+  //   if (ctrlDown && e.key == "v") {
+  //     console.log("yes", e.key);
+  //   }
+  // });
+
+  useEffect(()=>{
+    const deleteKeyDown = (e) =>{
+      if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
+      if (
+        changeJson.values.type == "page" ||
+        changeJson.values.type == "background"
+      )
+        return;
+      const deletedState = matchAndDelete(
+        jsonValue.elements,
+        changeJson.values
+      );
+
+      console.log("keydown delete");
+      setJsonValue({ elements: deletedState });
+      setChangeJson({
+        name: undefined,
+        values: {},
+      });
+    }
+    if (e.key == "Control") setCtrlDown(true);
+    if (ctrlDown && e.key == "v") {
+      console.log("yes", e.key);
+    }
+  } 
+  document.addEventListener("keydown", deleteKeyDown)
+    return() => document.removeEventListener("keydown", deleteKeyDown)
+  })
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
@@ -170,6 +226,7 @@ const Design = () => {
     };
 
     document.addEventListener("mousedown", checkIfClickedOutside);
+    console.log("useEffect addElement");
     return () => {
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
@@ -185,18 +242,22 @@ const Design = () => {
       handleDragging,
       handleDragEnd,
       handleScroll,
-      scrollValue
+      scrollValue,
+
+      handleDeleteKeyDown
     );
 
+    console.log("useEffect jsonValue");
     if (document.querySelector("#Background")) {
       const bg = document.querySelector("#Background");
+      console.log("test scrollValue");
       bg.scrollTo(scrollValue, scrollValue);
     }
-
     return () => {};
-  }, [jsonValue, refresh]);
+  }, [jsonValue]);
 
   useEffect(() => {
+    console.log("useEffect colorUpdate");
     if (colorUpdate.target) {
       if (
         changeJson.values.type == "background" ||
@@ -454,6 +515,42 @@ const Design = () => {
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
       }
 
+      if (e.target.id == "icon_element") {
+        const containerValue = matchAndGet(
+          jsonValue.elements,
+          changeJson.values.id
+        );
+
+        const parentId =
+          containerValue.type == "container"
+            ? containerValue.children[0].id
+            : containerValue.id;
+
+        newElement = new Object({
+          parent: parentId,
+          type: "icon-parent",
+          id: `icon-parent-${newCount}`,
+          order: newCount,
+          imgSize: "100",
+          children: [
+            {
+              parent: parentId,
+              type: "icon",
+              id: `icon-${newCount}`,
+              icon: "ArrowDown",
+              order: newCount,
+              children: [],
+            },
+          ],
+        });
+
+        addedElement = matchAndAdd(
+          jsonValue.elements,
+          parentId,
+          newElement
+        );
+      }
+
       if (newElement !== null) {
         setJsonValue({ elements: addedElement });
         setNewCount(newCount + 1);
@@ -496,6 +593,8 @@ const Design = () => {
                     : null,
               };
             }
+
+            // updating changeJson state
             setChangeJson((old) => ({
               ...old,
               values: { ...old.values, isActive: true },
@@ -929,12 +1028,12 @@ const Design = () => {
     }
   };
 
-  document.onmousedown = (e) => {
-    if (e.target.id == inputColorPicker.id || e.target.id == "canvas") {
-      return;
-    }
-    setInputColorPicker({});
-  };
+  // document.onmousedown = (e) => {
+  //   if (e.target.id == inputColorPicker.id || e.target.id == "canvas") {
+  //     return;
+  //   }
+  //   setInputColorPicker({});
+  // };
 
   const handleColorPickerInput = (e) => {
     if (e.target.id == "canvas" || e.target.id == inputColorPicker.id) {
@@ -1099,7 +1198,7 @@ const Design = () => {
     }
   };
 
-  document.addEventListener("keydown", (e) => {
+  const handleDeleteKeyDown = (e) => {
     if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
       if (
         changeJson.values.type == "page" ||
@@ -1110,18 +1209,18 @@ const Design = () => {
         jsonValue.elements,
         changeJson.values
       );
+      console.log("keydown delete");
       setJsonValue({ elements: deletedState });
       setChangeJson({
         name: undefined,
         values: {},
       });
     }
-
     if (e.key == "Control") setCtrlDown(true);
     if (ctrlDown && e.key == "v") {
       console.log("yes", e.key);
     }
-  });
+  };
 
   const columnNames = new Object({
     0: "First",
@@ -1145,7 +1244,7 @@ const Design = () => {
     });
   };
 
-  const handleButtonAdd = (e) =>{
+  const handleButtonAdd = (e) => {
     if (changeJson.values && changeJson.values.type == "button-parent") {
       const newEle = new Object({
         parent: changeJson.values.id,
@@ -1164,27 +1263,48 @@ const Design = () => {
         newEle
       );
 
-      const newChange = matchAndGet(newState, changeJson.values.id)
+      const newChange = matchAndGet(newState, changeJson.values.id);
 
       setJsonValue({ elements: newState });
-      setChangeJson(old => ({...old, values: newChange}))
+      setChangeJson((old) => ({ ...old, values: newChange }));
     }
-  }
 
-  const handleButtonDelete = (e) =>{
-    if (changeJson.values && changeJson.values.type == "button-parent") {
-      const deletedState = matchAndDelete(
+    if (changeJson.values && changeJson.values.type == "icon-parent") {
+      const newEle = new Object({
+        parent: changeJson.values.id,
+        type: "icon",
+        id: `icon-${newCount}`,
+        icon: "ArrowDown",
+        order: newCount,
+        children: [],
+      });
+      setNewCount(newCount + 1);
+
+      const newState = matchAndAdd(
         jsonValue.elements,
-        {id: e.target.getAttribute("name")}
+        changeJson.values.id,
+        newEle
       );
+
+      const newChange = matchAndGet(newState, changeJson.values.id);
+      setJsonValue({ elements: newState });
+      setChangeJson((old) => ({ ...old, values: newChange }));
+    }
+  };
+
+  const handleButtonDelete = (e) => {
+    if (changeJson.values && changeJson.values.type == "button-parent") {
+      const deletedState = matchAndDelete(jsonValue.elements, {
+        id: e.target.getAttribute("name"),
+      });
       const newChange = matchAndGet(deletedState, changeJson.values.id);
       setJsonValue({ elements: deletedState });
-      // setChangeJson((old) => ({ ...old, values: newChange }));
+      setChangeJson((old) => ({ ...old, values: newChange }));
     }
-  }
+  };
 
   const handleButtonDropDown = (e) => {
-    if (e.target.getAttribute("type") == "delete") return
+    if (e.target.getAttribute("type") == "delete") return;
 
     if (
       buttonDropDown.name == e.target.getAttribute("name") &&
@@ -1193,25 +1313,27 @@ const Design = () => {
       setButtonDropDown({ name: "", isActive: false });
       return;
     }
-    
+
     setButtonDropDown({
       name: e.target.getAttribute("name"),
       isActive: true,
     });
   };
 
-  const udpateButtonValues = (e) =>{
+  const udpateButtonValues = (e) => {
     const newState = matchAndUpdate(
       e.target,
-      {id: e.target.name},
+      { id: e.target.name },
       jsonValue.elements
     );
 
-    const newChange = matchAndGet(newState, changeJson.values.id)
+    const newChange = matchAndGet(newState, changeJson.values.id);
 
-    setJsonValue({elements: newState})
+    setJsonValue({ elements: newState });
     setChangeJson((old) => ({ ...old, values: newChange }));
-  }
+  };
+
+  console.log("jsonValue", jsonValue.elements);
 
   return (
     <div>
@@ -2522,10 +2644,9 @@ const Design = () => {
                           name={button.id}
                           onClick={handleButtonDelete}
                         >
-                        {
-                          changeJson.values.children.length > 1 ?
-                          <BsTrashFill className="pointer-events-none" /> : null
-                        }
+                          {changeJson.values.children.length > 1 ? (
+                            <BsTrashFill className="pointer-events-none" />
+                          ) : null}
                         </div>
                       </div>
                       <div
@@ -2589,6 +2710,103 @@ const Design = () => {
       )}
       {/* Button Container Ending */}
 
+      {/* Icon Container Beggining */}
+      {changeJson.values &&
+      changeJson.values.isActive &&
+      changeJson.values.type == "icon-parent" ? (
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-y-auto">
+          <div className="text-white pb-[100px]">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+              {changeJson.values.id}
+            </h1>
+            <div className="pt-5 px-10">
+              <div className="border-t-2 border-r-2 border-l-2 rounded-lg border-[rgba(255,255,255,.075)]">
+                {changeJson.values.children.map((icon) => {
+                  return (
+                    <div
+                      className="border-[rgba(255,255,255,.075)]"
+                      key={icon.id}
+                    >
+                      <div
+                        className="p-2 hover:cursor-pointer 
+                                  hover:bg-[rgba(71,73,88,.475)] 
+                                  border-b-2 border-[rgba(255,255,255,.075)] 
+                                  rounded flex justify-between"
+                        name={icon.id}
+                        onClick={handleButtonDropDown}
+                      >
+                        <div className="pointer-events-none"> {icon.icon} </div>
+                        <div
+                          type="delete"
+                          className="hover:scale-[1.1] pt-1 h-full"
+                          name={icon.id}
+                          onClick={handleButtonDelete}
+                        >
+                          {changeJson.values.children.length > 1 ? (
+                            <BsTrashFill className="pointer-events-none" />
+                          ) : null}
+                        </div>
+                      </div>
+                      <div
+                        className={
+                          buttonDropDown.name == icon.id &&
+                          buttonDropDown.isActive
+                            ? "px-2 border-b-2 border-[rgba(255,255,255,.075)] rounded"
+                            : "hidden"
+                        }
+                      >
+                        <div className="p-2">
+                          <h3 className="pb-2">Icon</h3>
+                          <select
+                            id="icon"
+                            className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
+                            name={icon.id}
+                            value={icon.icon}
+                            onChange={udpateButtonValues}
+                          >
+                            {iconItems.map((item) => {
+                              return (
+                                <option
+                                  key={item}
+                                  id="icon"
+                                  value={item}
+                                  className="bg-[rgba(53,54,66,.9825)]"
+                                >
+                                  {item}
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+                        <div className="p-2">
+                          <h3 className="pb-2">Size</h3>
+                          <input
+                            max={100}
+                            id="iconSize"
+                            type="range"
+                            className="slider_style pr-5"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div
+                className="mt-2 border-2 border-white p-2 rounded-lg text-center 
+                                hover:bg-[rgba(255,255,255,.075)] hover:cursor-pointer"
+                onClick={handleButtonAdd}
+              >
+                Add
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+      {/* Icon Container Ending */}
+
       {/* Edit modal Ends here*/}
 
       {/* New element Beginning here */}
@@ -2628,7 +2846,13 @@ const Design = () => {
             >
               Buttons
             </div>
-            <div className="design_new_elements">Icons</div>
+            <div
+              className="design_new_elements"
+              id="icon_element"
+              onClick={addNewElement}
+            >
+              Icons
+            </div>
           </div>
         </div>
       ) : null}

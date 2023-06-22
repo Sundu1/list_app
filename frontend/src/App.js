@@ -17,13 +17,13 @@ import {
 function App() {
   const [value, setValue] = useState({});
 
-  useEffect(() => {
-    setValue(
-      localStorage.getItem("user")
-        ? JSON.parse(localStorage.getItem("user"))
-        : {}
-    );
-  }, []);
+  // useEffect(() => {
+  //   setValue(
+  //     localStorage.getItem("user")
+  //       ? JSON.parse(localStorage.getItem("user"))
+  //       : {}
+  //   );
+  // }, []);
 
   return (
     <UserContext.Provider value={{ value, setValue }}>

@@ -9,10 +9,10 @@ const HtmlRenderFunction = (
   handleDrop,
   handleDragging,
   handleDragEnd,
-  handleScroll
+  handleScroll,
 ) => {
-  let newDiv;
 
+  let newDiv;
   const traverse_dfs = (jsonvalues, parentelement) => {
     if (typeof jsonvalues === "object") {
       const sortedArr = quickSort(jsonvalues);
@@ -115,7 +115,6 @@ const HtmlRenderFunction = (
 
             radial_gradient =
               radial_gradient != "" ? radial_gradient.slice(0, -1) : "";
-            console.log(radial_gradient);
 
             if (radial_gradient == "") {
               newDiv.style.backgroundImage =
@@ -311,7 +310,9 @@ const HtmlRenderFunction = (
           newDiv.removeAttribute("draggable");
 
           newDiv.style.display = "flex";
-          newDiv.style.justifyContent = "left";
+          newDiv.style.alignContent = 'space-between'
+          newDiv.style.flexWrap = "wrap"
+          newDiv.style.gap = "10px"
           newDiv.style.alignItems = "center";
           newDiv.style.padding = "10px";
           newDiv.style.width = "100%";
@@ -358,6 +359,94 @@ const HtmlRenderFunction = (
           containerWrapperDiv.appendChild(newDiv);
           parent.appendChild(containerWrapperDiv);
           if (element.children == null || element.children.length == 0) return;
+          traverse_dfs(element.children, element.id);
+          return;
+        }
+
+        if (element.type == "icon") {
+          newDiv.setAttribute("data-type", "icon");
+          newDiv.removeAttribute("draggable");
+
+          newDiv.classList.add("button");
+          const img = document.createElement("img");
+          img.src = icons[element.icon];
+
+          img.style.paddingTop = "2px";
+          img.style.paddingLeft = "5px";
+          img.style.height = parent.getAttribute("icon_size") + "px";
+          img.style.width = parent.getAttribute("icon_size") + "px";
+
+          newDiv.appendChild(img);
+          newDiv.style.marginRight = "5%";
+        }
+
+        if (element.type == "icon-parent") {
+          newDiv.setAttribute("data-type", "icon-parent");
+          newDiv.removeAttribute("draggable");
+
+          newDiv.setAttribute("img_size",element.imgSize)
+          newDiv.style.display = "flex";
+          newDiv.style.alignContent = "space-between";
+          newDiv.style.flexWrap = "wrap";
+          newDiv.style.gap = "10px";
+          newDiv.style.alignItems = "center";
+          newDiv.style.padding = "10px";
+          newDiv.style.width = "100%";
+
+          const containerWrapperDiv = document.createElement("div");
+          containerWrapperDiv.id = element.id + "-wrapper";
+          containerWrapperDiv.classList.add("icon-wrapper");
+          containerWrapperDiv.style.display = "flex";
+          containerWrapperDiv.style.justifyContent = element.text_align;
+          containerWrapperDiv.style.alignItems = "center";
+          containerWrapperDiv.style.padding = "10px";
+          containerWrapperDiv.style.width = "100%";
+
+          containerWrapperDiv.setAttribute("draggable", true);
+          containerWrapperDiv.addEventListener(
+            "dragstart",
+            handleDragStart
+          );
+          containerWrapperDiv.addEventListener("dragstart", () => {
+            containerWrapperDiv.style.height =
+              document
+                .querySelector(`#${element.id}`)
+                .getBoundingClientRect().height + "px";
+            containerWrapperDiv.style.width =
+              document
+                .querySelector(`#${element.id}`)
+                .getBoundingClientRect().width + "px";
+          });
+
+          containerWrapperDiv.addEventListener(
+            "dragover",
+            handleDragOver
+          );
+          containerWrapperDiv.addEventListener("drop", handleDrop);
+          containerWrapperDiv.addEventListener("drag", handleDragging);
+          containerWrapperDiv.addEventListener(
+            "dragend",
+            handleDragEnd
+          );
+
+          containerWrapperDiv.onpointerdown = function (e) {
+            if (
+              e.target.id == element.id ||
+              e.target.className == "icon-wrapper"
+            ) {
+              setChangeJson({ values: element });
+            }
+          };
+
+          if (element.isActive) {
+            containerWrapperDiv.style.border = "solid 3px";
+            containerWrapperDiv.style.borderColor = "#33ada9";
+          }
+
+          containerWrapperDiv.appendChild(newDiv);
+          parent.appendChild(containerWrapperDiv);
+          if (element.children == null || element.children.length == 0)
+            return;
           traverse_dfs(element.children, element.id);
           return;
         }
