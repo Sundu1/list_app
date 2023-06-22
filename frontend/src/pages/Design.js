@@ -141,6 +141,11 @@ const Design = () => {
     isActive: false,
   });
 
+  const [buttonDropDown, setButtonDropDown] = useState({
+    name: "",
+    isActive: false,
+  });
+
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -422,11 +427,19 @@ const Design = () => {
 
         newElement = new Object({
           parent: parentId,
-          type: "button",
-          id: `button-${newCount}`,
-          text: "Button",
+          type: "button-parent",
+          id: `button-parent-${newCount}`,
           order: newCount,
-          children: [],
+          children: [
+            {
+              parent: parentId,
+              type: "button",
+              id: `button-${newCount}`,
+              label: "Button",
+              order: newCount,
+              children: [],
+            },
+          ],
         });
 
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
@@ -1132,6 +1145,58 @@ const Design = () => {
       isActive: true,
     });
   };
+
+  const handleButtonAdd = (e) =>{
+    if (changeJson.values && changeJson.values.type == "button-parent") {
+      const newEle = new Object({
+        parent: changeJson.values.id,
+        type: "button",
+        id: `button-${newCount}`,
+        label: "Button",
+        order: newCount,
+        children: [],
+      });
+      setNewCount(newCount + 1);
+
+      const newState = matchAndAdd(
+        jsonValue.elements,
+        changeJson.values.id,
+        newEle
+      );
+
+      const newChange = matchAndGet(newState, changeJson.values.id)
+
+      setJsonValue({ elements: newState });
+      setChangeJson(old => ({...old, values: newChange}))
+    }
+  }
+
+  const handleButtonDropDown = (e) => {
+    if (
+      buttonDropDown.name == e.target.getAttribute("name") &&
+      buttonDropDown.isActive
+    ) {
+      setButtonDropDown({ name: "", isActive: false });
+      return;
+    }
+    setButtonDropDown({
+      name: e.target.getAttribute("name"),
+      isActive: true,
+    });
+  };
+
+  const udpateButtonValues = (e) =>{
+    const newState = matchAndUpdate(
+      e.target,
+      {id: e.target.name},
+      jsonValue.elements
+    );
+
+    const newChange = matchAndGet(newState, changeJson.values.id)
+
+    setJsonValue({elements: newState})
+    setChangeJson((old) => ({ ...old, values: newChange }));
+  }
 
   return (
     <div>
@@ -2374,6 +2439,7 @@ const Design = () => {
       ) : (
         ""
       )}
+      {/* Page container Ending */}
 
       {/* Image Container Beggining */}
       {changeJson.values &&
@@ -2409,7 +2475,67 @@ const Design = () => {
       )}
       {/* Image Container Ending */}
 
-      {/* Page container Ending */}
+      {/* Button Container Beggining */}
+      {changeJson.values &&
+      changeJson.values.isActive &&
+      changeJson.values.type == "button-parent" ? (
+        <div className="fixed right-0 h-full w-[22em] bg-[rgba(53,54,66,.9825)] z-50 overflow-y-auto">
+          <div className="text-white pb-[100px]">
+            <h1 className="px-5 py-3 border-b-2 border-black text-lg">
+              {changeJson.values.id}
+            </h1>
+            <div className="pt-5 px-10">
+              <div className="border-t-2 border-r-2 border-l-2 rounded-lg border-[rgba(255,255,255,.075)]">
+                {changeJson.values.children.map((button, index) => {
+                  return (
+                    <div
+                      className="border-[rgba(255,255,255,.075)]"
+                      key={button.id}
+                    >
+                      <div
+                        className="p-2 hover:cursor-pointer 
+                                          hover:bg-[rgba(71,73,88,.475)] border-b-2 border-[rgba(255,255,255,.075)] rounded"
+                        name={button.id}
+                        onClick={handleButtonDropDown}
+                      >
+                        {button.label ? button.label : "No label!!"}
+                      </div>
+                      <div
+                        className={
+                          buttonDropDown.name == button.id &&
+                          buttonDropDown.isActive
+                            ? "px-2 border-b-2 border-[rgba(255,255,255,.075)] rounded"
+                            : "hidden"
+                        }
+                      >
+                        <div className="p-2">
+                          <h3 className="pb-2">Label</h3>
+                          <input className="input_color_picker"
+                            id="label"
+                            name={button.id}
+                            value={button.label}
+                            onChange={udpateButtonValues}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div
+                className="mt-2 border-2 border-white p-2 rounded-lg text-center 
+                                hover:bg-[rgba(255,255,255,.075)] hover:cursor-pointer"
+                onClick={handleButtonAdd}
+              >
+                Add
+              </div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        ""
+      )}
+      {/* Button Container Ending */}
 
       {/* Edit modal Ends here*/}
 

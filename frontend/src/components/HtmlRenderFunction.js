@@ -246,22 +246,36 @@ const HtmlRenderFunction = (
           return;
         }
 
-        if (element.type == "button") {
+        if(element.type == "button"){
           newDiv.setAttribute("data-type", "button");
           newDiv.removeAttribute("draggable");
 
           newDiv.classList.add("button");
           newDiv.style.height = "30px";
-          newDiv.style.width = "80px";
+          // newDiv.style.width = "80px";
           newDiv.style.background = "white";
           newDiv.style.borderRadius = "5%";
           newDiv.style.cursor = "pointer";
           newDiv.style.textAlign = "center";
-          newDiv.style.paddingTop = "2px";
-          newDiv.innerText = element.text;
+          newDiv.style.paddingLeft = "10px";
+          newDiv.style.paddingTop = "3px";
+          newDiv.style.paddingRight = "10px";
+          newDiv.innerText = element.label;
+          newDiv.style.marginRight = "5%"
+        }
+
+        if (element.type == "button-parent") {
+          newDiv.setAttribute("data-type", "button-parent");
+          newDiv.removeAttribute("draggable");
+
+          newDiv.style.display = "flex";
+          newDiv.style.justifyContent = "left";
+          newDiv.style.alignItems = "center";
+          newDiv.style.padding = "10px";
+          newDiv.style.width = "100%";
 
           const containerWrapperDiv = document.createElement("div");
-          containerWrapperDiv.id = element.id;
+          containerWrapperDiv.id = element.id + "-wrapper";
           containerWrapperDiv.classList.add("button-wrapper");
           containerWrapperDiv.style.display = "flex";
           containerWrapperDiv.style.justifyContent = element.text_align;
