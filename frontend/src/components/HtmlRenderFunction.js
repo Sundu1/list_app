@@ -1,4 +1,5 @@
 import quickSort from "./quickSort";
+import * as icons from './icons'
 
 const HtmlRenderFunction = (
   htmlValue,
@@ -198,7 +199,29 @@ const HtmlRenderFunction = (
           newDiv.style.color = element.text_color;
           newDiv.style.fontSize = element.text_size + "px";
           newDiv.style.fontFamily = element.text_fontfamily;
-          newDiv.innerText = element.text_value;
+          newDiv.innerHTML = parseMarkdown(element.text_value);
+
+          newDiv.style.pointerEvents= "none"
+          // MarkDown
+
+          function parseMarkdown(markdown) {
+            // Headings
+            markdown = markdown.replace(/^#\s(.*)$/gm, "<h1>$1</h1>");
+            markdown = markdown.replace(/^##\s(.*)$/gm, "<h2>$1</h2>");
+            markdown = markdown.replace(/^###\s(.*)$/gm, "<h3>$1</h3>");
+            markdown = markdown.replace(/^####\s(.*)$/gm, "<h4>$1</h4>");
+            markdown = markdown.replace(/^#####\s(.*)$/gm, "<h5>$1</h5>");
+            markdown = markdown.replace(/^######\s(.*)$/gm, "<h6>$1</h6>");
+
+            // Bold and Italic
+            markdown = markdown.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            markdown = markdown.replace(/\*(.*?)\*/g, "<em>$1</em>");
+
+            // Paragraphs
+            const paragraphs = markdown.split("\n\n");
+            markdown = paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
+            return markdown;
+          }
 
           const containerWrapperDiv = document.createElement("div");
           containerWrapperDiv.id = element.id;
@@ -260,7 +283,26 @@ const HtmlRenderFunction = (
           newDiv.style.paddingLeft = "10px";
           newDiv.style.paddingTop = "3px";
           newDiv.style.paddingRight = "10px";
-          newDiv.innerText = element.label;
+          newDiv.style.display = "flex"
+          newDiv.style.justifyContent = "between"
+          newDiv.style.alignItems= "center"
+
+          const span = document.createElement("span")
+          span.style.fontSize = '13px'
+          span.style.font = "san serif"
+          span.style.fontWeight = "800"
+
+          const img = document.createElement("img")
+          img.src = icons[element.icon]
+
+          img.style.paddingTop = "2px"
+          img.style.paddingLeft = "5px"
+          img.style.height = "18px"
+          img.style.width = "18px"
+
+          span.innerText = element.label
+          newDiv.appendChild(span)
+          newDiv.appendChild(img);
           newDiv.style.marginRight = "5%"
         }
 
@@ -360,13 +402,9 @@ const HtmlRenderFunction = (
           });
 
           containerWrapperDiv.addEventListener("dragover", handleDragOver);
-
           containerWrapperDiv.addEventListener("drop", handleDrop);
-
           containerWrapperDiv.addEventListener("drag", handleDragging);
-
           containerWrapperDiv.addEventListener("dragend", handleDragEnd);
-
           containerWrapperDiv.onpointerdown = function (e) {
             if (
               e.target.id == element.id ||

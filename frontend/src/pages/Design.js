@@ -9,19 +9,15 @@ import { useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 
 import Navbar from "../components/Navbar";
+import { BsFillDatabaseFill, BsTrashFill } from "react-icons/bs";
 
-import {
-  BsArrowReturnRight,
-  BsFillDatabaseFill,
-  BsFillTrainLightrailFrontFill,
-} from "react-icons/bs";
 import {
   GiDustCloud,
   GiHamburgerMenu,
   GiJamesBondAperture,
 } from "react-icons/gi";
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 
+import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
 import PickColor from "../components/PickColor";
 
@@ -148,6 +144,18 @@ const Design = () => {
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
+
+
+  // Icons
+  const iconItems = [
+    "ArrowDown",
+    "ArrowLeft",
+    "Mail",
+    "Phone",
+    "SocialFacebook",
+    "SocialInstagram",
+    "SocialTiktok",
+  ];
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
@@ -436,6 +444,7 @@ const Design = () => {
               type: "button",
               id: `button-${newCount}`,
               label: "Button",
+              icon: "ArrowDown",
               order: newCount,
               children: [],
             },
@@ -467,16 +476,6 @@ const Design = () => {
     "math",
     "fangsong",
   ];
-
-  // const markdownParser = (text) => {
-  //   const toHTML = text
-  //     .replace(/^###(.*$)/gim, "<h3>$1</h3>") // h3 tag
-  //     .replace(/^##(.*$)/gim, "<h2>$1</h2>") // h2 tag
-  //     .replace(/^#(.*$)/gim, "<h1>$1</h1>") // h1 tag
-  //     .replace(/\*\*(.*)\*\*/gim, "<b>$1</b>") // bold text
-  //     .replace(/\*(.*)\*/gim, "<i>$1</i>"); // italic text
-  //   return toHTML.trim(); // using trim method to remove whitespace
-  // };
 
   const clickedElement = (e) => {
     if (jsonValue && jsonValue.elements) {
@@ -1153,6 +1152,7 @@ const Design = () => {
         type: "button",
         id: `button-${newCount}`,
         label: "Button",
+        icon: "ArrowDown",
         order: newCount,
         children: [],
       });
@@ -1171,7 +1171,21 @@ const Design = () => {
     }
   }
 
+  const handleButtonDelete = (e) =>{
+    if (changeJson.values && changeJson.values.type == "button-parent") {
+      const deletedState = matchAndDelete(
+        jsonValue.elements,
+        {id: e.target.getAttribute("name")}
+      );
+      const newChange = matchAndGet(deletedState, changeJson.values.id);
+      setJsonValue({ elements: deletedState });
+      // setChangeJson((old) => ({ ...old, values: newChange }));
+    }
+  }
+
   const handleButtonDropDown = (e) => {
+    if (e.target.getAttribute("type") == "delete") return
+
     if (
       buttonDropDown.name == e.target.getAttribute("name") &&
       buttonDropDown.isActive
@@ -1179,6 +1193,7 @@ const Design = () => {
       setButtonDropDown({ name: "", isActive: false });
       return;
     }
+    
     setButtonDropDown({
       name: e.target.getAttribute("name"),
       isActive: true,
@@ -2486,7 +2501,7 @@ const Design = () => {
             </h1>
             <div className="pt-5 px-10">
               <div className="border-t-2 border-r-2 border-l-2 rounded-lg border-[rgba(255,255,255,.075)]">
-                {changeJson.values.children.map((button, index) => {
+                {changeJson.values.children.map((button) => {
                   return (
                     <div
                       className="border-[rgba(255,255,255,.075)]"
@@ -2494,11 +2509,24 @@ const Design = () => {
                     >
                       <div
                         className="p-2 hover:cursor-pointer 
-                                          hover:bg-[rgba(71,73,88,.475)] border-b-2 border-[rgba(255,255,255,.075)] rounded"
+                                  hover:bg-[rgba(71,73,88,.475)] 
+                                  border-b-2 border-[rgba(255,255,255,.075)] 
+                                  rounded flex justify-between"
                         name={button.id}
                         onClick={handleButtonDropDown}
                       >
                         {button.label ? button.label : "No label!!"}
+                        <div
+                          type="delete"
+                          className="hover:scale-[1.1] pt-1 h-full"
+                          name={button.id}
+                          onClick={handleButtonDelete}
+                        >
+                        {
+                          changeJson.values.children.length > 1 ?
+                          <BsTrashFill className="pointer-events-none" /> : null
+                        }
+                        </div>
                       </div>
                       <div
                         className={
@@ -2510,12 +2538,36 @@ const Design = () => {
                       >
                         <div className="p-2">
                           <h3 className="pb-2">Label</h3>
-                          <input className="input_color_picker"
+                          <input
+                            className="input_color_picker"
                             id="label"
                             name={button.id}
                             value={button.label}
                             onChange={udpateButtonValues}
                           />
+                        </div>
+                        <div className="p-2">
+                          <h3 className="pb-2">Icon</h3>
+                          <select
+                            id="icon"
+                            className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
+                            name={button.id}
+                            value={button.icon}
+                            onChange={udpateButtonValues}
+                          >
+                            {iconItems.map((icon) => {
+                              return (
+                                <option
+                                  key={icon}
+                                  id="icon"
+                                  value={icon}
+                                  className="bg-[rgba(53,54,66,.9825)]"
+                                >
+                                  {icon}
+                                </option>
+                              );
+                            })}
+                          </select>
                         </div>
                       </div>
                     </div>
