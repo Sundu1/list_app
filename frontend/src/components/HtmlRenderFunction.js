@@ -56,7 +56,8 @@ const HtmlRenderFunction = (
           newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
           newDiv.style.marginTop = element.margin_top + "px";
-          newDiv.style.marginBottom = element.margin_bottom + "px";
+          newDiv.style.marginBottom = element.margin_top + "px";
+          // newDiv.style.marginBottom = element.margin_bottom + "px";
 
           newDiv.style.paddingTop = element.padding_vertical + "px";
           newDiv.style.paddingBottom = element.padding_vertical + "px";
@@ -292,6 +293,7 @@ const HtmlRenderFunction = (
           span.style.fontWeight = "800"
 
           const img = document.createElement("img")
+          img.style.pointerEvents = "none"
           img.src = icons[element.icon]
 
           img.style.paddingTop = "2px"
@@ -316,6 +318,7 @@ const HtmlRenderFunction = (
           newDiv.style.alignItems = "center";
           newDiv.style.padding = "10px";
           newDiv.style.width = "100%";
+          newDiv.style.pointerEvents = "none"
 
           const containerWrapperDiv = document.createElement("div");
           containerWrapperDiv.id = element.id + "-wrapper";
@@ -384,7 +387,7 @@ const HtmlRenderFunction = (
           newDiv.setAttribute("data-type", "icon-parent");
           newDiv.removeAttribute("draggable");
 
-          newDiv.setAttribute("img_size",element.imgSize)
+          newDiv.setAttribute("icon_size", element.iconSize);
           newDiv.style.display = "flex";
           newDiv.style.alignContent = "space-between";
           newDiv.style.flexWrap = "wrap";

@@ -17,7 +17,7 @@ import {
   GiJamesBondAperture,
 } from "react-icons/gi";
 
-import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
+import { FaArrowLeft, FaArrowRight, FaUnderline } from "react-icons/fa";
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
 import PickColor from "../components/PickColor";
 
@@ -41,6 +41,7 @@ const Design = () => {
 
   const [scrollValue, setScrollValue] = useState(0);
   const [dragValue, setDragValue] = useState("");
+  const [copiedObj, setCopiedObj] = useState("");
 
   const [jsonValue, setJsonValue] = useState({
     elements: [
@@ -137,12 +138,10 @@ const Design = () => {
     isActive: false,
   });
 
-  const [buttonDropDown, setButtonDropDown] = useState({
+  const [elementDropDown, setelementDropDown] = useState({
     name: "",
     isActive: false,
   });
-
-  const [testRender, setTestRender] = useState(1);
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -159,33 +158,8 @@ const Design = () => {
     "SocialTiktok",
   ];
 
-  // document.addEventListener("keydown", (e) => {
-  //   if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
-  //     if (
-  //       changeJson.values.type == "page" ||
-  //       changeJson.values.type == "background"
-  //     )
-  //       return;
-  //     const deletedState = matchAndDelete(
-  //       jsonValue.elements,
-  //       changeJson.values
-  //     );
-
-  //     console.log("keydown delete");
-  //     setJsonValue({ elements: deletedState });
-  //     setChangeJson({
-  //       name: undefined,
-  //       values: {},
-  //     });
-  //   }
-  //   if (e.key == "Control") setCtrlDown(true);
-  //   if (ctrlDown && e.key == "v") {
-  //     console.log("yes", e.key);
-  //   }
-  // });
-
   useEffect(()=>{
-    const deleteKeyDown = (e) =>{
+    const keyDown = (e) =>{
       if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
       if (
         changeJson.values.type == "page" ||
@@ -197,7 +171,6 @@ const Design = () => {
         changeJson.values
       );
 
-      console.log("keydown delete");
       setJsonValue({ elements: deletedState });
       setChangeJson({
         name: undefined,
@@ -205,12 +178,47 @@ const Design = () => {
       });
     }
     if (e.key == "Control") setCtrlDown(true);
+
+    if (ctrlDown && e.key == "c") setCopiedObj(changeJson.values)
     if (ctrlDown && e.key == "v") {
-      console.log("yes", e.key);
+      const containerEle = (elements, values) => {
+        let currentEle = values;
+        while (currentEle.type != undefined) {
+          currentEle = matchAndGet(elements, currentEle.parent);
+          if(currentEle.type == "page") break
+          if(currentEle.type == "container")break
+        }
+        return currentEle.id;
+      };
+
+      const parentId = containerEle(jsonValue.elements, changeJson.values)
+      if (Object.keys(copiedObj).length < 1 || parentId == copiedObj.id || parentId == undefined) return;
+      console.log("paste", parentId, copiedObj);
+
+      copiedObj.id = `Container-${newCount}`
+
+      const newState = matchAndAdd(jsonValue.elements, parentId, copiedObj);
+      setNewCount(newCount + 1)
+      setJsonValue({elements: newState})
     }
-  } 
-  document.addEventListener("keydown", deleteKeyDown)
-    return() => document.removeEventListener("keydown", deleteKeyDown)
+
+    if (ctrlDown && e.key == "s") {
+      e.preventDefault();
+      console.log("save");
+    }
+  }
+
+  const keyUp = (e) => {
+    if (e.key == "Control") setCtrlDown(false);
+  };
+
+  document.addEventListener("keydown", keyDown);
+  document.addEventListener("keyup", keyUp);
+
+    return () => (
+      document.removeEventListener("keydown", keyDown), 
+      document.removeEventListener("keyup", keyUp)
+    )
   })
 
   useEffect(() => {
@@ -226,7 +234,6 @@ const Design = () => {
     };
 
     document.addEventListener("mousedown", checkIfClickedOutside);
-    console.log("useEffect addElement");
     return () => {
       document.removeEventListener("mousedown", checkIfClickedOutside);
     };
@@ -242,22 +249,17 @@ const Design = () => {
       handleDragging,
       handleDragEnd,
       handleScroll,
-      scrollValue,
-
-      handleDeleteKeyDown
+      scrollValue
     );
 
-    console.log("useEffect jsonValue");
     if (document.querySelector("#Background")) {
       const bg = document.querySelector("#Background");
-      console.log("test scrollValue");
       bg.scrollTo(scrollValue, scrollValue);
     }
     return () => {};
   }, [jsonValue]);
 
   useEffect(() => {
-    console.log("useEffect colorUpdate");
     if (colorUpdate.target) {
       if (
         changeJson.values.type == "background" ||
@@ -355,6 +357,7 @@ const Design = () => {
         newElement = new Object({
           type: "container",
           id: `Container-${newCount}`,
+          parent: changeJson.values.id ? changeJson.values.id : "Page" ,
           order: containers.children.length + 1,
           height: "100",
           width: "200",
@@ -415,6 +418,7 @@ const Design = () => {
           children: [
             {
               type: "container-column",
+              parent: `Container-${newCount}`,
               id: `column-${columnsCount}`,
               isActive: false,
               isSpace: false,
@@ -531,7 +535,7 @@ const Design = () => {
           type: "icon-parent",
           id: `icon-parent-${newCount}`,
           order: newCount,
-          imgSize: "100",
+          iconSize: "20",
           children: [
             {
               parent: parentId,
@@ -1133,6 +1137,7 @@ const Design = () => {
         if (e.target.name == "container-column") {
           newElement = new Object({
             type: "container-column",
+            parent: changeJson.values.id,
             id: `column-${columnsCount}`,
             isSpace: false,
             isActive: false,
@@ -1198,30 +1203,6 @@ const Design = () => {
     }
   };
 
-  const handleDeleteKeyDown = (e) => {
-    if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
-      if (
-        changeJson.values.type == "page" ||
-        changeJson.values.type == "background"
-      )
-        return;
-      const deletedState = matchAndDelete(
-        jsonValue.elements,
-        changeJson.values
-      );
-      console.log("keydown delete");
-      setJsonValue({ elements: deletedState });
-      setChangeJson({
-        name: undefined,
-        values: {},
-      });
-    }
-    if (e.key == "Control") setCtrlDown(true);
-    if (ctrlDown && e.key == "v") {
-      console.log("yes", e.key);
-    }
-  };
-
   const columnNames = new Object({
     0: "First",
     1: "Second",
@@ -1244,7 +1225,7 @@ const Design = () => {
     });
   };
 
-  const handleButtonAdd = (e) => {
+  const handleMultiEleAdd = (e) => {
     if (changeJson.values && changeJson.values.type == "button-parent") {
       const newEle = new Object({
         parent: changeJson.values.id,
@@ -1292,8 +1273,12 @@ const Design = () => {
     }
   };
 
-  const handleButtonDelete = (e) => {
-    if (changeJson.values && changeJson.values.type == "button-parent") {
+  const handleMultiEleDelete = (e) => {
+    if (
+      (changeJson.values && 
+      changeJson.values.type == "button-parent") ||
+      changeJson.values.type == "icon-parent"
+    ) {
       const deletedState = matchAndDelete(jsonValue.elements, {
         id: e.target.getAttribute("name"),
       });
@@ -1303,24 +1288,24 @@ const Design = () => {
     }
   };
 
-  const handleButtonDropDown = (e) => {
+  const handleDropDown = (e) => {
     if (e.target.getAttribute("type") == "delete") return;
 
     if (
-      buttonDropDown.name == e.target.getAttribute("name") &&
-      buttonDropDown.isActive
+      elementDropDown.name == e.target.getAttribute("name") &&
+      elementDropDown.isActive
     ) {
-      setButtonDropDown({ name: "", isActive: false });
+      setelementDropDown({ name: "", isActive: false });
       return;
     }
 
-    setButtonDropDown({
+    setelementDropDown({
       name: e.target.getAttribute("name"),
       isActive: true,
     });
   };
 
-  const udpateButtonValues = (e) => {
+  const udpateMultiElementValues = (e) => {
     const newState = matchAndUpdate(
       e.target,
       { id: e.target.name },
@@ -1332,8 +1317,6 @@ const Design = () => {
     setJsonValue({ elements: newState });
     setChangeJson((old) => ({ ...old, values: newChange }));
   };
-
-  console.log("jsonValue", jsonValue.elements);
 
   return (
     <div>
@@ -1801,12 +1784,22 @@ const Design = () => {
                     />
                   </div>
                   <div className="col-start-3 col-end-2 text-center">
-                    <input
+                    {/* <input
                       id="margin_bottom"
                       // type="number"
                       type="range"
                       className="margin_webkit"
                       value={changeJson.values.margin_bottom}
+                      onChange={updateElementsValues}
+                    /> */}
+
+                    <input
+                      id="margin_top"
+                      // type="number"
+                      type="range"
+                      max={100}
+                      className="margin_webkit"
+                      value={changeJson.values.margin_top}
                       onChange={updateElementsValues}
                     />
                   </div>
@@ -2635,14 +2628,14 @@ const Design = () => {
                                   border-b-2 border-[rgba(255,255,255,.075)] 
                                   rounded flex justify-between"
                         name={button.id}
-                        onClick={handleButtonDropDown}
+                        onClick={handleDropDown}
                       >
                         {button.label ? button.label : "No label!!"}
                         <div
                           type="delete"
                           className="hover:scale-[1.1] pt-1 h-full"
                           name={button.id}
-                          onClick={handleButtonDelete}
+                          onClick={handleMultiEleDelete}
                         >
                           {changeJson.values.children.length > 1 ? (
                             <BsTrashFill className="pointer-events-none" />
@@ -2651,8 +2644,8 @@ const Design = () => {
                       </div>
                       <div
                         className={
-                          buttonDropDown.name == button.id &&
-                          buttonDropDown.isActive
+                          elementDropDown.name == button.id &&
+                          elementDropDown.isActive
                             ? "px-2 border-b-2 border-[rgba(255,255,255,.075)] rounded"
                             : "hidden"
                         }
@@ -2664,7 +2657,7 @@ const Design = () => {
                             id="label"
                             name={button.id}
                             value={button.label}
-                            onChange={udpateButtonValues}
+                            onChange={udpateMultiElementValues}
                           />
                         </div>
                         <div className="p-2">
@@ -2674,7 +2667,7 @@ const Design = () => {
                             className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
                             name={button.id}
                             value={button.icon}
-                            onChange={udpateButtonValues}
+                            onChange={udpateMultiElementValues}
                           >
                             {iconItems.map((icon) => {
                               return (
@@ -2698,7 +2691,7 @@ const Design = () => {
               <div
                 className="mt-2 border-2 border-white p-2 rounded-lg text-center 
                                 hover:bg-[rgba(255,255,255,.075)] hover:cursor-pointer"
-                onClick={handleButtonAdd}
+                onClick={handleMultiEleAdd}
               >
                 Add
               </div>
@@ -2709,7 +2702,6 @@ const Design = () => {
         ""
       )}
       {/* Button Container Ending */}
-
       {/* Icon Container Beggining */}
       {changeJson.values &&
       changeJson.values.isActive &&
@@ -2733,14 +2725,14 @@ const Design = () => {
                                   border-b-2 border-[rgba(255,255,255,.075)] 
                                   rounded flex justify-between"
                         name={icon.id}
-                        onClick={handleButtonDropDown}
+                        onClick={handleDropDown}
                       >
                         <div className="pointer-events-none"> {icon.icon} </div>
                         <div
                           type="delete"
                           className="hover:scale-[1.1] pt-1 h-full"
                           name={icon.id}
-                          onClick={handleButtonDelete}
+                          onClick={handleMultiEleDelete}
                         >
                           {changeJson.values.children.length > 1 ? (
                             <BsTrashFill className="pointer-events-none" />
@@ -2749,8 +2741,8 @@ const Design = () => {
                       </div>
                       <div
                         className={
-                          buttonDropDown.name == icon.id &&
-                          buttonDropDown.isActive
+                          elementDropDown.name == icon.id &&
+                          elementDropDown.isActive
                             ? "px-2 border-b-2 border-[rgba(255,255,255,.075)] rounded"
                             : "hidden"
                         }
@@ -2762,7 +2754,7 @@ const Design = () => {
                             className="bg-[rgba(71,73,88,.475)] rounded p-2 w-full"
                             name={icon.id}
                             value={icon.icon}
-                            onChange={udpateButtonValues}
+                            onChange={udpateMultiElementValues}
                           >
                             {iconItems.map((item) => {
                               return (
@@ -2778,15 +2770,6 @@ const Design = () => {
                             })}
                           </select>
                         </div>
-                        <div className="p-2">
-                          <h3 className="pb-2">Size</h3>
-                          <input
-                            max={100}
-                            id="iconSize"
-                            type="range"
-                            className="slider_style pr-5"
-                          />
-                        </div>
                       </div>
                     </div>
                   );
@@ -2795,9 +2778,29 @@ const Design = () => {
               <div
                 className="mt-2 border-2 border-white p-2 rounded-lg text-center 
                                 hover:bg-[rgba(255,255,255,.075)] hover:cursor-pointer"
-                onClick={handleButtonAdd}
+                onClick={handleMultiEleAdd}
               >
                 Add
+              </div>
+              <div className="p-2">
+                <div className="flex justify-between">
+                  <h3 className="pb-2">Size</h3>
+                  <input
+                    id="iconSize"
+                    className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                    value={changeJson.values.iconSize}
+                    onChange={updateElementsValues}
+                  />
+                </div>
+                <input
+                  max={100}
+                  min={10}
+                  id="iconSize"
+                  type="range"
+                  className="slider_style pr-5"
+                  value={changeJson.values.iconSize}
+                  onChange={updateElementsValues}
+                />
               </div>
             </div>
           </div>
