@@ -188,18 +188,45 @@ const Design = () => {
           if(currentEle.type == "page") break
           if(currentEle.type == "container")break
         }
-        return currentEle.id;
+        return Array.isArray(currentEle) ? undefined : currentEle;
       };
 
       const parentId = containerEle(jsonValue.elements, changeJson.values)
-      if (Object.keys(copiedObj).length < 1 || parentId == copiedObj.id || parentId == undefined) return;
-      console.log("paste", parentId, copiedObj);
+      if (
+        Object.keys(copiedObj).length < 1 ||
+        parentId && 
+        parentId.id == copiedObj.id ||
+        parentId == undefined
+      )
+        return;
 
-      copiedObj.id = `Container-${newCount}`
+      console.log("copiedObj", copiedObj);
 
-      const newState = matchAndAdd(jsonValue.elements, parentId, copiedObj);
-      setNewCount(newCount + 1)
-      setJsonValue({elements: newState})
+      const replaceNumberTest = (string, replaceValue) =>{
+        const result = string.split('').map(value =>{
+          const regex = /\d/g
+          if(regex.test(value)){
+            return replaceValue
+          }
+          return value
+        })
+
+        return result.join("")
+      }
+
+      const updateEverySingleId = (obj) =>{
+        if(typeof obj != "object") return
+        if(obj && obj.id){
+          obj.id = replaceNumberTest(obj.id, "123")
+          return obj
+        }
+      }
+
+      console.log(updateEverySingleId(copiedObj));
+
+      // const newState = matchAndAdd(jsonValue.elements, parentId.id, copiedObj);
+      // setNewCount(newCount + 1)
+      // setJsonValue({elements: newState})
     }
 
     if (ctrlDown && e.key == "s") {
