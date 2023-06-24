@@ -1,5 +1,5 @@
 import quickSort from "./quickSort";
-import * as icons from './icons'
+import * as icons from "./icons";
 
 const HtmlRenderFunction = (
   htmlValue,
@@ -9,9 +9,8 @@ const HtmlRenderFunction = (
   handleDrop,
   handleDragging,
   handleDragEnd,
-  handleScroll,
+  handleScroll
 ) => {
-
   let newDiv;
   const traverse_dfs = (jsonvalues, parentelement) => {
     if (typeof jsonvalues === "object") {
@@ -201,7 +200,7 @@ const HtmlRenderFunction = (
           newDiv.style.fontFamily = element.text_fontfamily;
           newDiv.innerHTML = parseMarkdown(element.text_value);
 
-          newDiv.style.pointerEvents= "none"
+          newDiv.style.pointerEvents = "none";
           // MarkDown
 
           function parseMarkdown(markdown) {
@@ -214,12 +213,17 @@ const HtmlRenderFunction = (
             markdown = markdown.replace(/^######\s(.*)$/gm, "<h6>$1</h6>");
 
             // Bold and Italic
-            markdown = markdown.replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+            markdown = markdown.replace(
+              /\*\*(.*?)\*\*/g,
+              "<strong>$1</strong>"
+            );
             markdown = markdown.replace(/\*(.*?)\*/g, "<em>$1</em>");
 
             // Paragraphs
             const paragraphs = markdown.split("\n\n");
-            markdown = paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join("");
+            markdown = paragraphs
+              .map((paragraph) => `<p>${paragraph}</p>`)
+              .join("");
             return markdown;
           }
 
@@ -269,7 +273,7 @@ const HtmlRenderFunction = (
           return;
         }
 
-        if(element.type == "button"){
+        if (element.type == "button") {
           newDiv.setAttribute("data-type", "button");
           newDiv.removeAttribute("draggable");
 
@@ -283,28 +287,28 @@ const HtmlRenderFunction = (
           newDiv.style.paddingLeft = "10px";
           newDiv.style.paddingTop = "3px";
           newDiv.style.paddingRight = "10px";
-          newDiv.style.display = "flex"
-          newDiv.style.justifyContent = "between"
-          newDiv.style.alignItems= "center"
+          newDiv.style.display = "flex";
+          newDiv.style.justifyContent = "between";
+          newDiv.style.alignItems = "center";
 
-          const span = document.createElement("span")
-          span.style.fontSize = '13px'
-          span.style.font = "san serif"
-          span.style.fontWeight = "800"
+          const span = document.createElement("span");
+          span.style.fontSize = "13px";
+          span.style.font = "san serif";
+          span.style.fontWeight = "800";
 
-          const img = document.createElement("img")
-          img.style.pointerEvents = "none"
-          img.src = icons[element.icon]
+          const img = document.createElement("img");
+          img.style.pointerEvents = "none";
+          img.src = icons[element.icon];
 
-          img.style.paddingTop = "2px"
-          img.style.paddingLeft = "5px"
-          img.style.height = "18px"
-          img.style.width = "18px"
+          img.style.paddingTop = "2px";
+          img.style.paddingLeft = "5px";
+          img.style.height = "18px";
+          img.style.width = "18px";
 
-          span.innerText = element.label
-          newDiv.appendChild(span)
+          span.innerText = element.label;
+          newDiv.appendChild(span);
           newDiv.appendChild(img);
-          newDiv.style.marginRight = "5%"
+          newDiv.style.marginRight = "5%";
         }
 
         if (element.type == "button-parent") {
@@ -312,13 +316,13 @@ const HtmlRenderFunction = (
           newDiv.removeAttribute("draggable");
 
           newDiv.style.display = "flex";
-          newDiv.style.alignContent = 'space-between'
-          newDiv.style.flexWrap = "wrap"
-          newDiv.style.gap = "10px"
+          newDiv.style.alignContent = "space-between";
+          newDiv.style.flexWrap = "wrap";
+          newDiv.style.gap = "10px";
           newDiv.style.alignItems = "center";
           newDiv.style.padding = "10px";
           newDiv.style.width = "100%";
-          newDiv.style.pointerEvents = "none"
+          newDiv.style.pointerEvents = "none";
 
           const containerWrapperDiv = document.createElement("div");
           containerWrapperDiv.id = element.id + "-wrapper";
@@ -406,31 +410,20 @@ const HtmlRenderFunction = (
           containerWrapperDiv.style.width = "100%";
 
           containerWrapperDiv.setAttribute("draggable", true);
-          containerWrapperDiv.addEventListener(
-            "dragstart",
-            handleDragStart
-          );
+          containerWrapperDiv.addEventListener("dragstart", handleDragStart);
           containerWrapperDiv.addEventListener("dragstart", () => {
             containerWrapperDiv.style.height =
-              document
-                .querySelector(`#${element.id}`)
-                .getBoundingClientRect().height + "px";
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .height + "px";
             containerWrapperDiv.style.width =
-              document
-                .querySelector(`#${element.id}`)
-                .getBoundingClientRect().width + "px";
+              document.querySelector(`#${element.id}`).getBoundingClientRect()
+                .width + "px";
           });
 
-          containerWrapperDiv.addEventListener(
-            "dragover",
-            handleDragOver
-          );
+          containerWrapperDiv.addEventListener("dragover", handleDragOver);
           containerWrapperDiv.addEventListener("drop", handleDrop);
           containerWrapperDiv.addEventListener("drag", handleDragging);
-          containerWrapperDiv.addEventListener(
-            "dragend",
-            handleDragEnd
-          );
+          containerWrapperDiv.addEventListener("dragend", handleDragEnd);
 
           containerWrapperDiv.onpointerdown = function (e) {
             if (
@@ -448,8 +441,7 @@ const HtmlRenderFunction = (
 
           containerWrapperDiv.appendChild(newDiv);
           parent.appendChild(containerWrapperDiv);
-          if (element.children == null || element.children.length == 0)
-            return;
+          if (element.children == null || element.children.length == 0) return;
           traverse_dfs(element.children, element.id);
           return;
         }

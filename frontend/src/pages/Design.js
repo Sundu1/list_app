@@ -7,16 +7,9 @@ import React, {
 } from "react";
 import { useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
-
 import Navbar from "../components/Navbar";
 import { BsFillDatabaseFill, BsTrashFill } from "react-icons/bs";
-
-import {
-  GiDustCloud,
-  GiHamburgerMenu,
-  GiJamesBondAperture,
-} from "react-icons/gi";
-
+import {GiHamburgerMenu} from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight, FaUnderline } from "react-icons/fa";
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
 import PickColor from "../components/PickColor";
@@ -25,24 +18,18 @@ const Design = () => {
   const { designTable } = useParams();
   const { value, setValue } = useContext(UserContext);
 
-  const [newCount, setNewCount] = useState(1);
-
   const [changeJson, setChangeJson] = useState({
     name: undefined,
     values: {},
   });
-
   const [inputColorPicker, setInputColorPicker] = useState({});
   const [columnsCount, setColumnsCount] = useState(0);
   const [refresh, setRefresh] = useState(false);
-
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
-
   const [scrollValue, setScrollValue] = useState(0);
   const [dragValue, setDragValue] = useState("");
   const [copiedObj, setCopiedObj] = useState("");
-
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
@@ -123,26 +110,23 @@ const Design = () => {
       },
     ],
   });
-
-  // const [isDragging, setIsDragging] = useState(false);
-  // const [offset, setOffset] = useState({ x: 0, y: 0 });
-  // const [movableDiv, setMovableDiv] = useState({});
-  // const [placeholderDiv, setPlaceholderDiv] = useState({});
-  // const [moved, setMoved] = useState(false);
-  // const [columnValue, setcolumnValue] = useState("");
-
   const [savedColumns, setSavedColumns] = useState([]);
   const [ctrlDown, setCtrlDown] = useState(false);
   const [columnDropDown, setColumnDropDown] = useState({
     name: "",
     isActive: false,
   });
-
   const [elementDropDown, setelementDropDown] = useState({
     name: "",
     isActive: false,
   });
-
+  const[containerCount, setContainerCount] = useState(1)
+  const[textCount, setTextCount] = useState(1)
+  const[imageCount, setImageCount] = useState(1)
+  const[iconParentCount, setIconParentCount] = useState(1)
+  const[iconCount, setIconCount] = useState(1)
+  const[buttonParentCount, setButtonParentCount] = useState(1)
+  const[buttonCount, setButtonCount] = useState(1)
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -158,95 +142,187 @@ const Design = () => {
     "SocialTiktok",
   ];
 
-  useEffect(()=>{
-    const keyDown = (e) =>{
+  useEffect(() => {
+    const keyDown = (e) => {
       if (e.key == "Delete" && changeJson.values && changeJson.values.id) {
-      if (
-        changeJson.values.type == "page" ||
-        changeJson.values.type == "background"
-      )
-        return;
-      const deletedState = matchAndDelete(
-        jsonValue.elements,
-        changeJson.values
-      );
+        if (
+          changeJson.values.type == "page" ||
+          changeJson.values.type == "background"
+        )
+          return;
+        const deletedState = matchAndDelete(
+          jsonValue.elements,
+          changeJson.values
+        );
 
-      setJsonValue({ elements: deletedState });
-      setChangeJson({
-        name: undefined,
-        values: {},
-      });
-    }
-    if (e.key == "Control") setCtrlDown(true);
+        setJsonValue({ elements: deletedState });
+        setChangeJson({
+          name: undefined,
+          values: {},
+        });
+      }
+      if (e.key == "Control") setCtrlDown(true);
 
-    if (ctrlDown && e.key == "c") setCopiedObj(changeJson.values)
-    if (ctrlDown && e.key == "v") {
-      const containerEle = (elements, values) => {
-        let currentEle = values;
-        while (currentEle.type != undefined) {
-          currentEle = matchAndGet(elements, currentEle.parent);
-          if(currentEle.type == "page") break
-          if(currentEle.type == "container")break
-        }
-        return Array.isArray(currentEle) ? undefined : currentEle;
-      };
-
-      const parentId = containerEle(jsonValue.elements, changeJson.values)
-      if (
-        Object.keys(copiedObj).length < 1 ||
-        parentId && 
-        parentId.id == copiedObj.id ||
-        parentId == undefined
-      )
-        return;
-
-      console.log("copiedObj", copiedObj);
-
-      const replaceNumberTest = (string, replaceValue) =>{
-        const result = string.split('').map(value =>{
-          const regex = /\d/g
-          if(regex.test(value)){
-            return replaceValue
+      if (ctrlDown && e.key == "c") setCopiedObj(changeJson.values);
+      if (ctrlDown && e.key == "v") {
+        const containerEle = (elements, values) => {
+          let currentEle = values;
+          while (currentEle.type != undefined) {
+            currentEle = matchAndGet(elements, currentEle.parent);
+            if (currentEle.type == "page") break;
+            if (currentEle.type == "container") break;
           }
-          return value
-        })
+          return Array.isArray(currentEle) ? undefined : currentEle;
+        };
 
-        return result.join("")
-      }
+        const parentId = containerEle(jsonValue.elements, changeJson.values);
+        if (
+          Object.keys(copiedObj).length < 1 ||
+          (parentId && parentId.id == copiedObj.id) ||
+          parentId == undefined
+        )
+          return;
 
-      const updateEverySingleId = (obj) =>{
-        if(typeof obj != "object") return
-        if(obj && obj.id){
-          obj.id = replaceNumberTest(obj.id, "123")
-          return obj
+        const replaceNumberTest = (string, replaceValue) => {
+          const result = string.split("").map((value) => {
+            if (/\d/g.test(value)) {
+              return replaceValue;
+            }
+            return value;
+          });
+          return result.join("");
+        };
+
+        const updateEverySingleId = (obj) => {
+
+          const countObject = new Object({
+            container: containerCount,
+            column: columnsCount,
+            text: textCount,
+            image: imageCount,
+            iconParent: iconParentCount,
+            icon: iconCount,
+            buttonParent: buttonParentCount,
+            button: buttonCount,
+          })
+
+          const types = [
+            {name : "container",        countName : "container"},
+            {name : "container-column", countName : "column"},
+            {name : "text",             countName : "text"},
+            {name : "image",            countName : "image"},
+            {name : "icon-parent",      countName : "iconParent"},
+            {name : "icon",             countName : "icon"},
+            {name : "button-parent",    countName : "buttonParent"},
+            {name : "button",           countName : "button"}
+          ]
+
+          const mutateObj = (obj, countObject) => {
+            if(typeof obj === "object" && obj != null && obj.id){
+              for (const type of types){
+                if(obj.type == type.name){
+                  obj.id = replaceNumberTest(obj.id, countObject[type.countName])
+                  countObject[type.countName] = countObject[type.countName] + 1
+                  if(obj.type != "container"){
+                    obj.parent = replaceNumberTest(obj.parent, countObject.container)
+                  }
+                }
+              }
+
+              // if(obj.type == "container"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.container)
+              //   countObject.container = countObject.container + 1
+              // }
+              // if(obj.type == "container-column"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.column)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.column = countObject.column + 1
+              // }
+              // if(obj.type == "text"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.text)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.text = countObject.text + 1
+              // }
+              // if(obj.type == "image"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.image)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.image = countObject.image + 1
+              // }
+              // if(obj.type == "icon-parent"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.iconParent)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.iconParent = countObject.iconParent + 1
+              // }
+              // if(obj.type == "icon"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.icon)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.icon = countObject.icon + 1
+              // }
+              // if(obj.type == "button-parent"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.buttonParent)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.buttonParent = countObject.buttonParent + 1
+              // }
+              // if(obj.type == "button"){
+              //   obj.id = replaceNumberTest(obj.id, countObject.button)
+              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
+              //   countObject.button = countObject.button + 1
+              // }
+          }
+          if(obj.children && Array.isArray(obj.children)){
+            for (const child of obj.children){
+              mutateObj(child, countObject)
+            }
+          }
         }
+
+        mutateObj(obj, countObject)
+
+        setContainerCount(countObject.container)
+        setColumnsCount(countObject.column)
+        setTextCount(countObject.text)
+        setImageCount(countObject.image)
+        setIconParentCount(countObject.iconParent)
+        setIconCount(countObject.icon)
+        setButtonParentCount(countObject.buttonParent)
+        setButtonCount(countObject.button)
+        return obj
+        };
+
+        const updateContainerOrder = (obj, orderNumber) =>{
+          if(typeof obj === "object" && obj != null){
+            if(obj.order){
+              obj.order = orderNumber
+            }
+          }
+        }
+
+        const updatedObj1 = updateEverySingleId(cloneObject(copiedObj))
+        console.log("updatedObj1", updatedObj1);
+        // const updatedObj2 = updateEverySingleId(cloneObject(updatedObj1), o)
+        const newState = matchAndAdd(jsonValue.elements, parentId.id, updatedObj1);
+        setJsonValue({elements: newState})
       }
 
-      console.log(updateEverySingleId(copiedObj));
+      if (ctrlDown && e.key == "s") {
+        e.preventDefault();
+      }
+    };
 
-      // const newState = matchAndAdd(jsonValue.elements, parentId.id, copiedObj);
-      // setNewCount(newCount + 1)
-      // setJsonValue({elements: newState})
-    }
+    console.log("jsonValue", jsonValue);
 
-    if (ctrlDown && e.key == "s") {
-      e.preventDefault();
-      console.log("save");
-    }
-  }
+    const keyUp = (e) => {
+      if (e.key == "Control") setCtrlDown(false);
+    };
 
-  const keyUp = (e) => {
-    if (e.key == "Control") setCtrlDown(false);
-  };
-
-  document.addEventListener("keydown", keyDown);
-  document.addEventListener("keyup", keyUp);
+    document.addEventListener("keydown", keyDown);
+    document.addEventListener("keyup", keyUp);
 
     return () => (
-      document.removeEventListener("keydown", keyDown), 
+      document.removeEventListener("keydown", keyDown),
       document.removeEventListener("keyup", keyUp)
-    )
-  })
+    );
+  });
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
@@ -284,7 +360,7 @@ const Design = () => {
       bg.scrollTo(scrollValue, scrollValue);
     }
     return () => {};
-  }, [jsonValue]);
+  }, [jsonValue, refresh]);
 
   useEffect(() => {
     if (colorUpdate.target) {
@@ -378,14 +454,14 @@ const Design = () => {
       changeJson.values.type == "page" ||
       changeJson.values.type == "container"
     ) {
-      const containers = matchAndGet(jsonValue.elements, changeJson.values.id);
 
       if (e.target.id == "container_element") {
         newElement = new Object({
           type: "container",
-          id: `Container-${newCount}`,
-          parent: changeJson.values.id ? changeJson.values.id : "Page" ,
-          order: containers.children.length + 1,
+          id: `Container-${containerCount}`,
+          parent: changeJson.values.id ? changeJson.values.id : "Page",
+          // order: containers.children.length + 1,
+          order: containerCount,
           height: "100",
           width: "200",
           background_color: "",
@@ -445,7 +521,7 @@ const Design = () => {
           children: [
             {
               type: "container-column",
-              parent: `Container-${newCount}`,
+              parent: `Container-${containerCount}`,
               id: `column-${columnsCount}`,
               isActive: false,
               isSpace: false,
@@ -454,14 +530,16 @@ const Design = () => {
           ],
         });
 
-        setColumnsCount(columnsCount + 1);
         addedElement = matchAndAdd(
           jsonValue.elements,
           changeJson.values.id && changeJson.values.type != "container"
-            ? changeJson.values.id
-            : "Page",
+          ? changeJson.values.id
+          : "Page",
           newElement
-        );
+          );
+
+        setContainerCount(containerCount + 1)
+        setColumnsCount(columnsCount + 1);
       }
 
       if (e.target.id == "text_element") {
@@ -477,8 +555,8 @@ const Design = () => {
         newElement = new Object({
           parent: parentId,
           type: "text",
-          id: `text-${newCount}`,
-          order: newCount,
+          id: `text-${textCount}`,
+          order: textCount,
           wordBreak: "",
           text_color: "",
           text_size: "15",
@@ -489,6 +567,7 @@ const Design = () => {
         });
 
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
+        setTextCount(textCount + 1)
       }
 
       if (e.target.id == "img_element") {
@@ -505,13 +584,14 @@ const Design = () => {
         newElement = new Object({
           parent: parentId,
           type: "image",
-          id: `image-${newCount}`,
-          order: newCount,
+          id: `image-${imageCount}`,
+          order: imageCount,
           url: "",
           children: [],
         });
 
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
+        setImageCount(imageCount + 1)
       }
 
       if (e.target.id == "button_element") {
@@ -528,22 +608,24 @@ const Design = () => {
         newElement = new Object({
           parent: parentId,
           type: "button-parent",
-          id: `button-parent-${newCount}`,
-          order: newCount,
+          id: `button-parent-${buttonParentCount}`,
+          order: buttonParentCount,
           children: [
             {
               parent: parentId,
               type: "button",
-              id: `button-${newCount}`,
+              id: `button-${buttonCount}`,
               label: "Button",
               icon: "ArrowDown",
-              order: newCount,
+              order: buttonCount,
               children: [],
             },
           ],
         });
 
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
+        setButtonParentCount(buttonParentCount + 1)
+        setButtonCount(buttonCount + 1)
       }
 
       if (e.target.id == "icon_element") {
@@ -560,31 +642,28 @@ const Design = () => {
         newElement = new Object({
           parent: parentId,
           type: "icon-parent",
-          id: `icon-parent-${newCount}`,
-          order: newCount,
+          id: `icon-parent-${iconParentCount}`,
+          order: iconParentCount,
           iconSize: "20",
           children: [
             {
               parent: parentId,
               type: "icon",
-              id: `icon-${newCount}`,
+              id: `icon-${iconCount}`,
               icon: "ArrowDown",
-              order: newCount,
+              order: iconCount,
               children: [],
             },
           ],
         });
 
-        addedElement = matchAndAdd(
-          jsonValue.elements,
-          parentId,
-          newElement
-        );
+        addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
+        setIconParentCount(iconParentCount + 1)
+        setIconCount(iconCount + 1)
       }
 
       if (newElement !== null) {
         setJsonValue({ elements: addedElement });
-        setNewCount(newCount + 1);
       }
     }
   };
@@ -751,7 +830,6 @@ const Design = () => {
     e.preventDefault();
 
     if (
-      // changeJson.values.id == "Page" ||
       e.target.id == "Background"
     )
       return;
@@ -1257,22 +1335,20 @@ const Design = () => {
       const newEle = new Object({
         parent: changeJson.values.id,
         type: "button",
-        id: `button-${newCount}`,
+        id: `button-${buttonCount}`,
         label: "Button",
         icon: "ArrowDown",
-        order: newCount,
+        order: buttonCount,
         children: [],
       });
-      setNewCount(newCount + 1);
-
       const newState = matchAndAdd(
         jsonValue.elements,
         changeJson.values.id,
         newEle
       );
-
       const newChange = matchAndGet(newState, changeJson.values.id);
 
+      setButtonCount(buttonCount + 1)
       setJsonValue({ elements: newState });
       setChangeJson((old) => ({ ...old, values: newChange }));
     }
@@ -1281,20 +1357,19 @@ const Design = () => {
       const newEle = new Object({
         parent: changeJson.values.id,
         type: "icon",
-        id: `icon-${newCount}`,
+        id: `icon-${iconCount}`,
         icon: "ArrowDown",
-        order: newCount,
+        order: iconCount,
         children: [],
       });
-      setNewCount(newCount + 1);
-
       const newState = matchAndAdd(
         jsonValue.elements,
         changeJson.values.id,
         newEle
       );
-
       const newChange = matchAndGet(newState, changeJson.values.id);
+
+      setIconCount(iconCount + 1)
       setJsonValue({ elements: newState });
       setChangeJson((old) => ({ ...old, values: newChange }));
     }
@@ -1302,8 +1377,7 @@ const Design = () => {
 
   const handleMultiEleDelete = (e) => {
     if (
-      (changeJson.values && 
-      changeJson.values.type == "button-parent") ||
+      (changeJson.values && changeJson.values.type == "button-parent") ||
       changeJson.values.type == "icon-parent"
     ) {
       const deletedState = matchAndDelete(jsonValue.elements, {

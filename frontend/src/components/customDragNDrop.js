@@ -1,3 +1,10 @@
+  // const [isDragging, setIsDragging] = useState(false);
+  // const [offset, setOffset] = useState({ x: 0, y: 0 });
+  // const [movableDiv, setMovableDiv] = useState({});
+  // const [placeholderDiv, setPlaceholderDiv] = useState({});
+  // const [moved, setMoved] = useState(false);
+  // const [columnValue, setcolumnValue] = useState("");
+
 
 // const clickedElement = (e) => {
 // if (placeholderDiv.id) {
