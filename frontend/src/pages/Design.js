@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useEffect,
-  useContext,
-  useRef,
-  Children,
-} from "react";
+import React, { useState, useEffect, useContext, useRef} from "react";
 import { useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import Navbar from "../components/Navbar";
@@ -22,13 +16,12 @@ const Design = () => {
     name: undefined,
     values: {},
   });
-  const [inputColorPicker, setInputColorPicker] = useState({});
-  const [columnsCount, setColumnsCount] = useState(0);
+  const [inputColorPicker, setInputColorPicker] = useState({name: "", id: ""});
   const [refresh, setRefresh] = useState(false);
   const [colorUpdate, setColorUpdate] = useState({});
   const [isAddElement, setIsAddElement] = useState(false);
   const [scrollValue, setScrollValue] = useState(0);
-  const [dragValue, setDragValue] = useState("");
+  // const [dragValue, setDragValue] = useState("");
   const [copiedObj, setCopiedObj] = useState("");
   const [jsonValue, setJsonValue] = useState({
     elements: [
@@ -121,12 +114,14 @@ const Design = () => {
     isActive: false,
   });
   const[containerCount, setContainerCount] = useState(1)
+  const[columnsCount, setColumnsCount] = useState(1);
   const[textCount, setTextCount] = useState(1)
   const[imageCount, setImageCount] = useState(1)
   const[iconParentCount, setIconParentCount] = useState(1)
   const[iconCount, setIconCount] = useState(1)
   const[buttonParentCount, setButtonParentCount] = useState(1)
   const[buttonCount, setButtonCount] = useState(1)
+  const[orderObj, setOrderObj] = useState(1)
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -204,6 +199,7 @@ const Design = () => {
             icon: iconCount,
             buttonParent: buttonParentCount,
             button: buttonCount,
+            orderObj: orderObj
           })
 
           const types = [
@@ -223,52 +219,19 @@ const Design = () => {
                 if(obj.type == type.name){
                   obj.id = replaceNumberTest(obj.id, countObject[type.countName])
                   countObject[type.countName] = countObject[type.countName] + 1
-                  if(obj.type != "container"){
-                    obj.parent = replaceNumberTest(obj.parent, countObject.container)
+
+                  if(obj.type == "container"){
+                    obj.order = new Number(countObject.container) - 1
+                  }
+                  if(obj.type != "container" && obj.type != "container-column"){
+                    obj.parent = replaceNumberTest(obj.parent, countObject.container - 1)
+                    obj.order = countObject.orderObj
+                    countObject.orderObj = countObject.orderObj + 1
                   }
                 }
-              }
-
-              // if(obj.type == "container"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.container)
-              //   countObject.container = countObject.container + 1
-              // }
-              // if(obj.type == "container-column"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.column)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.column = countObject.column + 1
-              // }
-              // if(obj.type == "text"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.text)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.text = countObject.text + 1
-              // }
-              // if(obj.type == "image"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.image)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.image = countObject.image + 1
-              // }
-              // if(obj.type == "icon-parent"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.iconParent)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.iconParent = countObject.iconParent + 1
-              // }
-              // if(obj.type == "icon"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.icon)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.icon = countObject.icon + 1
-              // }
-              // if(obj.type == "button-parent"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.buttonParent)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.buttonParent = countObject.buttonParent + 1
-              // }
-              // if(obj.type == "button"){
-              //   obj.id = replaceNumberTest(obj.id, countObject.button)
-              //   obj.parent = replaceNumberTest(obj.parent, countObject.container)
-              //   countObject.button = countObject.button + 1
-              // }
+              } 
           }
+
           if(obj.children && Array.isArray(obj.children)){
             for (const child of obj.children){
               mutateObj(child, countObject)
@@ -277,7 +240,6 @@ const Design = () => {
         }
 
         mutateObj(obj, countObject)
-
         setContainerCount(countObject.container)
         setColumnsCount(countObject.column)
         setTextCount(countObject.text)
@@ -286,20 +248,11 @@ const Design = () => {
         setIconCount(countObject.icon)
         setButtonParentCount(countObject.buttonParent)
         setButtonCount(countObject.button)
+        setOrderObj(countObject.orderObj)
         return obj
         };
 
-        const updateContainerOrder = (obj, orderNumber) =>{
-          if(typeof obj === "object" && obj != null){
-            if(obj.order){
-              obj.order = orderNumber
-            }
-          }
-        }
-
         const updatedObj1 = updateEverySingleId(cloneObject(copiedObj))
-        console.log("updatedObj1", updatedObj1);
-        // const updatedObj2 = updateEverySingleId(cloneObject(updatedObj1), o)
         const newState = matchAndAdd(jsonValue.elements, parentId.id, updatedObj1);
         setJsonValue({elements: newState})
       }
@@ -308,8 +261,6 @@ const Design = () => {
         e.preventDefault();
       }
     };
-
-    console.log("jsonValue", jsonValue);
 
     const keyUp = (e) => {
       if (e.key == "Control") setCtrlDown(false);
@@ -460,7 +411,6 @@ const Design = () => {
           type: "container",
           id: `Container-${containerCount}`,
           parent: changeJson.values.id ? changeJson.values.id : "Page",
-          // order: containers.children.length + 1,
           order: containerCount,
           height: "100",
           width: "200",
@@ -556,7 +506,7 @@ const Design = () => {
           parent: parentId,
           type: "text",
           id: `text-${textCount}`,
-          order: textCount,
+          order: orderObj,
           wordBreak: "",
           text_color: "",
           text_size: "15",
@@ -568,6 +518,7 @@ const Design = () => {
 
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
         setTextCount(textCount + 1)
+        setOrderObj(orderObj + 1)
       }
 
       if (e.target.id == "img_element") {
@@ -585,13 +536,14 @@ const Design = () => {
           parent: parentId,
           type: "image",
           id: `image-${imageCount}`,
-          order: imageCount,
+          order: orderObj,
           url: "",
           children: [],
         });
 
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
         setImageCount(imageCount + 1)
+        setOrderObj(orderObj + 1)
       }
 
       if (e.target.id == "button_element") {
@@ -609,7 +561,7 @@ const Design = () => {
           parent: parentId,
           type: "button-parent",
           id: `button-parent-${buttonParentCount}`,
-          order: buttonParentCount,
+          order: orderObj,
           children: [
             {
               parent: parentId,
@@ -626,6 +578,7 @@ const Design = () => {
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
         setButtonParentCount(buttonParentCount + 1)
         setButtonCount(buttonCount + 1)
+        setOrderObj(orderObj + 1)
       }
 
       if (e.target.id == "icon_element") {
@@ -643,7 +596,7 @@ const Design = () => {
           parent: parentId,
           type: "icon-parent",
           id: `icon-parent-${iconParentCount}`,
-          order: iconParentCount,
+          order: orderObj,
           iconSize: "20",
           children: [
             {
@@ -660,6 +613,7 @@ const Design = () => {
         addedElement = matchAndAdd(jsonValue.elements, parentId, newElement);
         setIconParentCount(iconParentCount + 1)
         setIconCount(iconCount + 1)
+        setOrderObj(orderObj + 1)
       }
 
       if (newElement !== null) {
@@ -842,7 +796,7 @@ const Design = () => {
       const prev = target.order;
       const next = prev + 1;
 
-      const newContainers = containers.map((value, index) => {
+      const newContainers = containers.map((value) => {
         const newValue = cloneObject(value);
 
         if (value.order == key && key < prev) {
@@ -1137,20 +1091,6 @@ const Design = () => {
     }
   };
 
-  // document.onmousedown = (e) => {
-  //   if (e.target.id == inputColorPicker.id || e.target.id == "canvas") {
-  //     return;
-  //   }
-  //   setInputColorPicker({});
-  // };
-
-  const handleColorPickerInput = (e) => {
-    if (e.target.id == "canvas" || e.target.id == inputColorPicker.id) {
-      return;
-    }
-    setInputColorPicker({ name: e.target.dataset.name, id: e.target.id });
-  };
-
   const handleUploadImage = () => {
     uploadImageRef.current.click();
   };
@@ -1419,6 +1359,23 @@ const Design = () => {
     setChangeJson((old) => ({ ...old, values: newChange }));
   };
 
+  const handleTest = (e) =>{
+    console.log('testing 1');
+    if(e.currentTarget){
+      setInputColorPicker({name: e.currentTarget.getAttribute("name"), id: e.target.id})
+    }
+  }
+
+  useEffect(() =>{
+    const colorPickerHide = (e) =>{
+      if(e.target.id != inputColorPicker.id || inputColorPicker.name != "Page"){
+        setInputColorPicker({name: "", id: ""})
+      }
+    }
+    document.addEventListener("click", colorPickerHide)
+    return () => {document.removeEventListener("click", colorPickerHide)}
+  }, [inputColorPicker])
+
   return (
     <div>
       <Navbar />
@@ -1475,7 +1432,7 @@ const Design = () => {
       changeJson.values.type == "container" ? (
         <div
           className="fixed right-0 h-full w-[23em] bg-[rgba(53,54,66,.9825)]
-                           z-50 overflow-y-auto"
+                     z-50 overflow-y-auto"
         >
           <div className="text-white w-full">
             <h1
@@ -1609,7 +1566,7 @@ const Design = () => {
                     ></div>
                     <div className="">Color</div>
                   </div>
-                  <div onClick={handleColorPickerInput}>
+                  <div>
                     <input
                       data-name={changeJson.values.id}
                       id="background_color"
@@ -1672,7 +1629,7 @@ const Design = () => {
                         </div>
                         <div className="flex">
                           <div
-                            onClick={handleColorPickerInput}
+                             
                             className="w-[115px]"
                           >
                             <input
@@ -1955,7 +1912,7 @@ const Design = () => {
                   ></div>
                   <div className="">Border Color</div>
                 </div>
-                <div onClick={handleColorPickerInput}>
+                <div>
                   <input
                     data-name={changeJson.values.id}
                     id="border_color"
@@ -2247,7 +2204,7 @@ const Design = () => {
                   ></div>
                   <div className="">Color</div>
                 </div>
-                <div onClick={handleColorPickerInput}>
+                <div  >
                   <input
                     data-name={changeJson.values.id}
                     id="background_color"
@@ -2295,7 +2252,7 @@ const Design = () => {
                       </div>
                       <div className="flex">
                         <div
-                          onClick={handleColorPickerInput}
+                           
                           className="w-[115px]"
                         >
                           <input
@@ -2383,7 +2340,7 @@ const Design = () => {
                         </div>
                         <div className="flex">
                           <div
-                            onClick={handleColorPickerInput}
+                             
                             className="w-[115px]"
                           >
                             <input
@@ -2474,7 +2431,12 @@ const Design = () => {
                 ></div>
                 <div className="">Color</div>
               </div>
-              <div onClick={handleColorPickerInput}>
+              <div 
+                id="colorPicker"
+                name={changeJson.values.id}
+                className=""
+                onClick={handleTest}
+              >
                 <input
                   data-name={changeJson.values.id}
                   id="background_color"
@@ -2483,12 +2445,7 @@ const Design = () => {
                   onChange={updateElementsValues}
                 />
                 <div
-                  className={
-                    inputColorPicker.name == changeJson.values.id &&
-                    inputColorPicker.id == "background_color"
-                      ? "color_picker active"
-                      : "color_picker"
-                  }
+                  className={inputColorPicker.name == changeJson.values.id ? "color_picker active" : "color_picker"}
                 >
                   <PickColor
                     setColorUpdate={setColorUpdate}

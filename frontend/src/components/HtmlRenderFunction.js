@@ -48,6 +48,7 @@ const HtmlRenderFunction = (
           newDiv.setAttribute("data-type", "container");
           newDiv.removeAttribute("draggable");
 
+          newDiv.style.pointerEvents = "none"
           newDiv.style.position = element.position;
           newDiv.style.background = element.background_color;
           // newDiv.style.height = element.height + "px";
@@ -171,6 +172,7 @@ const HtmlRenderFunction = (
         if (element.type == "container-column") {
           newDiv.style.padding = "5px";
           newDiv.style.width = "100%";
+          newDiv.style.pointerEvents = "auto"
 
           if (element.children.length == 0) {
             if (element.isSpace) {
@@ -236,6 +238,9 @@ const HtmlRenderFunction = (
           containerWrapperDiv.style.padding = "10px";
           containerWrapperDiv.style.width = "100%";
 
+          // pointer events
+          containerWrapperDiv.style.pointerEvents = 'auto'
+
           containerWrapperDiv.setAttribute("draggable", true);
           containerWrapperDiv.addEventListener("dragstart", handleDragStart);
           containerWrapperDiv.addEventListener("dragstart", () => {
@@ -279,7 +284,6 @@ const HtmlRenderFunction = (
 
           newDiv.classList.add("button");
           newDiv.style.height = "30px";
-          // newDiv.style.width = "80px";
           newDiv.style.background = "white";
           newDiv.style.borderRadius = "5%";
           newDiv.style.cursor = "pointer";
@@ -337,10 +341,10 @@ const HtmlRenderFunction = (
           containerWrapperDiv.addEventListener("dragstart", handleDragStart);
           containerWrapperDiv.addEventListener("dragstart", () => {
             containerWrapperDiv.style.height =
-              document.querySelector(`#${element.id}`).getBoundingClientRect()
+              document.querySelector(`#${element.id}-wrapper`).getBoundingClientRect()
                 .height + "px";
             containerWrapperDiv.style.width =
-              document.querySelector(`#${element.id}`).getBoundingClientRect()
+              document.querySelector(`#${element.id}-wrapper`).getBoundingClientRect()
                 .width + "px";
           });
 
@@ -399,6 +403,7 @@ const HtmlRenderFunction = (
           newDiv.style.alignItems = "center";
           newDiv.style.padding = "10px";
           newDiv.style.width = "100%";
+          newDiv.style.pointerEvents = "none"
 
           const containerWrapperDiv = document.createElement("div");
           containerWrapperDiv.id = element.id + "-wrapper";
@@ -413,10 +418,10 @@ const HtmlRenderFunction = (
           containerWrapperDiv.addEventListener("dragstart", handleDragStart);
           containerWrapperDiv.addEventListener("dragstart", () => {
             containerWrapperDiv.style.height =
-              document.querySelector(`#${element.id}`).getBoundingClientRect()
+              document.querySelector(`#${element.id}-wrapper`).getBoundingClientRect()
                 .height + "px";
             containerWrapperDiv.style.width =
-              document.querySelector(`#${element.id}`).getBoundingClientRect()
+              document.querySelector(`#${element.id}-wrapper`).getBoundingClientRect()
                 .width + "px";
           });
 

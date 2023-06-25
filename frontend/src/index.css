@@ -16,7 +16,7 @@
   .column_expanded {
     height: 100px;
   }
-  button .color_picker {
+  .color_picker {
     display: none;
   }
   .color_picker.active {
