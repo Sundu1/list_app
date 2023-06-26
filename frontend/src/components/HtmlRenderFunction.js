@@ -405,7 +405,7 @@ const HtmlRenderFunction = (
           newDiv.setAttribute("icon_color", element.icon_color);
           newDiv.style.display = "flex";
           newDiv.style.alignContent = "space-between";
-          newDiv.style.justifyContent = "center";
+          newDiv.style.justifyContent = element.position;
           newDiv.style.flexWrap = "wrap";
           newDiv.style.gap = "10px";
           newDiv.style.alignItems = "center";
