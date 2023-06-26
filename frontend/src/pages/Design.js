@@ -7,6 +7,7 @@ import {GiHamburgerMenu} from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight, FaUnderline } from "react-icons/fa";
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
 import PickColor from "../components/PickColor";
+import { createNewDesign } from "../model/Post";
 
 const Design = () => {
   const { designTable } = useParams();
@@ -156,6 +157,7 @@ const Design = () => {
           values: {},
         });
       }
+
       if (e.key == "Control") setCtrlDown(true);
 
       if (ctrlDown && e.key == "c") setCopiedObj(changeJson.values);
@@ -259,6 +261,8 @@ const Design = () => {
 
       if (ctrlDown && e.key == "s") {
         e.preventDefault();
+        createNewDesign('test', jsonValue.elements, value)
+        console.log("Save the jsonValue");
       }
     };
 
@@ -315,11 +319,18 @@ const Design = () => {
 
   useEffect(() => {
     if (colorUpdate.target) {
-      if (
-        changeJson.values.type == "background" ||
-        changeJson.values.type == "container"
-      ) {
+      console.log("colorUpdate", colorUpdate.target);
+      if (colorUpdate.target.type == "background") {
+        console.log(colorUpdate);
         updateBackGround(colorUpdate);
+        return
+      } 
+      if(
+        colorUpdate.target.type == "container" &&
+        colorUpdate.target.id != "border_color"
+      ){
+        updateBackGround(colorUpdate);
+        return
       } else {
         updateElementsValues(colorUpdate);
       }
@@ -562,6 +573,9 @@ const Design = () => {
           type: "button-parent",
           id: `button-parent-${buttonParentCount}`,
           order: orderObj,
+          position: "center",
+          button_background_color: "white",
+          button_color: "white",
           children: [
             {
               parent: parentId,
@@ -598,6 +612,8 @@ const Design = () => {
           id: `icon-parent-${iconParentCount}`,
           order: orderObj,
           iconSize: "20",
+          position: "center",
+          icon_color: "black",
           children: [
             {
               parent: parentId,
@@ -856,7 +872,7 @@ const Design = () => {
       //     );
       return newContainers;
     };
-
+    
     if (
       e.target.className == "container-wrapper" &&
       e.target.children[0] &&
@@ -1359,16 +1375,15 @@ const Design = () => {
     setChangeJson((old) => ({ ...old, values: newChange }));
   };
 
-  const handleTest = (e) =>{
-    console.log('testing 1');
+  const handleColorPicker = (e) =>{
     if(e.currentTarget){
-      setInputColorPicker({name: e.currentTarget.getAttribute("name"), id: e.target.id})
+      setInputColorPicker({name: e.currentTarget.getAttribute("name"), id: e.currentTarget.id, idTest: e.target.id})
     }
   }
 
   useEffect(() =>{
     const colorPickerHide = (e) =>{
-      if(e.target.id != inputColorPicker.id || inputColorPicker.name != "Page"){
+      if(e.target.id != inputColorPicker.idTest){
         setInputColorPicker({name: "", id: ""})
       }
     }
@@ -1378,7 +1393,7 @@ const Design = () => {
 
   return (
     <div>
-      <Navbar />
+      {/* <Navbar /> */}
       <div
         className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] 
                         rounded-lg text-[30px] z-50"
@@ -1419,7 +1434,7 @@ const Design = () => {
 
       <div
         id="EditContainer"
-        className="fixed top-0 pt-[60px] flex justify-center bg-gray-300/50 w-full 
+        className="fixed top-0 flex justify-center bg-gray-300/50 w-full 
                    h-full text-black overflow-y-auto"
         onPointerUp={clickedElement}
       ></div>
@@ -1566,7 +1581,12 @@ const Design = () => {
                     ></div>
                     <div className="">Color</div>
                   </div>
-                  <div>
+                  <div
+                    id="backgroundColor"
+                    name={changeJson.values.id}
+                    className=""
+                    onClick={handleColorPicker}
+                  >
                     <input
                       data-name={changeJson.values.id}
                       id="background_color"
@@ -1580,8 +1600,8 @@ const Design = () => {
                     />
                     <div
                       className={
-                        inputColorPicker.name == changeJson.values.id &&
-                        inputColorPicker.id == "background_color"
+                        inputColorPicker.name == changeJson.values.id && 
+                        inputColorPicker.id == "backgroundColor"
                           ? "color_picker active"
                           : "color_picker"
                       }
@@ -1589,6 +1609,7 @@ const Design = () => {
                       <PickColor
                         setColorUpdate={setColorUpdate}
                         changeJson={changeJson}
+                        type="background_color"
                       />
                     </div>
                   </div>
@@ -1627,20 +1648,23 @@ const Design = () => {
                           ></div>
                           <div className="">Color</div>
                         </div>
-                        <div className="flex">
-                          <div
-                             
+                        <div className="flex w-full">
+                          <div 
                             className="w-[115px]"
+                            name={changeJson.values.id}
+                            id={`color-${i}`}
+                            onClick={handleColorPicker}
                           >
                             <input
                               data-indexvalue={i}
                               id={`color-${i}`}
-                              className="input_color_picker"
+                              className="input_color_picker w-full"
                               value={value.color}
                               onChange={updateBackGround}
                             />
                             <div
                               className={
+                                inputColorPicker.name == changeJson.values.id &&
                                 inputColorPicker.id == `color-${i}`
                                   ? "color_picker active"
                                   : "color_picker"
@@ -1659,7 +1683,12 @@ const Design = () => {
                             max={100}
                             id="percentage"
                             type="range"
-                            className="ml-2 slider_style w-[100px]"
+                            className={
+                              inputColorPicker.name == changeJson.values.id &&
+                              inputColorPicker.id == `color-${i}`
+                              ? "hidden"
+                              : "ml-2 slider_style w-[100px]"
+                            }
                             value={value.percentage}
                             onChange={updateBackGround}
                           />
@@ -1912,9 +1941,14 @@ const Design = () => {
                   ></div>
                   <div className="">Border Color</div>
                 </div>
-                <div>
+                <div
+                  id="borderColor"
+                  name={changeJson.values.id}
+                  className=""
+                  onClick={handleColorPicker}
+                >
                   <input
-                    data-name={changeJson.values.id}
+                    name={changeJson.values.id}
                     id="border_color"
                     className="input_color_picker"
                     value={changeJson.values.border_color}
@@ -1922,8 +1956,8 @@ const Design = () => {
                   />
                   <div
                     className={
-                      inputColorPicker.name == changeJson.values.id &&
-                      inputColorPicker.id == "border_color"
+                      inputColorPicker.name == changeJson.values.id && 
+                      inputColorPicker.id == "borderColor"
                         ? "color_picker active"
                         : "color_picker"
                     }
@@ -2204,7 +2238,12 @@ const Design = () => {
                   ></div>
                   <div className="">Color</div>
                 </div>
-                <div  >
+                <div
+                  id="colorPicker"
+                  name={changeJson.values.id}
+                  className=""
+                  onClick={handleColorPicker}
+                >
                   <input
                     data-name={changeJson.values.id}
                     id="background_color"
@@ -2219,7 +2258,7 @@ const Design = () => {
                   <div
                     className={
                       inputColorPicker.name == changeJson.values.id &&
-                      inputColorPicker.id == "background_color"
+                      inputColorPicker.id == "colorPicker"
                         ? "color_picker active"
                         : "color_picker"
                     }
@@ -2251,10 +2290,43 @@ const Design = () => {
                         <div className="">Color</div>
                       </div>
                       <div className="flex">
-                        <div
-                           
+                          {/* 
+                                                      <div 
+                            className="w-[115px]"
+                            name={changeJson.values.id}
+                            id={`color-${i}`}
+                            onClick={handleColorPicker}
+                          >
+                            <input
+                              data-indexvalue={i}
+                              id={`color-${i}`}
+                              className="input_color_picker w-full"
+                              value={value.color}
+                              onChange={updateBackGround}
+                            />
+                            <div
+                              className={
+                                inputColorPicker.name == changeJson.values.id &&
+                                inputColorPicker.id == `color-${i}`
+                                  ? "color_picker active"
+                                  : "color_picker"
+                              }
+                            >
+                              <PickColor
+                                setColorUpdate={setColorUpdate}
+                                changeJson={changeJson}
+                                type={"color"}
+                                idValue={i}
+                              />
+                            </div>
+                          </div>
+                          */}
+                        <div 
                           className="w-[115px]"
-                        >
+                          name={changeJson.values.id}
+                          id={`color-${i}`}
+                          onClick={handleColorPicker}
+                          >
                           <input
                             data-indexvalue={i}
                             id={`color-${i}`}
@@ -2264,6 +2336,7 @@ const Design = () => {
                           />
                           <div
                             className={
+                              inputColorPicker.name == changeJson.values.id &&
                               inputColorPicker.id == `color-${i}`
                                 ? "color_picker active"
                                 : "color_picker"
@@ -2282,7 +2355,12 @@ const Design = () => {
                           max={100}
                           id="percentage"
                           type="range"
-                          className="ml-2 slider_style w-[100px]"
+                          className={
+                            inputColorPicker.name == changeJson.values.id &&
+                            inputColorPicker.id == `color-${i}`
+                              ? "hidden"
+                              : "ml-2 slider_style w-[100px]"
+                          }
                           value={value.percentage}
                           onChange={updateBackGround}
                         />
@@ -2339,10 +2417,7 @@ const Design = () => {
                           <div className="">Color</div>
                         </div>
                         <div className="flex">
-                          <div
-                             
-                            className="w-[115px]"
-                          >
+                          <div className="w-[115px]">
                             <input
                               data-indexvalue={i}
                               id={`color-${i}`}
@@ -2431,11 +2506,11 @@ const Design = () => {
                 ></div>
                 <div className="">Color</div>
               </div>
-              <div 
+              <div
                 id="colorPicker"
                 name={changeJson.values.id}
                 className=""
-                onClick={handleTest}
+                onClick={handleColorPicker}
               >
                 <input
                   data-name={changeJson.values.id}
@@ -2445,11 +2520,17 @@ const Design = () => {
                   onChange={updateElementsValues}
                 />
                 <div
-                  className={inputColorPicker.name == changeJson.values.id ? "color_picker active" : "color_picker"}
+                  className={
+                    inputColorPicker.name == changeJson.values.id &&
+                    inputColorPicker.id == "colorPicker"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
                 >
                   <PickColor
                     setColorUpdate={setColorUpdate}
                     changeJson={changeJson}
+                    type="background_color"
                   />
                 </div>
               </div>
@@ -2753,6 +2834,64 @@ const Design = () => {
               >
                 Add
               </div>
+              <h1 className="py-3">Color</h1>
+              <div
+                id="buttonColor"
+                name={changeJson.values.id}
+                className=""
+                onClick={handleColorPicker}
+              >
+                <input
+                  data-name={changeJson.values.id}
+                  id="button_color"
+                  className="input_color_picker"
+                  value={changeJson.values.button_color}
+                  onChange={updateElementsValues}
+                />
+                <div
+                  className={
+                    inputColorPicker.name == changeJson.values.id && 
+                    inputColorPicker.id == "buttonColor"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
+                >
+                  <PickColor
+                    setColorUpdate={setColorUpdate}
+                    changeJson={changeJson}
+                    type="button_color"
+                  />
+                </div>
+              </div>
+              <h1 className="py-3">Background color</h1>
+              <div
+                id="backgroundColor"
+                name={changeJson.values.id}
+                className=""
+                onClick={handleColorPicker}
+              >
+                <input
+                  data-name={changeJson.values.id}
+                  id="button_background_color"
+                  className="input_color_picker"
+                  value={changeJson.values.button_background_color}
+                  onChange={updateElementsValues}
+                />
+                <div
+                  className={
+                    inputColorPicker.name == changeJson.values.id && 
+                    inputColorPicker.id == "backgroundColor"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
+                >
+                  <PickColor
+                      setColorUpdate={setColorUpdate}
+                      changeJson={changeJson}
+                    type="button_background_color"
+                  />
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -2859,6 +2998,34 @@ const Design = () => {
                   value={changeJson.values.iconSize}
                   onChange={updateElementsValues}
                 />
+              </div>
+              <div
+                id="backgroundColor"
+                name={changeJson.values.id}
+                className=""
+                onClick={handleColorPicker}
+              >
+                <input
+                  data-name={changeJson.values.id}
+                  id="icon_color"
+                  className="input_color_picker"
+                  value={changeJson.values.icon_color}
+                  onChange={updateElementsValues}
+                />
+                <div
+                  className={
+                    inputColorPicker.name == changeJson.values.id && 
+                    inputColorPicker.id == "backgroundColor"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
+                >
+                  <PickColor
+                    setColorUpdate={setColorUpdate}
+                    changeJson={changeJson}
+                    type="icon_color"
+                  />
+                </div>
               </div>
             </div>
           </div>

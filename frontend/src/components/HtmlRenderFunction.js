@@ -295,10 +295,13 @@ const HtmlRenderFunction = (
           newDiv.style.justifyContent = "between";
           newDiv.style.alignItems = "center";
 
+          newDiv.style.backgroundColor = parent.getAttribute("button_background_color") 
+
           const span = document.createElement("span");
           span.style.fontSize = "13px";
           span.style.font = "san serif";
           span.style.fontWeight = "800";
+          span.style.color = parent.getAttribute("button_color")
 
           const img = document.createElement("img");
           img.style.pointerEvents = "none";
@@ -317,6 +320,8 @@ const HtmlRenderFunction = (
 
         if (element.type == "button-parent") {
           newDiv.setAttribute("data-type", "button-parent");
+          newDiv.setAttribute("button_color", element.button_color);
+          newDiv.setAttribute("button_background_color", element.button_background_color);
           newDiv.removeAttribute("draggable");
 
           newDiv.style.display = "flex";
@@ -386,6 +391,7 @@ const HtmlRenderFunction = (
           img.style.paddingLeft = "5px";
           img.style.height = parent.getAttribute("icon_size") + "px";
           img.style.width = parent.getAttribute("icon_size") + "px";
+          img.style.fill = parent.getAttribute("icon_color")
 
           newDiv.appendChild(img);
           newDiv.style.marginRight = "5%";
@@ -396,8 +402,10 @@ const HtmlRenderFunction = (
           newDiv.removeAttribute("draggable");
 
           newDiv.setAttribute("icon_size", element.iconSize);
+          newDiv.setAttribute("icon_color", element.icon_color);
           newDiv.style.display = "flex";
           newDiv.style.alignContent = "space-between";
+          newDiv.style.justifyContent = "center";
           newDiv.style.flexWrap = "wrap";
           newDiv.style.gap = "10px";
           newDiv.style.alignItems = "center";
@@ -409,7 +417,8 @@ const HtmlRenderFunction = (
           containerWrapperDiv.id = element.id + "-wrapper";
           containerWrapperDiv.classList.add("icon-wrapper");
           containerWrapperDiv.style.display = "flex";
-          containerWrapperDiv.style.justifyContent = element.text_align;
+          // containerWrapperDiv.style.justifyContent = element.text_align;
+          containerWrapperDiv.style.justifyContent = element.position;
           containerWrapperDiv.style.alignItems = "center";
           containerWrapperDiv.style.padding = "10px";
           containerWrapperDiv.style.width = "100%";

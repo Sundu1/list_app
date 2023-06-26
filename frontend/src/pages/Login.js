@@ -20,7 +20,6 @@ const Login = () => {
     setLoading(true);
     e.preventDefault();
     const userInfo = await SignIn(username, password);
-    console.log(userInfo);
     if (userInfo.result) {
       localStorage.setItem("user", JSON.stringify(userInfo));
       setValue(userInfo);
@@ -32,10 +31,8 @@ const Login = () => {
       setIsNotif(!isNotif);
       return;
     }
-    console.log(userInfo.result);
   };
-
-  console.log(isNotif);
+  
   return (
     <section className="bg-gray-50 dark:bg-gray-900">
       {isNotif ? (

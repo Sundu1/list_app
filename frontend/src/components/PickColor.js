@@ -84,38 +84,6 @@ const PickColor = ({ setColorUpdate, changeJson, type, idValue }) => {
 
       const hex = valueToHex(imageData[0], imageData[1], imageData[2])
       let background_color_values;
-
-
-      if (changeJson.values && changeJson.values.type == "container") {
-        if ((type ||= "background_color")) {
-          background_color_values = new Object({
-            target: {
-              id: "background_color",
-              value: hex,
-            },
-          });
-        }
-        
-        if (type == "border_color") {
-          background_color_values = new Object({
-            target: {
-              id: "border_color",
-              value: hex,
-            },
-          });
-        }
-        if (type == "color") {
-          background_color_values = new Object({
-            target: {
-              id: "color",
-              dataset: {
-                indexvalue: idValue,
-              },
-              value: hex,
-            },
-          });
-        }
-      }
       
       if (changeJson.values && changeJson.values.type == "text") {
         background_color_values = new Object({
@@ -125,12 +93,13 @@ const PickColor = ({ setColorUpdate, changeJson, type, idValue }) => {
           },
         });
       }
-      if (changeJson.values && changeJson.values.type == "background") {
+      else if (changeJson.values && changeJson.values.type == "background") {
         if ((type ||= "background_color")) {
           background_color_values = new Object({
             target: {
               id: "background_color",
               value: hex,
+              type: "background"
             },
           });
         }
@@ -142,16 +111,70 @@ const PickColor = ({ setColorUpdate, changeJson, type, idValue }) => {
                 indexvalue: idValue,
               },
               value: hex,
+              type: "background"
             },
           });
         }
       }
 
-      if (changeJson.values && changeJson.values.type == "page") {
+      else if (changeJson.values && changeJson.values.type == "page") {
         background_color_values = new Object({
           target: {
             id: "background_color",
             value: hex,
+            type: "page"
+          },
+        });
+      }
+      else if (changeJson.values && changeJson.values.type == "container") {
+        if (type == "background_color") {
+          background_color_values = new Object({
+            target: {
+              id: type,
+              value: hex,
+              type: "container"
+            },
+          });
+        }
+        if (type == "border_color") {
+          background_color_values = new Object({
+            target: {
+              id: type,
+              value: hex,
+              type: "container"
+            },
+          });
+        }
+        if (type == "color") {
+          background_color_values = new Object({
+            target: {
+              id: type,
+              dataset: {
+                indexvalue: idValue,
+              },
+              value: hex,
+              type: "container"
+            },
+          });
+        }
+
+        background_color_values = new Object({
+          target: {
+            id: type,
+            dataset: {
+              indexvalue: idValue,
+            },
+            value: hex,
+            type: "container"
+          },
+        });
+      } 
+      else {
+        background_color_values = new Object({
+          target: {
+            id: type,
+            value: hex,
+            type: type
           },
         });
       }

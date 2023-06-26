@@ -86,13 +86,14 @@ const addColumnPost = async (tableName, user, columnInfo) => {
   }
 };
 
-const createNewDesign = async (designName, user) => {
+const createNewDesign = async (designName, designObjects ,user) => {
   try {
     const response = await axios({
       method: "post",
       url: `${BASE_URL}/create-design`,
       data: {
         designName,
+        designObjects,
         user,
       },
     });
@@ -103,4 +104,4 @@ const createNewDesign = async (designName, user) => {
   }
 };
 
-export { createNewRow, SignIn, insertNewTable, addColumnPost, createNewDesign };
+export { createNewRow, SignIn, insertNewTable, addColumnPost, createNewDesign};

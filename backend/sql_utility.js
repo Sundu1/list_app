@@ -30,8 +30,8 @@ class DesignTable {
       return "this value already exist";
 
     const result = await this.sqlClient.pool
-      .query(`insert into ${this.userSchemeName}.design_table(name, json_value)
-              values ('${data.name}', '${data.json_value}')`);
+      .query(`insert into ${this.userSchemeName}.design_table(name, json_value, user)
+              values ('${data.name}', '${data.json_value}', '${data.user}')`);
 
     return result ? "created successfully" : "did not created";
   }

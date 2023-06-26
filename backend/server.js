@@ -341,15 +341,7 @@ const sunsql = new Sunsql({
   },
 });
 
-// sunsql.designTable.init("admin");
-// const create = await sunsql.designTable.create({
-//   data: {
-//     name: "test",
-//     json_value: "{sdfsd}",
-//   },
-//   checkDuplicates: false,
-// });
-// console.log(create);
+
 
 // const findMany = await sunsql.designTable.findMany({
 //   where: {
@@ -374,6 +366,21 @@ app.get("/designlist/:user", async (req, res) => {
   const result = await sunsql.designTable.findAll();
   res.send(result);
 });
+
+
+sunsql.designTable.init("admin");
+
+app.post("/create-design", async(req, res) =>{
+  const {designName, designObjects, user} = req.body
+
+  const create = await sunsql.designTable.create({
+    data: {
+      name: designName,
+      json_value: "{sdfsd}",
+    },
+    checkDuplicates: false,
+  });
+})
 
 app.listen(port, function () {
   console.log("Server is listening at port 5000...");
