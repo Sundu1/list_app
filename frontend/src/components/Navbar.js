@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import { UserContext } from "./LoginProvider";
-import default_img from "../imgs/default.png";
+import default_img from "../assets/imgs/default.png";
 
 const Navbar = () => {
   const [dropdown, setDropdown] = useState(false);

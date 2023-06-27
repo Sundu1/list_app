@@ -204,6 +204,9 @@ const Design = () => {
   const[buttonParentCount, setButtonParentCount] = useState(1)
   const[buttonCount, setButtonCount] = useState(1)
   const[orderObj, setOrderObj] = useState(1)
+
+  const [test, setTest] = useState({})
+
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
 
@@ -357,8 +360,7 @@ const Design = () => {
           orderObj,
         })
         createNewDesign(designTable, jsonValue.elements, value, valuecounts)
-        const test = await getDesignSingle(value, designTable)
-        console.log(test);
+        // getDesignSingle(setTest ,value, designTable)
         console.log("Save the jsonValue");
       }
     };
