@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef} from "react";
-import { useParams } from "react-router-dom";
+import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import Navbar from "../components/Navbar";
 import { BsFillDatabaseFill, BsTrashFill } from "react-icons/bs";
@@ -8,6 +8,7 @@ import { FaArrowLeft, FaArrowRight, FaUnderline } from "react-icons/fa";
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
 import PickColor from "../components/PickColor";
 import { createNewDesign } from "../model/Post";
+import { getDesignSingle } from "../model/Get";
 
 const Design = () => {
   const { designTable } = useParams();
@@ -24,6 +25,86 @@ const Design = () => {
   const [scrollValue, setScrollValue] = useState(0);
   // const [dragValue, setDragValue] = useState("");
   const [copiedObj, setCopiedObj] = useState("");
+  const [defaultJson, setDefaultJson] = useState({
+    elements: [
+      {
+        type: "background",
+        id: "Background",
+        scroll_top: 0,
+        height: "100%",
+        width: "100%",
+        position: "fixed",
+        background_style_type: "color",
+        background_style_types: {
+          color: { background_color: "white" },
+          gradient: [
+            {
+              color: " rgba(135, 92, 161, 0.79)",
+              percentage: "21",
+            },
+            {
+              color: "rgba(66, 95, 199, 0.69)",
+              percentage: "68",
+            },
+            {
+              color: "rgba(0, 148, 255, 0.54)",
+              percentage: "100",
+            },
+          ],
+          image: {
+            background_color: "white",
+            background_url: "",
+            gradient: [
+              {
+                color: " rgba(135, 92, 161, 0.79)",
+                percentage: "21",
+                transparency: "0.79",
+              },
+              {
+                color: "rgba(66, 95, 199, 0.69)",
+                percentage: "68",
+                transparency: "0.69",
+              },
+              {
+                color: "rgba(0, 148, 255, 0.54)",
+                percentage: "100",
+                transparency: "0.54",
+              },
+            ],
+          },
+        },
+
+        isActive: false,
+        children: [
+          {
+            type: "page",
+            id: "Page",
+            height: "200",
+            width: "500",
+            position_div: "relative",
+            text_align: "center",
+            position: "center",
+            background_color: "rgb(220,220,220)",
+            padding: "10px",
+            text: "text here",
+            display: "",
+            margin_top: "0",
+            margin_left: "0",
+            margin_right: "0",
+            margin_bottom: "0",
+            padding_vertical: "20",
+            padding_horizontal: "20",
+            isActive: false,
+            border_color: "",
+            border_style: "",
+            border_size: "0",
+            border_roundness: "0",
+            children: [],
+          },
+        ],
+      },
+    ],
+  })
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
@@ -161,107 +242,123 @@ const Design = () => {
       if (e.key == "Control") setCtrlDown(true);
 
       if (ctrlDown && e.key == "c") setCopiedObj(changeJson.values);
+
       if (ctrlDown && e.key == "v") {
-        const containerEle = (elements, values) => {
-          let currentEle = values;
-          while (currentEle.type != undefined) {
-            currentEle = matchAndGet(elements, currentEle.parent);
-            if (currentEle.type == "page") break;
-            if (currentEle.type == "container") break;
-          }
-          return Array.isArray(currentEle) ? undefined : currentEle;
-        };
-
-        const parentId = containerEle(jsonValue.elements, changeJson.values);
-        if (
-          Object.keys(copiedObj).length < 1 ||
-          (parentId && parentId.id == copiedObj.id) ||
-          parentId == undefined
-        )
-          return;
-
-        const replaceNumberTest = (string, replaceValue) => {
-          const result = string.split("").map((value) => {
-            if (/\d/g.test(value)) {
-              return replaceValue;
+        if(e.target.nodeName != "INPUT"){
+          const containerEle = (elements, values) => {
+            let currentEle = values;
+            while (currentEle.type != undefined) {
+              currentEle = matchAndGet(elements, currentEle.parent);
+              if (currentEle.type == "page") break;
+              if (currentEle.type == "container") break;
             }
-            return value;
-          });
-          return result.join("");
-        };
+            return Array.isArray(currentEle) ? undefined : currentEle;
+          };
 
-        const updateEverySingleId = (obj) => {
+          const parentId = containerEle(jsonValue.elements, changeJson.values);
+          if (
+            Object.keys(copiedObj).length < 1 ||
+            (parentId && parentId.id == copiedObj.id) ||
+            parentId == undefined
+          )
+            return;
 
-          const countObject = new Object({
-            container: containerCount,
-            column: columnsCount,
-            text: textCount,
-            image: imageCount,
-            iconParent: iconParentCount,
-            icon: iconCount,
-            buttonParent: buttonParentCount,
-            button: buttonCount,
-            orderObj: orderObj
-          })
+          const replaceNumberTest = (string, replaceValue) => {
+            const result = string.split("").map((value) => {
+              if (/\d/g.test(value)) {
+                return replaceValue;
+              }
+              return value;
+            });
+            return result.join("");
+          };
 
-          const types = [
-            {name : "container",        countName : "container"},
-            {name : "container-column", countName : "column"},
-            {name : "text",             countName : "text"},
-            {name : "image",            countName : "image"},
-            {name : "icon-parent",      countName : "iconParent"},
-            {name : "icon",             countName : "icon"},
-            {name : "button-parent",    countName : "buttonParent"},
-            {name : "button",           countName : "button"}
-          ]
+          const updateEverySingleId = (obj) => {
 
-          const mutateObj = (obj, countObject) => {
-            if(typeof obj === "object" && obj != null && obj.id){
-              for (const type of types){
-                if(obj.type == type.name){
-                  obj.id = replaceNumberTest(obj.id, countObject[type.countName])
-                  countObject[type.countName] = countObject[type.countName] + 1
+            const countObject = new Object({
+              container: containerCount,
+              column: columnsCount,
+              text: textCount,
+              image: imageCount,
+              iconParent: iconParentCount,
+              icon: iconCount,
+              buttonParent: buttonParentCount,
+              button: buttonCount,
+              orderObj: orderObj
+            })
 
-                  if(obj.type == "container"){
-                    obj.order = new Number(countObject.container) - 1
+            const types = [
+              {name : "container",        countName : "container"},
+              {name : "container-column", countName : "column"},
+              {name : "text",             countName : "text"},
+              {name : "image",            countName : "image"},
+              {name : "icon-parent",      countName : "iconParent"},
+              {name : "icon",             countName : "icon"},
+              {name : "button-parent",    countName : "buttonParent"},
+              {name : "button",           countName : "button"}
+            ]
+
+            const mutateObj = (obj, countObject) => {
+              if(typeof obj === "object" && obj != null && obj.id){
+                for (const type of types){
+                  if(obj.type == type.name){
+                    obj.id = replaceNumberTest(obj.id, countObject[type.countName])
+                    countObject[type.countName] = countObject[type.countName] + 1
+
+                    if(obj.type == "container"){
+                      obj.order = new Number(countObject.container) - 1
+                    }
+                    if(obj.type != "container" && obj.type != "container-column"){
+                      obj.parent = replaceNumberTest(obj.parent, countObject.container - 1)
+                      obj.order = countObject.orderObj
+                      countObject.orderObj = countObject.orderObj + 1
+                    }
                   }
-                  if(obj.type != "container" && obj.type != "container-column"){
-                    obj.parent = replaceNumberTest(obj.parent, countObject.container - 1)
-                    obj.order = countObject.orderObj
-                    countObject.orderObj = countObject.orderObj + 1
-                  }
-                }
-              } 
-          }
+                } 
+            }
 
-          if(obj.children && Array.isArray(obj.children)){
-            for (const child of obj.children){
-              mutateObj(child, countObject)
+            if(obj.children && Array.isArray(obj.children)){
+              for (const child of obj.children){
+                mutateObj(child, countObject)
+              }
             }
           }
+
+          mutateObj(obj, countObject)
+          setContainerCount(countObject.container)
+          setColumnsCount(countObject.column)
+          setTextCount(countObject.text)
+          setImageCount(countObject.image)
+          setIconParentCount(countObject.iconParent)
+          setIconCount(countObject.icon)
+          setButtonParentCount(countObject.buttonParent)
+          setButtonCount(countObject.button)
+          setOrderObj(countObject.orderObj)
+          return obj
+          };
+
+          const updatedObj1 = updateEverySingleId(cloneObject(copiedObj))
+          const newState = matchAndAdd(jsonValue.elements, parentId.id, updatedObj1);
+          setJsonValue({elements: newState})
         }
-
-        mutateObj(obj, countObject)
-        setContainerCount(countObject.container)
-        setColumnsCount(countObject.column)
-        setTextCount(countObject.text)
-        setImageCount(countObject.image)
-        setIconParentCount(countObject.iconParent)
-        setIconCount(countObject.icon)
-        setButtonParentCount(countObject.buttonParent)
-        setButtonCount(countObject.button)
-        setOrderObj(countObject.orderObj)
-        return obj
-        };
-
-        const updatedObj1 = updateEverySingleId(cloneObject(copiedObj))
-        const newState = matchAndAdd(jsonValue.elements, parentId.id, updatedObj1);
-        setJsonValue({elements: newState})
       }
 
       if (ctrlDown && e.key == "s") {
         e.preventDefault();
-        createNewDesign('test', jsonValue.elements, value)
+        const valuecounts = new Object({
+          containerCount,
+          columnsCount,
+          textCount,
+          imageCount,
+          iconParentCount,
+          iconCount,
+          buttonParentCount,
+          buttonCount,
+          orderObj,
+        })
+        createNewDesign(designTable, jsonValue.elements, value, valuecounts)
+        const test = await getDesignSingle(value, designTable)
+        console.log(test);
         console.log("Save the jsonValue");
       }
     };
@@ -297,6 +394,23 @@ const Design = () => {
     };
   }, [isAddElement]);
 
+  useEffect(() =>{
+    const isExist = JSON.parse(localStorage.getItem(`design-jsonvalue-${designTable}`))
+    if(isExist){
+      const valuecounts = JSON.parse(localStorage.getItem(`design-valuecounts-${designTable}`))
+      setContainerCount(containerCount + valuecounts.containerCount)
+      setColumnsCount(columnsCount + valuecounts.columnsCount)
+      setTextCount(textCount + valuecounts.textCount)
+      setImageCount(imageCount + valuecounts.imageCount)
+      setIconParentCount(iconParentCount + valuecounts.iconParentCount)
+      setIconCount(iconCount + valuecounts.iconCount)
+      setButtonParentCount(buttonParentCount + valuecounts.buttonParentCount)
+      setButtonCount(buttonCount + valuecounts.buttonCount)
+      setOrderObj(orderObj + valuecounts.orderObj)
+      setJsonValue({elements : [isExist]})
+    }
+  },[])
+
   useEffect(() => {
     HtmlRenderFunction(
       jsonValue,
@@ -319,9 +433,7 @@ const Design = () => {
 
   useEffect(() => {
     if (colorUpdate.target) {
-      console.log("colorUpdate", colorUpdate.target);
       if (colorUpdate.target.type == "background") {
-        console.log(colorUpdate);
         updateBackGround(colorUpdate);
         return
       } 
@@ -1430,7 +1542,6 @@ const Design = () => {
           <GiHamburgerMenu className="design_icon" />
         </div>
       </div>
-
       {/* EditContainer is where all new divs will append to */}
 
       <div
@@ -2098,10 +2209,8 @@ const Design = () => {
               <div className="pb-2">Text</div>
               <textarea
                 contentEditable
-                rows={1}
-                suppressContentEditableWarning={true}
                 id="text_value"
-                className="bg-[rgba(71,73,88,.475)] p-2 rounded-lg inline-block w-full"
+                className="bg-[rgba(71,73,88,.475)] p-2 rounded-lg inline-block w-full box-border"
                 value={changeJson.values.text_value}
                 onChange={updateElementsValues}
               />

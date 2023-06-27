@@ -26,12 +26,13 @@ class DesignTable {
       },
     });
 
+    
     if (checkDuplicates && findMany.length > 0)
-      return "this value already exist";
+    return "this value already exist";
 
     const result = await this.sqlClient.pool
-      .query(`insert into ${this.userSchemeName}.design_table(name, json_value, user)
-              values ('${data.name}', '${data.json_value}', '${data.user}')`);
+      .query(`insert into ${this.userSchemeName}.design_table(designName, jsonValue, valuecounts)
+              values('${data.name}', '${data.json}', '${data.valuecounts}')`);
 
     return result ? "created successfully" : "did not created";
   }
@@ -40,7 +41,7 @@ class DesignTable {
     if (where.name) {
       const result = await this.sqlClient.pool.query(`
         select * from ${this.userSchemeName}.design_table 
-        where name = '${where.name}'
+        where designname = '${where.name}'
       `);
       return result.rows;
     }
@@ -65,7 +66,7 @@ class DesignTable {
 
     const result = await this.sqlClient.pool.query(`
     delete from ${this.userSchemeName}.design_table 
-    where name = '${where.name}'
+    where designName = '${where.name}'
     `);
     return result.rows ? "Deleted successfully" : "Delete failed";
   }
@@ -74,7 +75,7 @@ class DesignTable {
     if (where.name) {
       const result = await this.sqlClient.pool.query(`
       delete from ${this.userSchemeName}.design_table 
-      where name = '${where.name}'
+      where designName = '${where.name}'
       `);
       return result.rows ? "deleted successfully" : "delete failed";
     }

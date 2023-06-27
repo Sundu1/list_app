@@ -86,15 +86,16 @@ const addColumnPost = async (tableName, user, columnInfo) => {
   }
 };
 
-const createNewDesign = async (designName, designObjects ,user) => {
+const createNewDesign = async (designName, designObjects, user, valuecounts) => {
   try {
     const response = await axios({
       method: "post",
       url: `${BASE_URL}/create-design`,
       data: {
         designName,
-        designObjects,
+        designObjects : JSON.stringify(designObjects[0]),
         user,
+        valuecounts : JSON.stringify(valuecounts),
       },
     });
     const data = await response.data;

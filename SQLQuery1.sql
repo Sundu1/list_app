@@ -37,10 +37,6 @@ select * from Table_list
 insert into Table_list (TableID, TableName, CreatedBy, CreateAt, ModifiedAt, ModifiedBy)
 values (2, 'testTable','test', GETDATE(), GETDATE(), 'test')
 
-
-
-
-
 /* postgresql */
 
 CREATE TABLE Table_list (
@@ -78,3 +74,11 @@ CREATE TABLE Company(
     ModifiedBy VARCHAR(255) NOT NULL,
     ModifiedAt timestamp NOT NULL
   );
+
+
+create table admin.design_table(
+	pkid serial NOT NULL PRIMARY KEY,
+  designName VARCHAR(255) NOT NULL,
+  jsonvalue json NOT NULL,
+  valuecounts json NOT NULL
+  )

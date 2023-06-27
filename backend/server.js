@@ -342,12 +342,52 @@ const sunsql = new Sunsql({
 });
 
 
+app.get("/designlist/:user", async (req, res) => {
+  sunsql.designTable.init("admin");
+  const result = await sunsql.designTable.findAll();
+  res.send(result);
+});
 
-// const findMany = await sunsql.designTable.findMany({
-//   where: {
-//     name: "",
-//   },
-// });
+app.get("/designlist/:user/:designName", async (req, res) => {
+  const {user, designName} = req.params
+
+  sunsql.designTable.init(user);
+  const result = await sunsql.designTable.findMany({
+    where:{
+      name : designName
+    }
+  });
+  res.send(result[0])
+});
+
+app.post("/create-design", async(req, res) =>{
+  const {designName, designObjects, user, valuecounts} = req.body
+
+  sunsql.designTable.init(user.Username);
+  const create = await sunsql.designTable.create({
+    data: {
+      name: designName,
+      json: designObjects,
+      valuecounts: valuecounts,
+    },
+    checkDuplicates: true,
+  });
+
+  res.send(create)
+})
+
+// async function test123(){
+//   sunsql.designTable.init("admin");
+
+//   const findMany = await sunsql.designTable.findMany({
+//     where: {
+//       name: "test",
+//     },
+//   });
+//   console.log(findMany[0].jsonvalue.children);
+// }
+
+// test123()
 
 // const delete1 = await sunsql.designTable.delete({
 //   where: {
@@ -360,27 +400,6 @@ const sunsql = new Sunsql({
 //   where: { name: "" },
 // });
 // console.log(delete2);
-
-app.get("/designlist/:user", async (req, res) => {
-  sunsql.designTable.init("admin");
-  const result = await sunsql.designTable.findAll();
-  res.send(result);
-});
-
-
-sunsql.designTable.init("admin");
-
-app.post("/create-design", async(req, res) =>{
-  const {designName, designObjects, user} = req.body
-
-  const create = await sunsql.designTable.create({
-    data: {
-      name: designName,
-      json_value: "{sdfsd}",
-    },
-    checkDuplicates: false,
-  });
-})
 
 app.listen(port, function () {
   console.log("Server is listening at port 5000...");

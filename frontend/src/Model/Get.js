@@ -41,7 +41,20 @@ const getDesignList = async (setTableList, user) => {
   }
 };
 
-export { getTableValue, getTableList, getDesignList };
+const getDesignSingle = async (user, designName) => {
+  try {
+    const response = await axios({
+      method: "get",
+      url: `${BASE_URL}/designlist/${user.Username}/${designName}`,
+    });
+    const data = await response.data;
+    return data
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { getTableValue, getTableList, getDesignList, getDesignSingle};
 
 // if (localStorage.getItem(tableName)) {
 //   setTable(JSON.parse(localStorage.getItem(tableName)));

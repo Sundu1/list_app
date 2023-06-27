@@ -1,5 +1,6 @@
 import quickSort from "./quickSort";
 import * as icons from "./icons";
+import bgDefault from '../assets/imgs/bgSaturated.svg'
 
 const HtmlRenderFunction = (
   htmlValue,
@@ -73,6 +74,8 @@ const HtmlRenderFunction = (
             const background_type = element.background_style_type;
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
+
+            newDiv.style.backgroundImage = "url(" + bgDefault + ")"
           }
 
           if (element.background_style_type == "gradient") {
@@ -532,6 +535,7 @@ const HtmlRenderFunction = (
           newDiv.style.height = element.height;
           newDiv.style.paddingBottom = "30px";
           newDiv.style.width = element.width;
+          newDiv.style.overflowX = 'hidden'
 
           newDiv.addEventListener("scroll", handleScroll);
 
@@ -539,6 +543,8 @@ const HtmlRenderFunction = (
             const background_type = element.background_style_type;
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
+
+            newDiv.style.backgroundImage = "url(" + bgDefault + ")"
           }
 
           if (element.background_style_type == "gradient") {
