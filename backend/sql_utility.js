@@ -29,10 +29,10 @@ class DesignTable {
     
     if (checkDuplicates && findMany.length > 0)
     return "this value already exist";
-
+    
     const result = await this.sqlClient.pool
-      .query(`insert into ${this.userSchemeName}.design_table(designName, jsonValue, valuecounts)
-              values('${data.name}', '${data.json}', '${data.valuecounts}')`);
+    .query(`insert into ${this.userSchemeName}.design_table(designName, jsonValue, valuecounts)
+    values('${data.name}', '${data.json}', '${data.valuecounts}')`);
 
     return result ? "created successfully" : "did not created";
   }

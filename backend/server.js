@@ -341,7 +341,6 @@ const sunsql = new Sunsql({
   },
 });
 
-
 app.get("/designlist/:user", async (req, res) => {
   sunsql.designTable.init("admin");
   const result = await sunsql.designTable.findAll();

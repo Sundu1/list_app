@@ -35,6 +35,8 @@ const Home = () => {
     setCreateModal(!createModal);
   };
 
+  console.log();
+
   return (
     <div className="relative">
       <Navbar />
