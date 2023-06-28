@@ -105,4 +105,22 @@ const createNewDesign = async (designName, designObjects, user, valuecounts) => 
   }
 };
 
-export { createNewRow, SignIn, insertNewTable, addColumnPost, createNewDesign};
+const postImage = async(image) =>{
+  try {
+    const formData = new FormData()
+    // formData.append("image", image)
+    for (const file of image) {
+      formData.append("image", file);
+    }
+
+    axios.post(`${BASE_URL}/image`, formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+  })
+  } catch (error) {
+    console.error(error)
+  }
+}
+
+export { createNewRow, SignIn, insertNewTable, addColumnPost, createNewDesign, postImage};

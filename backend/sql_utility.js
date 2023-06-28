@@ -81,6 +81,18 @@ class DesignTable {
     }
     return "Either key or value is wrong or null";
   }
+
+  async updateMany({where}) {
+    if (where.name){
+      const result = await this.sqlClient.pool.query(`
+         update ${this.userSchemeName}.design_table as t
+         set jsonValue = '${where.jsonValue}', valuecounts = '${where.valuecounts}'
+         where t.designName = '${where.name}'
+      `)
+      return result.rows ? "deleted successfully" : "delete failed";
+    }
+    return "Either key or value is wrong or null";
+  }
 }
 
 module.exports = Sunsql;

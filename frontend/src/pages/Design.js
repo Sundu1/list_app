@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useRef} from "react";
+
 import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import Navbar from "../components/Navbar";
@@ -7,7 +8,8 @@ import {GiHamburgerMenu} from "react-icons/gi";
 import { FaArrowLeft, FaArrowRight, FaUnderline } from "react-icons/fa";
 import HtmlRenderFunction from "../components/HtmlRenderFunction";
 import PickColor from "../components/PickColor";
-import { createNewDesign } from "../model/Post";
+import { createNewDesign ,postImage} from "../model/Post";
+import { udpateNewDesign} from "../model/Put";
 import { getDesignSingle } from "../model/Get";
 
 const Design = () => {
@@ -205,7 +207,7 @@ const Design = () => {
   const[buttonCount, setButtonCount] = useState(1)
   const[orderObj, setOrderObj] = useState(1)
 
-  const [test, setTest] = useState({})
+  const [imageData, setImageData] = useState([])
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef();
@@ -247,7 +249,7 @@ const Design = () => {
       if (ctrlDown && e.key == "c") setCopiedObj(changeJson.values);
 
       if (ctrlDown && e.key == "v") {
-        if(e.target.nodeName != "INPUT"){
+        if(e.target.nodeName != "INPUT" && e.target.nodeName != "TEXTAREA"){
           const containerEle = (elements, values) => {
             let currentEle = values;
             while (currentEle.type != undefined) {
@@ -340,6 +342,8 @@ const Design = () => {
           return obj
           };
 
+      
+
           const updatedObj1 = updateEverySingleId(cloneObject(copiedObj))
           const newState = matchAndAdd(jsonValue.elements, parentId.id, updatedObj1);
           setJsonValue({elements: newState})
@@ -359,8 +363,28 @@ const Design = () => {
           buttonCount,
           orderObj,
         })
-        createNewDesign(designTable, jsonValue.elements, value, valuecounts)
-        // getDesignSingle(setTest ,value, designTable)
+
+        // Begin Capture
+        const body = document.querySelector("body")
+        body.addEventListener('load', function() {
+          console.log("testing");
+          var canvas = document.createElement('canvas');
+          var context = canvas.getContext('2d');
+        
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+        
+          var image = new Image();
+          context.drawImage(image, 0, 0, canvas.width, canvas.height);
+          var imageUrl = canvas.toDataURL('image/png');
+          var newTab = window.open();
+          newTab.document.write('<img src="' + imageUrl + '" alt="Screenshot">');
+        });
+        // End Captures
+
+        // createNewDesign(designTable, jsonValue.elements, value, valuecounts)
+        udpateNewDesign(designTable, jsonValue.elements, value, valuecounts)
+        postImage(imageData)
         console.log("Save the jsonValue");
       }
     };
@@ -1078,10 +1102,8 @@ const Design = () => {
 
             if (_child.background_style_type == "image") {
               if (e.target.id == "background_url") {
-                const img_url =
-                  e.target.files !== undefined
-                    ? `url(${URL.createObjectURL(e.target.files[0])})`
-                    : "url()";
+                const img_url = e.target.files ? e.target.files[0].name : ""
+                setImageData(old => [...old, e.target.files[0]])
 
                 setChangeJson((old) => ({
                   ...old,
@@ -1746,6 +1768,7 @@ const Design = () => {
                     ref={uploadImageRef}
                     id="background_url"
                     type="file"
+                    name="file"
                     className="hidden"
                   />
                   {changeJson.values.background_style_types[
@@ -2211,6 +2234,7 @@ const Design = () => {
               <div className="pb-2">Text</div>
               <textarea
                 contentEditable
+                suppressContentEditableWarning={true}
                 id="text_value"
                 className="bg-[rgba(71,73,88,.475)] p-2 rounded-lg inline-block w-full box-border"
                 value={changeJson.values.text_value}

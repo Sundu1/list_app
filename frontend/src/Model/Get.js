@@ -1,6 +1,7 @@
 import React from "react";
 import axios from "axios";
 import { BASE_URL } from "./config.js";
+import { LoginProvider } from "../components/LoginProvider.js";
 
 const getTableValue = async (tableName, setTable, user) => {
   try {
@@ -54,10 +55,29 @@ const getDesignSingle = async (setTest, user, designName) => {
   }
 };
 
+const udpateNewDesign = async (designName, designObjects, user, valuecounts) => {
+  try {
+    const response = await axios({
+      method: "put",
+      url: `${BASE_URL}/update-design`,
+      data: {
+        designName,
+        designObjects : JSON.stringify(designObjects[0]),
+        user,
+        valuecounts : JSON.stringify(valuecounts),
+      },
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
 export { getTableValue, getTableList, getDesignList, getDesignSingle};
 
 // if (localStorage.getItem(tableName)) {
 //   setTable(JSON.parse(localStorage.getItem(tableName)));
-//   return;
+//   return;g
 // }
 // localStorage.setItem(tableName, JSON.stringify(data));

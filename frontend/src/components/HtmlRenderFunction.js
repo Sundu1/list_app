@@ -1,6 +1,8 @@
 import quickSort from "./quickSort";
 import * as icons from "./icons";
 import bgDefault from '../assets/imgs/bgSaturated.svg'
+import axios from "axios";
+import { BASE_URL } from "../model/config.js";
 
 const HtmlRenderFunction = (
   htmlValue,
@@ -13,7 +15,7 @@ const HtmlRenderFunction = (
   handleScroll
 ) => {
   let newDiv;
-  const traverse_dfs = (jsonvalues, parentelement) => {
+  const traverse_dfs = async (jsonvalues, parentelement) => {
     if (typeof jsonvalues === "object") {
       const sortedArr = quickSort(jsonvalues);
 
@@ -119,17 +121,32 @@ const HtmlRenderFunction = (
 
             radial_gradient =
               radial_gradient != "" ? radial_gradient.slice(0, -1) : "";
-
+              
+            const url = element.background_style_types[background_type].background_url
+            
             if (radial_gradient == "") {
-              newDiv.style.backgroundImage =
-                element.background_style_types[background_type].background_url;
-              newDiv.style.backgroundSize = "100% 100%";
+                newDiv.style.backgroundImage =
+                  url;
+                newDiv.style.backgroundSize = "100% 100%";
             } else {
+              const test = `${BASE_URL}/images/${url}`
               newDiv.style.backgroundImage = `
               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
-              ${element.background_style_types[background_type].background_url}`;
+              url("${test}")`;
               newDiv.style.backgroundSize = "100% 100%";
             }
+
+            // if (radial_gradient == "") {
+            //   newDiv.style.backgroundImage =
+            //     element.background_style_types[background_type].background_url;
+            //   newDiv.style.backgroundSize = "100% 100%";
+            // } else {
+            //   newDiv.style.backgroundImage = `
+            //   radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
+            //   ${element.background_style_types[background_type].background_url}`;
+            //   newDiv.style.backgroundSize = "100% 100%";
+            // }
+
           }
           // background ending
 

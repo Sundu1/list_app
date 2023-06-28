@@ -1,5 +1,9 @@
 const express = require("express");
 const cors = require("cors");
+const multer = require('multer')
+const path = require('path');
+const request = require('request');
+
 const Pool = require("pg").Pool;
 const jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
@@ -19,6 +23,7 @@ var corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
+app.use(express.static('public'));
 
 const pool = new Pool({
   user: process.env.USER,
@@ -359,7 +364,22 @@ app.get("/designlist/:user/:designName", async (req, res) => {
   res.send(result[0])
 });
 
-app.post("/create-design", async(req, res) =>{
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'public/images/')
+  },
+  filename: (req, file, cb) => {
+    cb(null, file.originalname)
+  },
+})
+
+const upload = multer({ storage: storage })
+
+app.post('/image', upload.any("image"), function (req, res) {
+  res.json({})
+})
+
+app.post("/create-design",  async(req, res) =>{
   const {designName, designObjects, user, valuecounts} = req.body
 
   sunsql.designTable.init(user.Username);
@@ -375,30 +395,19 @@ app.post("/create-design", async(req, res) =>{
   res.send(create)
 })
 
-// async function test123(){
-//   sunsql.designTable.init("admin");
+app.put("/update-design", async(req, res)=>{
+  const {designName, designObjects, user, valuecounts} = req.body
 
-//   const findMany = await sunsql.designTable.findMany({
-//     where: {
-//       name: "test",
-//     },
-//   });
-//   console.log(findMany[0].jsonvalue.children);
-// }
-
-// test123()
-
-// const delete1 = await sunsql.designTable.delete({
-//   where: {
-//     name: "test",
-//   },
-// });
-// console.log(delete1);
-
-// const delete2 = await sunsql.designTable.deleteMany({
-//   where: { name: "" },
-// });
-// console.log(delete2);
+  sunsql.designTable.init(user.Username);
+  const result = await sunsql.designTable.updateMany({
+    where:{
+      name : designName,
+      jsonValue: designObjects,
+      valuecounts: valuecounts
+    }
+  });
+  res.send(result)
+})
 
 app.listen(port, function () {
   console.log("Server is listening at port 5000...");

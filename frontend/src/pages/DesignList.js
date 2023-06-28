@@ -34,8 +34,6 @@ const DesignList = () => {
     localStorage.setItem(`design-valuecounts-${designName}`, e.target.dataset.valuecounts)
   }
 
-  console.log(tableList);
-
   return (
     <div className="relative">
       <Navbar />
