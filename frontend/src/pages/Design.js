@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext, useRef} from "react";
-
+import React, { useState, useEffect, useContext, useRef, createElement} from "react";
+import html2canvas from 'html2canvas';
 import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import Navbar from "../components/Navbar";
@@ -210,7 +210,9 @@ const Design = () => {
   const [imageData, setImageData] = useState([])
 
   const uploadImageRef = useRef(null);
-  const refAddElement = useRef();
+  const refAddElement = useRef(null);
+  const editContainer = useRef(null)
+  const sideElePickerRef = useRef(null)
 
   // Icons
   const iconItems = [
@@ -342,8 +344,6 @@ const Design = () => {
           return obj
           };
 
-      
-
           const updatedObj1 = updateEverySingleId(cloneObject(copiedObj))
           const newState = matchAndAdd(jsonValue.elements, parentId.id, updatedObj1);
           setJsonValue({elements: newState})
@@ -364,24 +364,33 @@ const Design = () => {
           orderObj,
         })
 
-        // Begin Capture
-        const body = document.querySelector("body")
-        body.addEventListener('load', function() {
-          console.log("testing");
-          var canvas = document.createElement('canvas');
-          var context = canvas.getContext('2d');
-        
-          canvas.width = window.innerWidth;
-          canvas.height = window.innerHeight;
-        
-          var image = new Image();
-          context.drawImage(image, 0, 0, canvas.width, canvas.height);
-          var imageUrl = canvas.toDataURL('image/png');
-          var newTab = window.open();
-          newTab.document.write('<img src="' + imageUrl + '" alt="Screenshot">');
-        });
-        // End Captures
+        function takeScreenshot() {
+          var screenshot = document.documentElement
+            .cloneNode(true);
+          screenshot.style.pointerEvents = 'none';
+          screenshot.style.overflow = 'hidden';
+          screenshot.style.webkitUserSelect = 'none';
+          screenshot.style.mozUserSelect = 'none';
+          screenshot.style.msUserSelect = 'none';
+          screenshot.style.oUserSelect = 'none';
+          screenshot.style.userSelect = 'none';
+          screenshot.dataset.scrollX = window.scrollX;
+          screenshot.dataset.scrollY = window.scrollY;
+          var blob = new Blob([screenshot.outerHTML], {
+            type: 'text/html'
+          });
+          return blob;
+        }
 
+        function generate() {
+          window.URL = window.URL || window.webkitURL;
+          window.open(window.URL
+            .createObjectURL(takeScreenshot()));
+        }
+
+        sideElePickerRef.current.style.display = 'none'
+        generate()
+        
         // createNewDesign(designTable, jsonValue.elements, value, valuecounts)
         udpateNewDesign(designTable, jsonValue.elements, value, valuecounts)
         postImage(imageData)
@@ -1532,6 +1541,7 @@ const Design = () => {
     <div>
       {/* <Navbar /> */}
       <div
+        ref={sideElePickerRef}
         className="fixed left-[10px] mt-[10px] w-[50px] bg-[rgba(53,54,66,.9825)] 
                         rounded-lg text-[30px] z-50"
       >
@@ -1573,6 +1583,7 @@ const Design = () => {
         className="fixed top-0 flex justify-center bg-gray-300/50 w-full 
                    h-full text-black overflow-y-auto"
         onPointerUp={clickedElement}
+        ref={editContainer}
       ></div>
 
       {/* Edit modal Begins here*/}
