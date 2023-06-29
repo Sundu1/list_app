@@ -63,9 +63,12 @@ const DesignList = () => {
             tableList.length > 0 ? 
               tableList.map(design =>{
                 return (
-                  <div
-                  className="h-[200px] w-[320px] bg-trasparent rounded-lg border-2 border-black 
-                            flex justify-center items-center hover:cursor-pointer hover:bg-[#5A5A5A] transition ease-in"
+                  <img
+                  className="h-[200px] w-[320px] rounded-lg border-2 border-black 
+                            flex justify-center items-center hover:cursor-pointer hover:bg-[#5A5A5A] transition ease-in
+                            hover:bg-black
+                            "
+                  src={`${BASE_URL}/images/${design.screenshotimg}`}
                   id={design.designname}
                   data-jsonvalue={
                     JSON.stringify(design.jsonvalue)
@@ -75,9 +78,7 @@ const DesignList = () => {
                   }
                   onClick={handleNavigateDesign}
                   key={design.designname}
-                  >
-                    <img className="h-full w-full rounded-lg pointer-events-none" src={`${BASE_URL}/images/${design.screenshotimg}`}></img>
-                  </div>
+                  />
                 )
               })
               : null
