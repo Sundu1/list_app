@@ -55,25 +55,6 @@ const getDesignSingle = async (setTest, user, designName) => {
   }
 };
 
-const udpateNewDesign = async (designName, designObjects, user, valuecounts) => {
-  try {
-    const response = await axios({
-      method: "put",
-      url: `${BASE_URL}/update-design`,
-      data: {
-        designName,
-        designObjects : JSON.stringify(designObjects[0]),
-        user,
-        valuecounts : JSON.stringify(valuecounts),
-      },
-    });
-    const data = await response.data;
-    return data;
-  } catch (err) {
-    console.error(err);
-  }
-};
-
 export { getTableValue, getTableList, getDesignList, getDesignSingle};
 
 // if (localStorage.getItem(tableName)) {

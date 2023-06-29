@@ -8,6 +8,8 @@ import { json, useNavigate } from "react-router-dom";
 import { UserContext } from "../components/LoginProvider";
 import { insertNewTable, createNewDesign } from "../model/Post";
 
+import { BASE_URL } from "../model/config.js";
+
 const DesignList = () => {
   const { value, setValue } = useContext(UserContext);
   const [tableList, setTableList] = useState([]);
@@ -39,9 +41,9 @@ const DesignList = () => {
       <Navbar />
       <Sidebar />
       <div className="fixed h-full w-full overflow-y-scroll flex justify-center">
-        <div className="pl-[250px] pt-10 h-full w-[70em] flex flex-wrap gap-[50px]">
+        <div className="pl-[250px] pt-10 h-full w-full flex flex-wrap gap-[50px]">
           <div
-            className="h-[200px] w-[250px] bg-trasparent rounded-lg border-2 border-dashed border-black 
+            className="h-[200px] w-[320px] bg-trasparent rounded-lg border-2 border-dashed border-black 
                        flex justify-center items-center hover:cursor-pointer hover:bg-[#5A5A5A] transition ease-in"
             onMouseOver={() => {
               setSelectButton(true);
@@ -62,7 +64,7 @@ const DesignList = () => {
               tableList.map(design =>{
                 return (
                   <div
-                  className="h-[200px] w-[250px] bg-trasparent rounded-lg border-2 border-black 
+                  className="h-[200px] w-[320px] bg-trasparent rounded-lg border-2 border-black 
                             flex justify-center items-center hover:cursor-pointer hover:bg-[#5A5A5A] transition ease-in"
                   id={design.designname}
                   data-jsonvalue={
@@ -74,9 +76,7 @@ const DesignList = () => {
                   onClick={handleNavigateDesign}
                   key={design.designname}
                   >
-                    <div className="pointer-events-none">
-                      {design.designname}
-                    </div>
+                    <img className="h-full w-full rounded-lg pointer-events-none" src={`${BASE_URL}/images/${design.screenshotimg}`}></img>
                   </div>
                 )
               })

@@ -86,7 +86,7 @@ class DesignTable {
     if (where.name){
       const result = await this.sqlClient.pool.query(`
          update ${this.userSchemeName}.design_table as t
-         set jsonValue = '${where.jsonValue}', valuecounts = '${where.valuecounts}'
+         set jsonValue = '${where.jsonValue}', valuecounts = '${where.valuecounts}', screenshotimg = '${where.screenshotimg}'
          where t.designName = '${where.name}'
       `)
       return result.rows ? "deleted successfully" : "delete failed";

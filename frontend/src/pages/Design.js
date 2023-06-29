@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext, useRef, createElement} from "react";
-import html2canvas from 'html2canvas';
 import { json, useParams } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import Navbar from "../components/Navbar";
@@ -11,6 +10,8 @@ import PickColor from "../components/PickColor";
 import { createNewDesign ,postImage} from "../model/Post";
 import { udpateNewDesign} from "../model/Put";
 import { getDesignSingle } from "../model/Get";
+
+import * as htmlToImage from 'html-to-image';
 
 const Design = () => {
   const { designTable } = useParams();
@@ -27,86 +28,6 @@ const Design = () => {
   const [scrollValue, setScrollValue] = useState(0);
   // const [dragValue, setDragValue] = useState("");
   const [copiedObj, setCopiedObj] = useState("");
-  const [defaultJson, setDefaultJson] = useState({
-    elements: [
-      {
-        type: "background",
-        id: "Background",
-        scroll_top: 0,
-        height: "100%",
-        width: "100%",
-        position: "fixed",
-        background_style_type: "color",
-        background_style_types: {
-          color: { background_color: "white" },
-          gradient: [
-            {
-              color: " rgba(135, 92, 161, 0.79)",
-              percentage: "21",
-            },
-            {
-              color: "rgba(66, 95, 199, 0.69)",
-              percentage: "68",
-            },
-            {
-              color: "rgba(0, 148, 255, 0.54)",
-              percentage: "100",
-            },
-          ],
-          image: {
-            background_color: "white",
-            background_url: "",
-            gradient: [
-              {
-                color: " rgba(135, 92, 161, 0.79)",
-                percentage: "21",
-                transparency: "0.79",
-              },
-              {
-                color: "rgba(66, 95, 199, 0.69)",
-                percentage: "68",
-                transparency: "0.69",
-              },
-              {
-                color: "rgba(0, 148, 255, 0.54)",
-                percentage: "100",
-                transparency: "0.54",
-              },
-            ],
-          },
-        },
-
-        isActive: false,
-        children: [
-          {
-            type: "page",
-            id: "Page",
-            height: "200",
-            width: "500",
-            position_div: "relative",
-            text_align: "center",
-            position: "center",
-            background_color: "rgb(220,220,220)",
-            padding: "10px",
-            text: "text here",
-            display: "",
-            margin_top: "0",
-            margin_left: "0",
-            margin_right: "0",
-            margin_bottom: "0",
-            padding_vertical: "20",
-            padding_horizontal: "20",
-            isActive: false,
-            border_color: "",
-            border_style: "",
-            border_size: "0",
-            border_roundness: "0",
-            children: [],
-          },
-        ],
-      },
-    ],
-  })
   const [jsonValue, setJsonValue] = useState({
     elements: [
       {
@@ -197,6 +118,7 @@ const Design = () => {
     name: "",
     isActive: false,
   });
+
   const[containerCount, setContainerCount] = useState(1)
   const[columnsCount, setColumnsCount] = useState(1);
   const[textCount, setTextCount] = useState(1)
@@ -206,12 +128,11 @@ const Design = () => {
   const[buttonParentCount, setButtonParentCount] = useState(1)
   const[buttonCount, setButtonCount] = useState(1)
   const[orderObj, setOrderObj] = useState(1)
-
   const [imageData, setImageData] = useState([])
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef(null);
-  const editContainer = useRef(null)
+  const editContainerRef = useRef(null)
   const sideElePickerRef = useRef(null)
 
   // Icons
@@ -364,36 +285,27 @@ const Design = () => {
           orderObj,
         })
 
-        function takeScreenshot() {
-          var screenshot = document.documentElement
-            .cloneNode(true);
-          screenshot.style.pointerEvents = 'none';
-          screenshot.style.overflow = 'hidden';
-          screenshot.style.webkitUserSelect = 'none';
-          screenshot.style.mozUserSelect = 'none';
-          screenshot.style.msUserSelect = 'none';
-          screenshot.style.oUserSelect = 'none';
-          screenshot.style.userSelect = 'none';
-          screenshot.dataset.scrollX = window.scrollX;
-          screenshot.dataset.scrollY = window.scrollY;
-          var blob = new Blob([screenshot.outerHTML], {
-            type: 'text/html'
-          });
-          return blob;
-        }
+        let testFile
 
-        function generate() {
-          window.URL = window.URL || window.webkitURL;
-          window.open(window.URL
-            .createObjectURL(takeScreenshot()));
-        }
+        htmlToImage.toJpeg(editContainerRef.current).then(function(dataUrl){
+          testFile = dataURLtoFile(dataUrl, designTable + "Screenshot.jpg");
+          imageData.push(testFile)
+          console.log("imageData", imageData);
+          postImage(imageData)
+          udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+        })
 
-        sideElePickerRef.current.style.display = 'none'
-        generate()
-        
-        // createNewDesign(designTable, jsonValue.elements, value, valuecounts)
-        udpateNewDesign(designTable, jsonValue.elements, value, valuecounts)
-        postImage(imageData)
+        function dataURLtoFile(dataurl, filename) {
+          var arr = dataurl.split(','),
+              mime = arr[0].match(/:(.*?);/)[1],
+              bstr = atob(arr[arr.length - 1]), 
+              n = bstr.length, 
+              u8arr = new Uint8Array(n);
+          while(n--){
+              u8arr[n] = bstr.charCodeAt(n);
+          }
+          return new File([u8arr], filename, {type:mime});
+      }
         console.log("Save the jsonValue");
       }
     };
@@ -668,7 +580,7 @@ const Design = () => {
           wordBreak: "",
           text_color: "",
           text_size: "15",
-          text_fontfamily: "",
+          text_fontfamily: "Arial",
           text_value: "put your text here",
           text_align: "center",
           children: [],
@@ -787,6 +699,7 @@ const Design = () => {
   };
 
   const css_font_family = [
+    "Arial",
     "serif",
     "sans-serif",
     "monospace",
@@ -1111,9 +1024,12 @@ const Design = () => {
 
             if (_child.background_style_type == "image") {
               if (e.target.id == "background_url") {
-                const img_url = e.target.files ? e.target.files[0].name : ""
-                setImageData(old => [...old, e.target.files[0]])
+                const img_url = new Object({
+                  name: e.target.files ? e.target.files[0].name : "",
+                  url: URL.createObjectURL(e.target.files[0])
+                })
 
+                setImageData(old => [...old, e.target.files[0]])
                 setChangeJson((old) => ({
                   ...old,
                   values: {
@@ -1580,10 +1496,10 @@ const Design = () => {
 
       <div
         id="EditContainer"
-        className="fixed top-0 flex justify-center bg-gray-300/50 w-full 
+        className="fixed top-0 mt-0 flex justify-center bg-gray-300/50 w-full 
                    h-full text-black overflow-y-auto"
         onPointerUp={clickedElement}
-        ref={editContainer}
+        ref={editContainerRef}
       ></div>
 
       {/* Edit modal Begins here*/}
@@ -3228,6 +3144,10 @@ const Design = () => {
               Icons
             </div>
           </div>
+          <svg width="50px" height="50px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z" fill="#000000"/>
+        </svg>
+          <svg fill="black" height="10px" width="10px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z" fill="#000000"></path></svg>
         </div>
       ) : null}
       {/* New element Ending here */}

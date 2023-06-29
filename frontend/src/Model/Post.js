@@ -113,11 +113,12 @@ const postImage = async(image) =>{
       formData.append("image", file);
     }
 
-    axios.post(`${BASE_URL}/image`, formData, {
-      headers: {
-        'Content-Type': 'multipart/form-data'
-      }
-  })
+    axios.post(`${BASE_URL}/image`, 
+                formData, {
+                headers: {
+                  'Content-Type': 'multipart/form-data'
+                }
+              })
   } catch (error) {
     console.error(error)
   }

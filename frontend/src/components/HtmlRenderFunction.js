@@ -4,6 +4,8 @@ import bgDefault from '../assets/imgs/bgSaturated.svg'
 import axios from "axios";
 import { BASE_URL } from "../model/config.js";
 
+import ArrowDown from '../assets/icons/arrow_down copy'
+
 const HtmlRenderFunction = (
   htmlValue,
   setChangeJson,
@@ -77,7 +79,7 @@ const HtmlRenderFunction = (
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
 
-            newDiv.style.backgroundImage = "url(" + bgDefault + ")"
+            newDiv.style.backgroundImage = "url(http://localhost:3000" + bgDefault + ")"
           }
 
           if (element.background_style_type == "gradient") {
@@ -129,12 +131,17 @@ const HtmlRenderFunction = (
                   url;
                 newDiv.style.backgroundSize = "100% 100%";
             } else {
-              const test = `${BASE_URL}/images/${url}`
+              let newUrl
+              if(url.name == undefined){
+                 newUrl = `${BASE_URL}/images/${url}`
+              }else {
+                newUrl = url.url
+              }
               newDiv.style.backgroundImage = `
               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
-              url("${test}")`;
+              url("${newUrl}")`;
               newDiv.style.backgroundSize = "100% 100%";
-            }
+            } 
 
             // if (radial_gradient == "") {
             //   newDiv.style.backgroundImage =
@@ -325,7 +332,7 @@ const HtmlRenderFunction = (
 
           const img = document.createElement("img");
           img.style.pointerEvents = "none";
-          img.src = icons[element.icon];
+          img.src = "http://localhost:3000" + icons[element.icon];
 
           img.style.paddingTop = "2px";
           img.style.paddingLeft = "5px";
@@ -405,7 +412,7 @@ const HtmlRenderFunction = (
 
           newDiv.classList.add("button");
           const img = document.createElement("img");
-          img.src = icons[element.icon];
+          img.src = "http://localhost:3000" + icons[element.icon];
 
           img.style.paddingTop = "2px";
           img.style.paddingLeft = "5px";
@@ -561,7 +568,7 @@ const HtmlRenderFunction = (
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
 
-            newDiv.style.backgroundImage = "url(" + bgDefault + ")"
+            newDiv.style.backgroundImage = "url(http://localhost:3000" + bgDefault + ")"
           }
 
           if (element.background_style_type == "gradient") {

@@ -75,3 +75,44 @@
 
 //   const allContainer = document.querySelectorAll("[data-type='container']");
 // };
+
+
+
+
+
+
+
+        // function takeScreenshot() {
+        //   const screenshot = editContainerRef.current.cloneNode(true)
+        //   screenshot.style.pointerEvents = 'none';
+        //   screenshot.style.overflow = 'hidden';
+        //   screenshot.style.webkitUserSelect = 'none';
+        //   screenshot.style.mozUserSelect = 'none';
+        //   screenshot.style.msUserSelect = 'none';
+        //   screenshot.style.oUserSelect = 'none';
+        //   screenshot.style.userSelect = 'none';
+        //   screenshot.dataset.scrollX = window.scrollX;
+        //   screenshot.dataset.scrollY = window.scrollY;
+        //   var blob = new Blob([screenshot.outerHTML], {
+        //     type: 'image/jpg'
+        //   });
+
+        //   var img = new Image()
+        //   img.src = URL.createObjectURL(blob)
+        //   testFile = new File([img], "screenshot01.jpg")
+        //   console.log(testFile);
+        //   imageData.push(testFile)
+        // }
+
+        // takeScreenshot()
+        // function generate() {
+        //   window.URL = window.URL || window.webkitURL;
+        //   window.open(window.URL
+        //     .createObjectURL());
+        // }
+
+        // sideElePickerRef.current.style.display = 'none'
+        // generate()
+        
+        // createNewDesign(designTable, jsonValue.elements, value, valuecounts)
+        // sideElePickerRef.current.style.display = "block"

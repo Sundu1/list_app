@@ -396,14 +396,15 @@ app.post("/create-design",  async(req, res) =>{
 })
 
 app.put("/update-design", async(req, res)=>{
-  const {designName, designObjects, user, valuecounts} = req.body
+  const {designName, designObjects, user, valuecounts, screenshotimg} = req.body
 
   sunsql.designTable.init(user.Username);
   const result = await sunsql.designTable.updateMany({
     where:{
       name : designName,
       jsonValue: designObjects,
-      valuecounts: valuecounts
+      valuecounts: valuecounts,
+      screenshotimg
     }
   });
   res.send(result)

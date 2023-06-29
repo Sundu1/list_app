@@ -15,7 +15,7 @@ const editRow = async (editRowData) => {
   }
 };
 
-const udpateNewDesign = async (designName, designObjects, user, valuecounts) => {
+const udpateNewDesign = async (designName, designObjects, user, valuecounts, screenshotimg) => {
   try {
     const response = await axios({
       method: "put",
@@ -25,6 +25,7 @@ const udpateNewDesign = async (designName, designObjects, user, valuecounts) => 
         designObjects : JSON.stringify(designObjects[0]),
         user,
         valuecounts : JSON.stringify(valuecounts),
+        screenshotimg
       },
     });
     const data = await response.data;
