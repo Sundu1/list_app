@@ -125,23 +125,18 @@ const HtmlRenderFunction = (
               radial_gradient != "" ? radial_gradient.slice(0, -1) : "";
               
             const url = element.background_style_types[background_type].background_url
-            
+
             if (radial_gradient == "") {
                 newDiv.style.backgroundImage =
                   url;
                 newDiv.style.backgroundSize = "100% 100%";
             } else {
-              let newUrl
-              if(url.name == undefined){
-                 newUrl = `${BASE_URL}/images/${url}`
-              }else {
-                newUrl = url.url
-              }
+              const newUrl = `${BASE_URL}/images/${url.name}`
               newDiv.style.backgroundImage = `
               radial-gradient(79% 150% at 29% 100%, ${radial_gradient}),
               url("${newUrl}")`;
               newDiv.style.backgroundSize = "100% 100%";
-            } 
+            }
 
             // if (radial_gradient == "") {
             //   newDiv.style.backgroundImage =

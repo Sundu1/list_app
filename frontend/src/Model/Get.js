@@ -42,14 +42,14 @@ const getDesignList = async (setTableList, user) => {
   }
 };
 
-const getDesignSingle = async (setTest, user, designName) => {
+const getDesignSingle = async (setSigleDesign, user, designName) => {
   try {
     const response = await axios({
       method: "get",
       url: `${BASE_URL}/designlist/${user.Username}/${designName}`,
     });
     const data = await response.data;
-    setTest(data)
+    setSigleDesign(data)
   } catch (err) {
     console.error(err);
   }

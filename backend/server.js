@@ -361,8 +361,10 @@ app.get("/designlist/:user/:designName", async (req, res) => {
       name : designName
     }
   });
-  res.send(result[0])
-});
+
+  console.log(result);
+  res.send(result)
+}); 
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -405,6 +407,17 @@ app.put("/update-design", async(req, res)=>{
       jsonValue: designObjects,
       valuecounts: valuecounts,
       screenshotimg
+    }
+  });
+  res.send(result)
+})
+
+app.delete("/delete-design", async(req, res) =>{
+  const {user, designName} = req.body
+  sunsql.designTable.init(user.Username);
+  const result = await sunsql.designTable.deleteMany({
+    where:{
+      name : designName,
     }
   });
   res.send(result)

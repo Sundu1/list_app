@@ -21,6 +21,7 @@ const Design = () => {
     name: undefined,
     values: {},
   });
+
   const [inputColorPicker, setInputColorPicker] = useState({name: "", id: ""});
   const [refresh, setRefresh] = useState(false);
   const [colorUpdate, setColorUpdate] = useState({});
@@ -128,7 +129,9 @@ const Design = () => {
   const[buttonParentCount, setButtonParentCount] = useState(1)
   const[buttonCount, setButtonCount] = useState(1)
   const[orderObj, setOrderObj] = useState(1)
+
   const [imageData, setImageData] = useState([])
+  const [singleDesign, setSingleDesign] = useState(null)
 
   const uploadImageRef = useRef(null);
   const refAddElement = useRef(null);
@@ -285,14 +288,20 @@ const Design = () => {
           orderObj,
         })
 
+        console.log("singleDesign", singleDesign);
+
         let testFile
 
         htmlToImage.toJpeg(editContainerRef.current).then(function(dataUrl){
           testFile = dataURLtoFile(dataUrl, designTable + "Screenshot.jpg");
           imageData.push(testFile)
-          console.log("imageData", imageData);
           postImage(imageData)
-          udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+
+          if(singleDesign != null){
+            udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+          } else {
+            createNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+          }
         })
 
         function dataURLtoFile(dataurl, filename) {
@@ -304,7 +313,7 @@ const Design = () => {
           while(n--){
               u8arr[n] = bstr.charCodeAt(n);
           }
-          return new File([u8arr], filename, {type:mime});
+          return new File([u8arr], filename, {type:mime})
       }
         console.log("Save the jsonValue");
       }
@@ -344,6 +353,9 @@ const Design = () => {
   useEffect(() =>{
     const isExist = JSON.parse(localStorage.getItem(`design-jsonvalue-${designTable}`))
     if(isExist){
+      if(Object.keys(value).length > 0){
+        getDesignSingle(setSingleDesign, value, designTable)
+      }
       const valuecounts = JSON.parse(localStorage.getItem(`design-valuecounts-${designTable}`))
       setContainerCount(containerCount + valuecounts.containerCount)
       setColumnsCount(columnsCount + valuecounts.columnsCount)
@@ -356,7 +368,7 @@ const Design = () => {
       setOrderObj(orderObj + valuecounts.orderObj)
       setJsonValue({elements : [isExist]})
     }
-  },[])
+  },[value])
 
   useEffect(() => {
     HtmlRenderFunction(

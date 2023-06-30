@@ -9,6 +9,13 @@
 }
 
 @layer components {
+  .design_list_img{
+    opacity: 1;
+  }
+
+  .design_list_hover:hover .design_list_img{
+    opacity: 0.7;
+  }
 
   .button:hover {
     transform: scale(1.2);

@@ -30,4 +30,18 @@ const DeleteColumn = async (deleteColumnInfo) => {
   }
 };
 
-export { DeleteRow, DeleteColumn };
+const DeleteDesign = async (deleteDesignInfo) => {
+  try {
+    const response = await axios({
+      method: "delete",
+      url: `${BASE_URL}/delete-design`,
+      data: deleteDesignInfo,
+    });
+    const data = await response.data;
+    return data;
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { DeleteRow, DeleteColumn, DeleteDesign };
