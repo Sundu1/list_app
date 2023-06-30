@@ -8,7 +8,6 @@ import { json, useNavigate } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import { insertNewTable, createNewDesign } from "../model/Post";
 import { DeleteDesign } from "../model/Delete";
-
 import { BASE_URL } from "../model/config.js";
 
 const DesignList = () => {
@@ -53,7 +52,7 @@ const DesignList = () => {
         <div className="pl-[250px] pt-10 w-full flex flex-wrap gap-[50px]">
           <div
             id="new"
-            className="h-[200px] w-[320px] bg-trasparent rounded-lg border-2 border-dashed border-black 
+            className="h-[200px] w-[320px] bg-[#808080] rounded-lg border-2 border-dashed border-black 
                        flex justify-center items-center hover:cursor-pointer hover:bg-[#5A5A5A] transition ease-in"
             onMouseOver={(e) => {
               setSelectButton({name: "new", isActive: true});
@@ -63,6 +62,8 @@ const DesignList = () => {
             }}
             onClick={handleSelectClick}
           >
+            <img
+            />
             {selectButton.name == "new" && selectButton.isActive == true ? (
               <div className="text-white h-[40px] w-[90px] bg-[#136565] rounded-lg text-center pt-1.5">
                 Select
