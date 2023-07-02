@@ -33,7 +33,7 @@ const pool = new Pool({
   password: process.env.PASSWORD,
   port: process.env.PORT,
   ssl: {
-    rejectUnauthorized: true,
+    rejectUnauthorized: false,
   },
 });
 
@@ -427,6 +427,8 @@ app.delete("/delete-design", async(req, res) =>{
   }
 })
 
-app.listen(process.env.PORT || 5000, function () {
-  console.log("Server is listening at port 5000...");
+// const port = process.env.PORT || 5000
+const port = 5000
+app.listen(port, function () {
+  console.log(`Server is listening at port ${port}...`);
 });
