@@ -20,6 +20,7 @@ const corsOptions = {
            "https://dynamic-list-app.herokuapp.com"],
   optionsSuccessStatus: 200,
   credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'device-remember-token', 'Access-Control-Allow-Origin', 'Origin', 'Accept']
 };
 
 app.use(cors(corsOptions));
@@ -429,6 +430,7 @@ app.delete("/delete-design", async(req, res) =>{
 })
 
 const port = process.env.PORT || 5000
+// const port = 38400
 app.listen(port, function () {
   console.log(`Server is listening at port ${port}...`);
 });
