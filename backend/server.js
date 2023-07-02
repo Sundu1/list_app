@@ -13,9 +13,8 @@ require("dotenv").config();
 const Sunsql = require("./sql_utility.js");
 
 const app = express();
-const port = 5000;
 
-var corsOptions = {
+const corsOptions = {
   origin: ["http://localhost:3000", 
            "https://list-app-80e45.web.app", 
            "https://dynamic-list-app.herokuapp.com"],
@@ -34,7 +33,7 @@ const pool = new Pool({
   password: process.env.PASSWORD,
   port: process.env.PORT,
   ssl: {
-    rejectUnauthorized: false,
+    rejectUnauthorized: true,
   },
 });
 
@@ -422,7 +421,10 @@ app.delete("/delete-design", async(req, res) =>{
       name : designName,
     }
   });
-  res.send(result)
+
+  if(result !== "error"){
+    res.send(result)
+  }
 })
 
 app.listen(process.env.PORT || 5000, function () {

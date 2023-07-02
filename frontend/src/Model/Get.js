@@ -41,7 +41,9 @@ const getDesignList = async (setTableList, user) => {
       }
     });
     const data = await response.data;
-    setTableList(data);
+    if(data !== "error"){
+      setTableList(data);
+    }
   } catch (err) {
     console.error(err);
   }
