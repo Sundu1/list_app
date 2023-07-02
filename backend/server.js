@@ -19,6 +19,7 @@ const corsOptions = {
            "https://list-app-80e45.web.app", 
            "https://dynamic-list-app.herokuapp.com"],
   optionsSuccessStatus: 200,
+  credentials: true,
 };
 
 app.use(cors(corsOptions));
