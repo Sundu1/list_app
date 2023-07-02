@@ -428,8 +428,7 @@ app.delete("/delete-design", async(req, res) =>{
   }
 })
 
-// const port = process.env.PORT || 5000
-const port = 5000
+const port = process.env.PORT || 5000
 app.listen(port, function () {
   console.log(`Server is listening at port ${port}...`);
 });
