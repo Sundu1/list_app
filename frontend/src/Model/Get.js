@@ -34,6 +34,11 @@ const getDesignList = async (setTableList, user) => {
     const response = await axios({
       method: "get",
       url: `${BASE_URL}/designlist/${user}`,
+      headers: {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Credentials': 'true'
+      }
     });
     const data = await response.data;
     setTableList(data);

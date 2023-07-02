@@ -49,9 +49,13 @@ class DesignTable {
   }
 
   async findAll() {
+   try {
     const result = await this.sqlClient.pool.query(`
     select * from ${this.userSchemeName}.design_table`);
     return result.rows ? result.rows : "empty";
+   } catch (error) {
+    return "error"
+   }
   }
 
   async delete({ where }) {
