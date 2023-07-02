@@ -3,6 +3,7 @@ import { FaRegListAlt } from "react-icons/fa";
 import { RiContactsBookFill } from "react-icons/ri";
 import { AiFillAppstore } from "react-icons/ai";
 import { useNavigate } from "react-router-dom";
+import { LINK_APPS } from '../model/config'
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -63,7 +64,7 @@ const Sidebar = () => {
             <a
               className="flex items-center p-2 text-gray-900 rounded-lg dark:text-white hover:bg-gray-100
                         dark:hover:bg-gray-700 hover:cursor-pointer"
-              onClick={() => navigate(`/apps`)}
+              onClick={() => navigate(LINK_APPS)}
             >
               <div
                 className="flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400

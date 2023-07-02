@@ -4,6 +4,7 @@ import { SignIn } from "../model/Post";
 import { UserContext } from "../components/LoginProvider";
 import { LoadingBar } from "../components/LoadingBar";
 import { Notification } from "../components/Notification";
+import { LINK_APPS } from "../model/config";
 
 const Login = () => {
   const { value, setValue } = useContext(UserContext);
@@ -23,7 +24,7 @@ const Login = () => {
     if (userInfo.result) {
       localStorage.setItem("user", JSON.stringify(userInfo));
       setValue(userInfo);
-      navigate("/apps");
+      navigate(LINK_APPS);
       return;
     } else if (userInfo.message) {
       setLoading(false);
@@ -141,7 +142,7 @@ const Login = () => {
                 Don’t have an account yet?{" "}
                 <button
                   className="font-medium text-primary-600 hover:underline dark:text-primary-500"
-                  onClick={() => navigate(`/signup`)}
+                  onClick={() => navigate(`/#/signup`)}
                 >
                   Sign up
                 </button>

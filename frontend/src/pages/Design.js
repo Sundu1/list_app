@@ -21,7 +21,7 @@ const Design = () => {
     name: undefined,
     values: {},
   });
-
+  
   const [inputColorPicker, setInputColorPicker] = useState({name: "", id: ""});
   const [refresh, setRefresh] = useState(false);
   const [colorUpdate, setColorUpdate] = useState({});
@@ -288,8 +288,6 @@ const Design = () => {
           orderObj,
         })
 
-        console.log("singleDesign", singleDesign);
-
         let testFile
 
         htmlToImage.toJpeg(editContainerRef.current).then(function(dataUrl){
@@ -331,6 +329,8 @@ const Design = () => {
       document.removeEventListener("keyup", keyUp)
     );
   });
+
+  console.log("jsonValue", jsonValue.elements);
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {

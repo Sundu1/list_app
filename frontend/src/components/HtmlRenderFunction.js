@@ -2,8 +2,7 @@ import quickSort from "./quickSort";
 import * as icons from "./icons";
 import bgDefault from '../assets/imgs/bgSaturated.svg'
 import axios from "axios";
-import { BASE_URL } from "../model/config.js";
-
+import { BASE_URL, FRONTEND_URL } from "../model/config.js";
 import ArrowDown from '../assets/icons/arrow_down copy'
 
 const HtmlRenderFunction = (
@@ -79,7 +78,7 @@ const HtmlRenderFunction = (
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
 
-            newDiv.style.backgroundImage = "url(http://localhost:3000" + bgDefault + ")"
+            newDiv.style.backgroundImage = `url(${FRONTEND_URL}/${bgDefault})`
           }
 
           if (element.background_style_type == "gradient") {
@@ -327,7 +326,7 @@ const HtmlRenderFunction = (
 
           const img = document.createElement("img");
           img.style.pointerEvents = "none";
-          img.src = "http://localhost:3000" + icons[element.icon];
+          img.src = FRONTEND_URL + icons[element.icon];
 
           img.style.paddingTop = "2px";
           img.style.paddingLeft = "5px";
@@ -407,8 +406,9 @@ const HtmlRenderFunction = (
 
           newDiv.classList.add("button");
           const img = document.createElement("img");
-          img.src = "http://localhost:3000" + icons[element.icon];
+          img.src = FRONTEND_URL + icons[element.icon];
 
+          console.log(img.src);
           img.style.paddingTop = "2px";
           img.style.paddingLeft = "5px";
           img.style.height = parent.getAttribute("icon_size") + "px";
@@ -563,7 +563,7 @@ const HtmlRenderFunction = (
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
 
-            newDiv.style.backgroundImage = "url(http://localhost:3000" + bgDefault + ")"
+            newDiv.style.backgroundImage = `url(${FRONTEND_URL}/${bgDefault})`
           }
 
           if (element.background_style_type == "gradient") {

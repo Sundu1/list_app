@@ -16,7 +16,7 @@ const app = express();
 const port = 5000;
 
 var corsOptions = {
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000", "https://list-app-80e45.web.app"],
   optionsSuccessStatus: 200,
 };
 

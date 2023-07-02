@@ -6,6 +6,7 @@ import List from "./pages/List";
 import Signup from "./pages/Signup";
 import Design from "./pages/Design";
 import DesignList from "./pages/DesignList";
+import { LINK_APPS } from './model/config'
 
 import { Router, Route, Routes } from "react-router-dom";
 import {
@@ -62,7 +63,7 @@ function App() {
           }
         />
         <Route
-          path="/apps"
+          path={LINK_APPS}
           element={
             <LoginProvider>
               <DesignList />
