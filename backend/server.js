@@ -421,7 +421,7 @@ app.post("/create-design",  async(req, res) =>{
   res.send(create)
 })
 
-app.put("/update-design", async(req, res)=>{
+app.post("/update-design", async(req, res)=>{
   const {designName, designObjects, user, valuecounts, screenshotimg} = req.body
 
   console.log(req.body);

@@ -18,7 +18,7 @@ const editRow = async (editRowData) => {
 const udpateNewDesign = async (designName, designObjects, user, valuecounts, screenshotimg) => {
   try {
     const response = await axios({
-      method: "put",
+      method: "post",
       url: `${BASE_URL}/update-design`,
       data: {
         designName,
