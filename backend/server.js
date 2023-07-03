@@ -50,12 +50,12 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  // user: process.env.USER,
-  // host: process.env.HOST,
-  // database: process.env.DATABASE,
-  // password: process.env.PASSWORD,
-  // port: process.env.PORT,
+  // connectionString: process.env.DATABASE_URL,
+  user: process.env.USER,
+  host: process.env.HOST,
+  database: process.env.DATABASE,
+  password: process.env.PASSWORD,
+  port: process.env.PORT,
   ssl: {
     rejectUnauthorized: false,
   },
