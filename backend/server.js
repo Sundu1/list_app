@@ -349,7 +349,10 @@ const sunsql = new Sunsql({
 });
 
 app.get("/designlist/:user", async (req, res) => {
-  sunsql.designTable.init("admin");
+  const { user } = req.params
+
+  if(user == null) return
+  sunsql.designTable.init(user.Username);
   const result = await sunsql.designTable.findAll();
   res.send(result);
 });
