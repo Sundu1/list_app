@@ -290,18 +290,20 @@ const Design = () => {
 
         let testFile
 
-        htmlToImage.toJpeg(editContainerRef.current).then(function(dataUrl){
+        htmlToImage.toJpeg(editContainerRef.current, {height: 200, width: 320}).then(function(dataUrl){
           testFile = dataURLtoFile(dataUrl, designTable + "Screenshot.jpg");
           imageData.push(testFile)
           postImage(imageData)
 
-          if(singleDesign != null){
-            udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
-          } else {
-            createNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+          if(value && value.Username){
+            if(singleDesign.length > 0){
+              udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+            } else {
+              createNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+            }
           }
         })
-
+        
         function dataURLtoFile(dataurl, filename) {
           var arr = dataurl.split(','),
               mime = arr[0].match(/:(.*?);/)[1],
@@ -329,8 +331,6 @@ const Design = () => {
       document.removeEventListener("keyup", keyUp)
     );
   });
-
-  console.log("jsonValue", jsonValue.elements);
 
   useEffect(() => {
     const checkIfClickedOutside = (e) => {

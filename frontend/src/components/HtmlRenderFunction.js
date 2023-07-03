@@ -408,7 +408,6 @@ const HtmlRenderFunction = (
           const img = document.createElement("img");
           img.src = FRONTEND_URL + icons[element.icon];
 
-          console.log(img.src);
           img.style.paddingTop = "2px";
           img.style.paddingLeft = "5px";
           img.style.height = parent.getAttribute("icon_size") + "px";

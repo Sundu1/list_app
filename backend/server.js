@@ -72,7 +72,6 @@ async function getAll(tableName, user) {
         AND table_name   = '${tableName.toLowerCase()}'
         `);
 
-    console.log(columns_query.rows);
     // AND column_name != 'pkid'
     let list_query = "";
     columns_query.rows.forEach((value) => {
@@ -388,7 +387,6 @@ app.get("/designlist/:user/:designName", async (req, res) => {
     }
   });
 
-  console.log(result);
   res.send(result)
 }); 
 
@@ -426,6 +424,8 @@ app.post("/create-design",  async(req, res) =>{
 app.put("/update-design", async(req, res)=>{
   const {designName, designObjects, user, valuecounts, screenshotimg} = req.body
 
+  console.log(req.body);
+  if(user == undefined) return
   sunsql.designTable.init(user.Username);
   const result = await sunsql.designTable.updateMany({
     where:{
@@ -453,7 +453,6 @@ app.delete("/delete-design", async(req, res) =>{
 })
 
 const port = process.env.PORT || 5000
-// const port = 38400
 app.listen(port, function () {
   console.log(`Server is listening at port ${port}...`);
 });
