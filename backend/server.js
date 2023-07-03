@@ -19,30 +19,30 @@ const corsOptions = {
            "https://dynamic-list-app.herokuapp.com"],
   optionsSuccessStatus: 200,
   credentials: true,
-  allowedHeaders: ['Content-Type', 
-                   'Authorization', 
-                   'X-Requested-With', 
-                   'device-remember-token', 
-                   'Access-Control-Allow-Origin', 
-                   'Origin', 
-                   'Accept']
+  // allowedHeaders: ['Content-Type', 
+  //                  'Authorization', 
+  //                  'X-Requested-With', 
+  //                  'device-remember-token', 
+  //                  'Access-Control-Allow-Origin', 
+  //                  'Origin', 
+  //                  'Accept']
 };
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested, Content-Type, Accept Authorization"
-  )
-  if (req.method === "OPTIONS") {
-    res.header(
-      "Access-Control-Allow-Methods",
-      "POST, PUT, PATCH, GET, DELETE"
-    )
-    return res.status(200).json({})
-  }
-  next()
-})
+// app.use((req, res, next) => {
+//   res.header("Access-Control-Allow-Origin", "*")
+//   res.header(
+//     "Access-Control-Allow-Headers",
+//     "Origin, X-Requested, Content-Type, Accept Authorization"
+//   )
+//   if (req.method === "OPTIONS") {
+//     res.header(
+//       "Access-Control-Allow-Methods",
+//       "POST, PUT, PATCH, GET, DELETE"
+//     )
+//     return res.status(200).json({})
+//   }
+//   next()
+// })
 
 app.use(cors(corsOptions));
 app.use(express.urlencoded({ extended: true }));
