@@ -62,13 +62,11 @@ const DesignList = () => {
             }}
             onClick={handleSelectClick}
           >
-            <img
-            />
             {selectButton.name == "new" && selectButton.isActive == true ? (
               <div className="text-white h-[40px] w-[90px] bg-[#136565] rounded-lg text-center pt-1.5">
                 Select
               </div>
-            ) : null}
+            ) : <div className="text-white text-[20px]">New design</div>}
           </div>
           {
             tableList.length > 0 ? 

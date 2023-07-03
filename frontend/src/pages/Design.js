@@ -290,7 +290,7 @@ const Design = () => {
 
         let testFile
 
-        htmlToImage.toJpeg(editContainerRef.current, {height: 200, width: 320}).then(function(dataUrl){
+        htmlToImage.toJpeg(editContainerRef.current, {canvasHeight: 200, canvasWidth: 320}).then(function(dataUrl){
           testFile = dataURLtoFile(dataUrl, designTable + "Screenshot.jpg");
           imageData.push(testFile)
           postImage(imageData)
@@ -303,7 +303,7 @@ const Design = () => {
             }
           }
         })
-        
+
         function dataURLtoFile(dataurl, filename) {
           var arr = dataurl.split(','),
               mime = arr[0].match(/:(.*?);/)[1],
@@ -872,10 +872,7 @@ const Design = () => {
   const handleDrop = (e) => {
     e.preventDefault();
 
-    if (
-      e.target.id == "Background"
-    )
-      return;
+    if (e.target.id == "Background") return;
 
     const insertIntoArray = (dragValue, targetValue) => {
       const containers = matchAndGet(jsonValue.elements, "Page").children;
@@ -973,18 +970,29 @@ const Design = () => {
     }
 
     // Update Parent
-    const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
+    const hoverElement = matchAndGet(jsonValue.elements,
+                                     e.target.id.includes("wrapper") ? 
+                                     e.target.id.replace("-wrapper","") :
+                                     e.target.id );
 
     if (e.target.getAttribute("dropdownzone")) return;
-    if (hoverElement == null) return;
-    if (hoverElement.type == "text" || hoverElement.type == "image") {
-      const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
-      updateElementParent(
-        e.dataTransfer.getData("dragging_container"),
-        parentEle.id
-      );
-    }
+    if (hoverElement !== null){
+      if (hoverElement.type == "text" || 
+          hoverElement.type == "image" || 
+          hoverElement.type == "button-parent") {
+        const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
+        updateElementParent(
+          e.dataTransfer.getData("dragging_container").includes("wrapper") ? 
+          e.dataTransfer.getData("dragging_container").replace("-wrapper","") :
+          e.dataTransfer.getData("dragging_container"),
+          parentEle.id
+        );
+      }
+    };
+
     updateElementParent(
+      e.dataTransfer.getData("dragging_container").includes("wrapper") ? 
+      e.dataTransfer.getData("dragging_container").replace("-wrapper","") :
       e.dataTransfer.getData("dragging_container"),
       e.target.id
     );
@@ -3156,10 +3164,6 @@ const Design = () => {
               Icons
             </div>
           </div>
-          <svg width="50px" height="50px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z" fill="#000000"/>
-        </svg>
-          <svg fill="black" height="10px" width="10px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z" fill="#000000"></path></svg>
         </div>
       ) : null}
       {/* New element Ending here */}
