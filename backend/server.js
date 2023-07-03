@@ -361,11 +361,12 @@ app.put("/edit-row-data", async (req, res) => {
 });
 
 const sunsql = new Sunsql({
-  user: process.env.USER,
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-  port: process.env.PORT,
+  connectionString: process.env.DATABASE_URL,
+  // user: process.env.USER,
+  // host: process.env.HOST,
+  // database: process.env.DATABASE,
+  // password: process.env.PASSWORD,
+  // port: process.env.PORT,
   ssl: {
     rejectUnauthorized: false,
   },
