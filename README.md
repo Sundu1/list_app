@@ -1,5 +1,7 @@
 You can check out the link here. https://list-app-80e45.web.app/
-If you're interested, you can use username "admin" and password "123" to log in.
+If you're interested, sign up and build your unique designs or you can test it out with the default credentials below.
+Username: admin
+Password: 123
 
 Image 1:
 ![image](https://github.com/Sundu1/list_app/assets/87574080/7812b027-1ed3-43b3-9b43-edb3ea9b2f7e)
