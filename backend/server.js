@@ -352,7 +352,7 @@ app.get("/designlist/:user", async (req, res) => {
   const { user } = req.params
 
   if(user == null) return
-  sunsql.designTable.init(user.Username);
+  sunsql.designTable.init(user);
   const result = await sunsql.designTable.findAll();
   res.send(result);
 });
@@ -368,7 +368,7 @@ app.get("/designlist/:user/:designName", async (req, res) => {
   });
 
   res.send(result)
-}); 
+});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {

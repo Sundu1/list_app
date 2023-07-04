@@ -34,7 +34,7 @@ const getDesignList = async (setTableList, user) => {
     const response = await axios({
       method: "get",
       url: `${BASE_URL}/designlist/${user}`,
-      withCredentials: true
+      withCredentials: true,
     });
     const data = await response.data;
     if(data !== "error"){
@@ -52,13 +52,26 @@ const getDesignSingle = async (setSigleDesign, user, designName) => {
       url: `${BASE_URL}/designlist/${user.Username}/${designName}`,
     });
     const data = await response.data;
-    setSigleDesign(data)
+    setSigleDesign(data[0])
   } catch (err) {
     console.error(err);
   }
 };
 
-export { getTableValue, getTableList, getDesignList, getDesignSingle};
+const getSingleDesign1 = async (user, designName) => {
+  try {
+    const response = await axios({
+      method: "get",
+      url: `${BASE_URL}/designlist/${user.Username}/${designName}`,
+    });
+    const data = await response.data;
+    return data
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+export { getTableValue, getTableList, getDesignList, getDesignSingle, getSingleDesign1};
 
 // if (localStorage.getItem(tableName)) {
 //   setTable(JSON.parse(localStorage.getItem(tableName)));
