@@ -4,6 +4,11 @@ If you're interested, sign up and build your unique designs or you can test it o
 Username: admin,
 Password: 123
 
+The technologies behind this mini design builder are:
+Frontend   -   React js, 
+Backend    -   Express js, 
+Database   -   Postgresql
+
 Image 1:
 ![image](https://github.com/Sundu1/list_app/assets/87574080/7812b027-1ed3-43b3-9b43-edb3ea9b2f7e)
 
@@ -16,7 +21,4 @@ Image 3:
 Image 4: 
 ![image](https://github.com/Sundu1/list_app/assets/87574080/50c8e58f-a346-485e-9d2e-363cbeebb8c7)
 
-
-
-https://github.com/Sundu1/list_app/assets/87574080/0324db39-851e-4b2d-bc29-de8f6ac51996
 
