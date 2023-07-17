@@ -7,6 +7,7 @@ import { AiOutlinePlus, AiOutlineClose } from "react-icons/ai";
 import { json, useNavigate } from "react-router-dom";
 import { LoginProvider, UserContext } from "../components/LoginProvider";
 import { insertNewTable, createNewDesign } from "../model/Post";
+import { getSingleDesign1 } from "../model/Get";
 import { DeleteDesign } from "../model/Delete";
 import { BASE_URL } from "../model/config.js";
 
@@ -14,8 +15,10 @@ const DesignList = () => {
   const { value, setValue } = useContext(UserContext);
   const [tableList, setTableList] = useState([]);
   const [refreshList, setRefreshList] = useState(false);
-  const [selectButton, setSelectButton] = useState({id: "", isActive: false});
+  const [hoverEle, setHoverele] = useState({id: "", isActive: false});
+  const [selectModal, setSelectModal] = useState({id: "", isActive: false})
   const [deleteModal, setDeleteModal] = useState({id: "", isActive: false})
+  const [errorNotifMessage, setErrorNotifMessage] = useState("")
 
   const navigate = useNavigate();
   useEffect(() => {
@@ -32,8 +35,6 @@ const DesignList = () => {
   const handleNavigateDesign = (e) =>{
     const designName = e.target.id
     navigate(`/design/${designName}`)
-    localStorage.setItem(`design-jsonvalue-${designName}`, e.target.dataset.jsonvalue)
-    localStorage.setItem(`design-valuecounts-${designName}`, e.target.dataset.valuecounts)
   }
 
   const handleDeleteDesign = (e) =>{
@@ -42,6 +43,24 @@ const DesignList = () => {
       designName: deleteModal.id
     })
     DeleteDesign(deleteDesignInfo)
+    setRefreshList(refreshList)
+    setDeleteModal({id: "", isActive: false})
+  }
+
+  const handleSelect = async (e) =>{
+    if(value && value.Username){
+      const data = await getSingleDesign1(value, selectModal.id)
+      if(data && data.length > 0){
+        setErrorNotifMessage("Design exists, Please choose another design's name")
+      }else {
+        navigate(`/design/${selectModal.id}`)
+      }
+    }
+  }
+
+  const handleCancelSelectModal = () =>{
+    setSelectModal({id : "", isActive : false})
+    setErrorNotifMessage("")
   }
 
   return (
@@ -55,20 +74,18 @@ const DesignList = () => {
             className="h-[200px] w-[320px] bg-[#808080] rounded-lg border-2 border-dashed border-black 
                        flex justify-center items-center hover:cursor-pointer hover:bg-[#5A5A5A] transition ease-in"
             onMouseOver={(e) => {
-              setSelectButton({name: "new", isActive: true});
+              setHoverele({name: "new", isActive: true});
             }}
             onMouseOut={(e) => {
-              setSelectButton({name: "", isActive: false});
+              setHoverele({name: "", isActive: false});
             }}
-            onClick={handleSelectClick}
+            onClick={() => setSelectModal({isActive: true})}
           >
-            <img
-            />
-            {selectButton.name == "new" && selectButton.isActive == true ? (
+            {hoverEle.name == "new" && hoverEle.isActive == true ? (
               <div className="text-white h-[40px] w-[90px] bg-[#136565] rounded-lg text-center pt-1.5">
                 Select
               </div>
-            ) : null}
+            ) : <div className="text-white text-[20px]">New design</div>}
           </div>
           {
             tableList.length > 0 ? 
@@ -79,10 +96,10 @@ const DesignList = () => {
                                   design_list_hover"
                       key={design.designname}
                       onMouseOver={() => {
-                        setSelectButton({name: design.designname, isActive: true});
+                        setHoverele({name: design.designname, isActive: true});
                       }}
                       onMouseOut={() => {
-                        setSelectButton({name: "", isActive: false});
+                        setHoverele({name: "", isActive: false});
                       }}
                    >
                     <img
@@ -93,7 +110,7 @@ const DesignList = () => {
                     src={`${BASE_URL}/images/${design.screenshotimg}`}
                     />
                     {
-                      selectButton.name == design.designname && selectButton.isActive == true ? (
+                      hoverEle.name == design.designname && hoverEle.isActive == true ? (
                         <div className="absolute 
                                         top-[50%] transform translate-y-[-50%] 
                                         left-[50%] transform translate-x-[-50%]
@@ -189,7 +206,45 @@ const DesignList = () => {
             </div>
           </div>
           : null }
-      {/* Delete End Modal */}
+     {/* Delete End Modal */}
+      {
+      selectModal && selectModal.isActive ? 
+        <div className="fixed top-0 left-0 h-full w-full bg-black z-50 bg-opacity-80 flex justify-center items-center">
+          <div className="h-[15em] w-[25em] bg-white rounded-lg text-center flex justify-center items-center">
+            <div className="">
+              <div className="flex justify-center pb-5"> 
+              </div>
+              <div className="text-[#ff0000]">{errorNotifMessage}</div>
+              <div className=""> Please enter your design's name </div>
+              <input 
+                 type="text" 
+                 className="m-5 bg-white p-2 border-2 border-black rounded-lg"
+                 value={selectModal.id}
+                 onChange={(e) => setSelectModal(old => ({...old, id: e.target.value})) }
+                 />
+              <div className="">
+                <button className="mx-3 text-white h-[40px] w-[90px] bg-[#ff3333] 
+                                  rounded-lg text-center
+                                  hover:bg-opacity-[0.8]
+                                  "
+                  onClick={handleSelect}
+                        >
+                  Continue
+                </button>
+                <button className="mx-3 text-white h-[40px] w-[90px] bg-[#136565] 
+                                  rounded-lg text-center
+                                  hover:bg-opacity-[0.8]
+                                  "
+                  onClick={handleCancelSelectModal}                  
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        : null }
+
     </div>
   );
 };

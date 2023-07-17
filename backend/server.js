@@ -11,7 +11,6 @@ const configAuth = require("./auth/auth.config.js");
 require("dotenv").config();
 
 const Sunsql = require("./sql_utility.js");
-
 const app = express();
 
 const corsOptions = {
@@ -20,7 +19,6 @@ const corsOptions = {
            "https://dynamic-list-app.herokuapp.com"],
   optionsSuccessStatus: 200,
   credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'device-remember-token', 'Access-Control-Allow-Origin', 'Origin', 'Accept']
 };
 
 app.use(cors(corsOptions));
@@ -29,11 +27,12 @@ app.use(express.json());
 app.use(express.static('public'));
 
 const pool = new Pool({
-  user: process.env.USER,
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-  port: process.env.PORT,
+  connectionString: process.env.DATABASE_URL,
+  // user: process.env.USER,
+  // host: process.env.HOST,
+  // database: process.env.DATABASE,
+  // password: process.env.PASSWORD,
+  // port: process.env.PORT,
   ssl: {
     rejectUnauthorized: false,
   },
@@ -50,7 +49,6 @@ async function getAll(tableName, user) {
         AND table_name   = '${tableName.toLowerCase()}'
         `);
 
-    console.log(columns_query.rows);
     // AND column_name != 'pkid'
     let list_query = "";
     columns_query.rows.forEach((value) => {
@@ -339,18 +337,22 @@ app.put("/edit-row-data", async (req, res) => {
 });
 
 const sunsql = new Sunsql({
-  user: process.env.USER,
-  host: process.env.HOST,
-  database: process.env.DATABASE,
-  password: process.env.PASSWORD,
-  port: process.env.PORT,
+  connectionString: process.env.DATABASE_URL,
+  // user: process.env.USER,
+  // host: process.env.HOST,
+  // database: process.env.DATABASE,
+  // password: process.env.PASSWORD,
+  // port: process.env.PORT,
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
 app.get("/designlist/:user", async (req, res) => {
-  sunsql.designTable.init("admin");
+  const { user } = req.params
+
+  if(user == null) return
+  sunsql.designTable.init(user);
   const result = await sunsql.designTable.findAll();
   res.send(result);
 });
@@ -365,9 +367,8 @@ app.get("/designlist/:user/:designName", async (req, res) => {
     }
   });
 
-  console.log(result);
   res.send(result)
-}); 
+});
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -400,9 +401,10 @@ app.post("/create-design",  async(req, res) =>{
   res.send(create)
 })
 
-app.put("/update-design", async(req, res)=>{
+app.post("/update-design", async(req, res)=>{
   const {designName, designObjects, user, valuecounts, screenshotimg} = req.body
 
+  if(user == undefined) return
   sunsql.designTable.init(user.Username);
   const result = await sunsql.designTable.updateMany({
     where:{
@@ -430,7 +432,6 @@ app.delete("/delete-design", async(req, res) =>{
 })
 
 const port = process.env.PORT || 5000
-// const port = 38400
 app.listen(port, function () {
   console.log(`Server is listening at port ${port}...`);
 });

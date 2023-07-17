@@ -88,16 +88,18 @@ const addColumnPost = async (tableName, user, columnInfo) => {
 
 const createNewDesign = async (designName, designObjects, user, valuecounts) => {
   try {
-    const response = await axios({
-      method: "post",
-      url: `${BASE_URL}/create-design`,
-      data: {
+    const response = await axios.post(
+      `${BASE_URL}/create-design`,
+      {
         designName,
         designObjects : JSON.stringify(designObjects[0]),
         user,
         valuecounts : JSON.stringify(valuecounts),
       },
-    });
+      {
+        headers: { 'Content-Type': 'application/json'},
+      }
+    );
     const data = await response.data;
     return data;
   } catch (err) {
@@ -114,11 +116,11 @@ const postImage = async(image) =>{
     }
 
     axios.post(`${BASE_URL}/image`, 
-                formData, {
-                headers: {
-                  'Content-Type': 'multipart/form-data'
+                formData, 
+                {
+                headers: { 'Content-Type': 'multipart/form-data' }
                 }
-              })
+              )
   } catch (error) {
     console.error(error)
   }

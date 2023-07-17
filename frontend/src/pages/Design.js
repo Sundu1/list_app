@@ -84,7 +84,7 @@ const Design = () => {
             type: "page",
             id: "Page",
             height: "200",
-            width: "500",
+            width: "50",
             position_div: "relative",
             text_align: "center",
             position: "center",
@@ -129,6 +129,8 @@ const Design = () => {
   const[buttonParentCount, setButtonParentCount] = useState(1)
   const[buttonCount, setButtonCount] = useState(1)
   const[orderObj, setOrderObj] = useState(1)
+
+  const [valueCounts, setValueCounts] = useState({})
 
   const [imageData, setImageData] = useState([])
   const [singleDesign, setSingleDesign] = useState(null)
@@ -290,15 +292,18 @@ const Design = () => {
 
         let testFile
 
-        htmlToImage.toJpeg(editContainerRef.current).then(function(dataUrl){
+        htmlToImage.toJpeg(editContainerRef.current, {canvasHeight: 200, canvasWidth: 400}).then(function(dataUrl){
           testFile = dataURLtoFile(dataUrl, designTable + "Screenshot.jpg");
           imageData.push(testFile)
           postImage(imageData)
 
-          if(singleDesign != null){
-            udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
-          } else {
-            createNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+          if(value && value.Username){
+            console.log(singleDesign);
+            if(singleDesign){
+              udpateNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+            } else {
+              createNewDesign(designTable, jsonValue.elements, value, valuecounts, testFile.name)
+            }
           }
         })
 
@@ -330,8 +335,6 @@ const Design = () => {
     );
   });
 
-  console.log("jsonValue", jsonValue.elements);
-
   useEffect(() => {
     const checkIfClickedOutside = (e) => {
       if (
@@ -351,24 +354,27 @@ const Design = () => {
   }, [isAddElement]);
 
   useEffect(() =>{
-    const isExist = JSON.parse(localStorage.getItem(`design-jsonvalue-${designTable}`))
-    if(isExist){
       if(Object.keys(value).length > 0){
         getDesignSingle(setSingleDesign, value, designTable)
       }
-      const valuecounts = JSON.parse(localStorage.getItem(`design-valuecounts-${designTable}`))
-      setContainerCount(containerCount + valuecounts.containerCount)
-      setColumnsCount(columnsCount + valuecounts.columnsCount)
-      setTextCount(textCount + valuecounts.textCount)
-      setImageCount(imageCount + valuecounts.imageCount)
-      setIconParentCount(iconParentCount + valuecounts.iconParentCount)
-      setIconCount(iconCount + valuecounts.iconCount)
-      setButtonParentCount(buttonParentCount + valuecounts.buttonParentCount)
-      setButtonCount(buttonCount + valuecounts.buttonCount)
-      setOrderObj(orderObj + valuecounts.orderObj)
-      setJsonValue({elements : [isExist]})
-    }
   },[value])
+
+  useEffect(() =>{
+    if(Object.keys(value).length > 0){
+      if(singleDesign && singleDesign.jsonvalue){
+        setContainerCount(containerCount + singleDesign.valuecounts.containerCount)
+        setColumnsCount(columnsCount + singleDesign.valuecounts.columnsCount)
+        setTextCount(textCount + singleDesign.valuecounts.textCount)
+        setImageCount(imageCount + singleDesign.valuecounts.imageCount)
+        setIconParentCount(iconParentCount + singleDesign.valuecounts.iconParentCount)
+        setIconCount(iconCount + singleDesign.valuecounts.iconCount)
+        setButtonParentCount(buttonParentCount + singleDesign.valuecounts.buttonParentCount)
+        setButtonCount(buttonCount + singleDesign.valuecounts.buttonCount)
+        setOrderObj(orderObj + singleDesign.valuecounts.orderObj)
+        setJsonValue({elements : [singleDesign.jsonvalue]})
+      }
+    }
+  }, [singleDesign])
 
   useEffect(() => {
     HtmlRenderFunction(
@@ -495,7 +501,7 @@ const Design = () => {
           parent: changeJson.values.id ? changeJson.values.id : "Page",
           order: containerCount,
           height: "100",
-          width: "200",
+          width: "100",
           background_color: "",
           border: "",
           text: "text here",
@@ -648,6 +654,9 @@ const Design = () => {
           button_background_color: "white",
           button_color: "black",
           button_size: "",
+          button_rounded: "0",
+          button_padding: "5",
+          button_width: "0",
           children: [
             {
               parent: parentId,
@@ -686,6 +695,8 @@ const Design = () => {
           iconSize: "20",
           position: "center",
           icon_color: "black",
+          icon_background: "",
+          icon_rounded: "0",
           children: [
             {
               parent: parentId,
@@ -872,10 +883,7 @@ const Design = () => {
   const handleDrop = (e) => {
     e.preventDefault();
 
-    if (
-      e.target.id == "Background"
-    )
-      return;
+    if (e.target.id == "Background") return;
 
     const insertIntoArray = (dragValue, targetValue) => {
       const containers = matchAndGet(jsonValue.elements, "Page").children;
@@ -973,18 +981,29 @@ const Design = () => {
     }
 
     // Update Parent
-    const hoverElement = matchAndGet(jsonValue.elements, e.target.id);
+    const hoverElement = matchAndGet(jsonValue.elements,
+                                     e.target.id.includes("wrapper") ? 
+                                     e.target.id.replace("-wrapper","") :
+                                     e.target.id );
 
     if (e.target.getAttribute("dropdownzone")) return;
-    if (hoverElement == null) return;
-    if (hoverElement.type == "text" || hoverElement.type == "image") {
-      const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
-      updateElementParent(
-        e.dataTransfer.getData("dragging_container"),
-        parentEle.id
-      );
-    }
+    if (hoverElement !== null){
+      if (hoverElement.type == "text" || 
+          hoverElement.type == "image" || 
+          hoverElement.type == "button-parent") {
+        const parentEle = matchAndGet(jsonValue.elements, hoverElement.parent);
+        updateElementParent(
+          e.dataTransfer.getData("dragging_container").includes("wrapper") ? 
+          e.dataTransfer.getData("dragging_container").replace("-wrapper","") :
+          e.dataTransfer.getData("dragging_container"),
+          parentEle.id
+        );
+      }
+    };
+
     updateElementParent(
+      e.dataTransfer.getData("dragging_container").includes("wrapper") ? 
+      e.dataTransfer.getData("dragging_container").replace("-wrapper","") :
       e.dataTransfer.getData("dragging_container"),
       e.target.id
     );
@@ -1318,9 +1337,12 @@ const Design = () => {
   };
 
   const updateImageValue = (e) => {
-    const img_url = e.target.files
-      ? URL.createObjectURL(e.target.files[0])
-      : undefined;
+
+    const img_url = new Object({
+      name: e.target.files ? e.target.files[0].name : "",
+      url: URL.createObjectURL(e.target.files[0])
+    })
+
     const target = new Object({
       target: {
         id: e.target.id,
@@ -1328,6 +1350,7 @@ const Design = () => {
       },
     });
 
+    setImageData(old => [...old, e.target.files[0]])
     updateElementsValues(target);
   };
 
@@ -1809,7 +1832,7 @@ const Design = () => {
               <input
                 id="width"
                 type="range"
-                max={1000}
+                max={100}
                 className="slider_style"
                 value={changeJson.values.width}
                 onChange={updateElementsValues}
@@ -2619,7 +2642,7 @@ const Design = () => {
               <input
                 id="width"
                 type="range"
-                max={1000}
+                max={100}
                 className="slider_style"
                 value={changeJson.values.width}
                 onChange={updateElementsValues}
@@ -2946,6 +2969,66 @@ const Design = () => {
                   />
                 </div>
               </div>
+              <div className="p-2">
+                <div className="flex justify-between">
+                  <h3 className="pb-2">Width</h3>
+                  <input
+                    id="button_width"
+                    className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                    value={changeJson.values.button_width == 0 ? "auto" : changeJson.values.button_width}
+                    onChange={updateElementsValues}
+                  />
+                </div>
+                <input
+                  max={500}
+                  min={0}
+                  id="button_width"
+                  type="range"
+                  className="slider_style pr-5"
+                  value={changeJson.values.button_width}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div className="p-2">
+                <div className="flex justify-between">
+                  <h3 className="pb-2">Rounded</h3>
+                  <input
+                    id="button_rounded"
+                    className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                    value={changeJson.values.button_rounded}
+                    onChange={updateElementsValues}
+                  />
+                </div>
+                <input
+                  max={50}
+                  min={0}
+                  id="button_rounded"
+                  type="range"
+                  className="slider_style pr-5"
+                  value={changeJson.values.button_rounded}
+                  onChange={updateElementsValues}
+                />
+              </div>
+              <div className="p-2">
+                <div className="flex justify-between">
+                  <h3 className="pb-2">Padding</h3>
+                  <input
+                    id="button_padding"
+                    className="mr-5 rounded px-1 w-[50px] bg-transparent"
+                    value={changeJson.values.button_padding}
+                    onChange={updateElementsValues}
+                  />
+                </div>
+                <input
+                  max={50}
+                  min={10}
+                  id="button_padding"
+                  type="range"
+                  className="slider_style pr-5"
+                  value={changeJson.values.button_padding}
+                  onChange={updateElementsValues}
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -3082,6 +3165,36 @@ const Design = () => {
                   />
                 </div>
               </div>
+
+              <h1 className="py-3">Background Color</h1>
+              <div
+                id="color"
+                name={changeJson.values.id}
+                className=""
+                onClick={handleColorPicker}
+                >
+                <input
+                  data-name={changeJson.values.id}
+                  id="icon_background"
+                  className="input_color_picker"
+                  value={changeJson.values.icon_background}
+                  onChange={updateElementsValues}
+                />
+                <div
+                  className={
+                    inputColorPicker.name == changeJson.values.id && 
+                    inputColorPicker.id == "color"
+                      ? "color_picker active"
+                      : "color_picker"
+                  }
+                >
+                  <PickColor
+                    setColorUpdate={setColorUpdate}
+                    changeJson={changeJson}
+                    type="icon_background"
+                  />
+                </div>
+              </div>
               <div>
               <h1 className="py-3">Position</h1>
               <select
@@ -3156,10 +3269,6 @@ const Design = () => {
               Icons
             </div>
           </div>
-          <svg width="50px" height="50px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z" fill="#000000"/>
-        </svg>
-          <svg fill="black" height="10px" width="10px" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z" fill="#000000"></path></svg>
         </div>
       ) : null}
       {/* New element Ending here */}

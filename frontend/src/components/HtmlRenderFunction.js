@@ -56,8 +56,8 @@ const HtmlRenderFunction = (
           newDiv.style.position = element.position;
           newDiv.style.background = element.background_color;
           // newDiv.style.height = element.height + "px";
-          newDiv.style.width = element.width + "px";
-          newDiv.style.marginLeft = element.margin_left + "px";
+            newDiv.style.width = element.width + "%";
+            newDiv.style.marginLeft = element.margin_left + "px";
           newDiv.style.marginRight = element.margin_right + "px";
           newDiv.style.marginTop = element.margin_top + "px";
           newDiv.style.marginBottom = element.margin_top + "px";
@@ -77,8 +77,7 @@ const HtmlRenderFunction = (
             const background_type = element.background_style_type;
             newDiv.style.background =
               element.background_style_types[background_type].background_color;
-
-            newDiv.style.backgroundImage = `url(${FRONTEND_URL}/${bgDefault})`
+            newDiv.style.backgroundImage = `url("data:image/svg+xml;charset=utf8,%3C%21--%20%28c%29%20Carrd%20Inc.%20All%20rights%20reserved.%20--%3E%0A%3Csvg%20viewBox%3D%220%200%20512%20512%22%20width%3D%22512%22%20height%3D%22512%22%20version%3D%221.1%22%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%3E%0A%09%3Cfilter%20id%3D%22noise%22%3E%0A%09%09%3CfeTurbulence%20type%3D%22fractalNoise%22%20baseFrequency%3D%220.875%22%20result%3D%22noise%22%20/%3E%0A%09%09%3CfeColorMatrix%20type%3D%22matrix%22%20values%3D%220.0546875%200%200%200%200%200%200.0546875%200%200%200%200%200%200.0703125%200%200%200%200%200%200.34765625%200%22%20/%3E%0A%09%3C/filter%3E%0A%09%3Crect%20filter%3D%22url%28%23noise%29%22%20x%3D%220%22%20y%3D%220%22%20width%3D%22512%22%20height%3D%22512%22%20fill%3D%22transparent%22%20opacity%3D%221%22%20/%3E%0A%3C/svg%3E")`
           }
 
           if (element.background_style_type == "gradient") {
@@ -313,10 +312,12 @@ const HtmlRenderFunction = (
           newDiv.style.paddingTop = "3px";
           newDiv.style.paddingRight = "10px";
           newDiv.style.display = "flex";
-          newDiv.style.justifyContent = "between";
+          newDiv.style.justifyContent = "space-between";
           newDiv.style.alignItems = "center";
-
           newDiv.style.backgroundColor = parent.getAttribute("button_background_color") 
+          newDiv.style.borderRadius = parent.getAttribute("button_rounded") + "px"
+          newDiv.style.padding = parent.getAttribute("button_padding") + "px"
+          newDiv.style.width = parent.getAttribute("button_width") == 0 ? null : parent.getAttribute("button_width") + "px"
 
           const span = document.createElement("span");
           span.style.fontSize = "13px";
@@ -343,6 +344,9 @@ const HtmlRenderFunction = (
           newDiv.setAttribute("data-type", "button-parent");
           newDiv.setAttribute("button_color", element.button_color);
           newDiv.setAttribute("button_background_color", element.button_background_color);
+          newDiv.setAttribute("button_rounded", element.button_rounded);
+          newDiv.setAttribute("button_padding", element.button_padding);
+          newDiv.setAttribute("button_width", element.button_width);
           newDiv.removeAttribute("draggable");
 
           newDiv.style.display = "flex";
@@ -408,13 +412,28 @@ const HtmlRenderFunction = (
           const img = document.createElement("img");
           img.src = FRONTEND_URL + icons[element.icon];
 
-          console.log(img.src);
-          img.style.paddingTop = "2px";
-          img.style.paddingLeft = "5px";
+          const svgEle = document.createElement("svg")
+          svgEle.setAttribute("xmlns", "http://www.w3.org/2000/svg")
+          svgEle.setAttributeNS(null, "viewBox", "0 0 24 24")
+          svgEle.setAttribute("width", "10px")
+          svgEle.setAttribute("height", "10px")
+          svgEle.setAttribute("fill", "none")
+
+          const pathEle = document.createElement("path")
+          pathEle.setAttribute("fill-rule", "evenodd")
+          pathEle.setAttribute("clip-rule", "evenodd")
+          pathEle.setAttribute("d", "M12 3C12.5523 3 13 3.44772 13 4V17.5858L18.2929 12.2929C18.6834 11.9024 19.3166 11.9024 19.7071 12.2929C20.0976 12.6834 20.0976 13.3166 19.7071 13.7071L12.7071 20.7071C12.3166 21.0976 11.6834 21.0976 11.2929 20.7071L4.29289 13.7071C3.90237 13.3166 3.90237 12.6834 4.29289 12.2929C4.68342 11.9024 5.31658 11.9024 5.70711 12.2929L11 17.5858V4C11 3.44772 11.4477 3 12 3Z")
+          pathEle.setAttribute("fill", "#000000")
+          svgEle.appendChild(pathEle)
+
           img.style.height = parent.getAttribute("icon_size") + "px";
           img.style.width = parent.getAttribute("icon_size") + "px";
           img.style.fill = parent.getAttribute("icon_color")
-
+          
+          newDiv.style.padding = "10px"
+          newDiv.style.backgroundColor = parent.getAttribute("icon_background")
+          newDiv.style.borderRadius = "100%"
+          newDiv.appendChild(svgEle)
           newDiv.appendChild(img);
           newDiv.style.marginRight = "5%";
         }
@@ -425,6 +444,7 @@ const HtmlRenderFunction = (
 
           newDiv.setAttribute("icon_size", element.iconSize);
           newDiv.setAttribute("icon_color", element.icon_color);
+          newDiv.setAttribute("icon_background", element.icon_background);
           newDiv.style.display = "flex";
           newDiv.style.alignContent = "space-between";
           newDiv.style.justifyContent = element.position;
@@ -439,7 +459,6 @@ const HtmlRenderFunction = (
           containerWrapperDiv.id = element.id + "-wrapper";
           containerWrapperDiv.classList.add("icon-wrapper");
           containerWrapperDiv.style.display = "flex";
-          // containerWrapperDiv.style.justifyContent = element.text_align;
           containerWrapperDiv.style.justifyContent = element.position;
           containerWrapperDiv.style.alignItems = "center";
           containerWrapperDiv.style.padding = "10px";
@@ -489,7 +508,7 @@ const HtmlRenderFunction = (
           imgEle.style.pointerEvents = "none";
 
           if (element.url != "") {
-            imgEle.src = element.url;
+            imgEle.src = `${BASE_URL}/images/${element.url.name}`;
           } else {
             imgEle.src = `data:image/svg+xml;charset=utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20width%3D%22250%22%20height%3D%22250%22%20viewBox%3D%220%200%20250%20250%22%20preserveAspectRatio%3D%22none%22%3E%3Cstyle%3Eline%20%7Bstroke%3A%20rgba%28255%2C255%2C255%2C0.25%29%3Bstroke-width%3A%201px%3B%7Drect%20%7Bfill%3A%20rgba%2894%2C95%2C103%2C0.625%29%3B%7D%3C/style%3E%3Crect%20x%3D%220%25%22%20y%3D%220%25%22%20width%3D%22100%25%22%20height%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%220%25%22%20x2%3D%22100%25%22%20y2%3D%22100%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3Cline%20x1%3D%220%25%22%20y1%3D%22100%25%22%20x2%3D%22100%25%22%20y2%3D%220%25%22%20vector-effect%3D%22non-scaling-stroke%22%20/%3E%3C/svg%3E`;
           }
@@ -621,7 +640,7 @@ const HtmlRenderFunction = (
           wrapperDiv.style.overflow = "hidden";
           wrapperDiv.style.background = element.background_color;
 
-          wrapperDiv.style.width = element.width + "px";
+          wrapperDiv.style.width = element.width + "%";
           wrapperDiv.style.marginLeft = element.margin_left + "px";
           wrapperDiv.style.marginRight = element.margin_right + "px";
           wrapperDiv.style.marginTop = element.margin_top + "px";
